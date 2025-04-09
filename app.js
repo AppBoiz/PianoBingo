@@ -1,6 +1,13 @@
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/PianoBingo/service-worker.js')
+        let url;
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            url = '/service-worker.js'
+        } else {
+            url = '/PianoBingo/service-worker.js'
+        }
+
+        navigator.serviceWorker.register(url)
             .then((registration) => {
                 console.log('Service Worker registered with scope:', registration.scope);
             })
@@ -13,6 +20,7 @@ if ('serviceWorker' in navigator) {
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (event) => {
+    console.log("Event trigger")
     event.preventDefault();
     deferredPrompt = event;
     const installBtn = document.createElement('button');
