@@ -11,7 +11,9 @@ const urlsToCache = [
     urlPrefix + '/styles.css',
     urlPrefix + '/app.js',
     urlPrefix + '/icons/icon-192x192.png',
-    urlPrefix + '/icons/icon-512x512.png'
+    urlPrefix + '/icons/icon-512x512.png',
+    urlPrefix + '/resources/base64/introdutione-seconda.js',
+    urlPrefix + '/pages/pdf-reader.html',
 ];
 
 self.addEventListener('install', (event) => {
