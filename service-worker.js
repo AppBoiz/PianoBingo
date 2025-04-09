@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-pwa-cache-v1';
+const CACHE_NAME = 'my-pwa-cache-v2';
 let urlPrefix;
 if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
     urlPrefix = ''
