@@ -1,11 +1,17 @@
 const CACHE_NAME = 'my-pwa-cache-v1';
+let urlPrefix;
+if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+    urlPrefix = ''
+} else {
+    urlPrefix = '/PianoBingo'
+}
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/styles.css',
-    '/app.js',
-    '/icons/icon-192x192.png',
-    '/icons/icon-512x512.png'
+    urlPrefix + '/',
+    urlPrefix + '/index.html',
+    urlPrefix + '/styles.css',
+    urlPrefix + '/app.js',
+    urlPrefix + '/icons/icon-192x192.png',
+    urlPrefix + '/icons/icon-512x512.png'
 ];
 
 self.addEventListener('install', (event) => {
