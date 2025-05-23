@@ -25,7 +25,7 @@ window.addEventListener('beforeinstallprompt', (event) => {
     deferredPrompt = event;
     const installBtn = document.createElement('button');
     installBtn.textContent = 'Install PWA';
-    document.body.appendChild(installBtn);
+    // document.body.appendChild(installBtn);
 
     installBtn.addEventListener('click', () => {
         deferredPrompt.prompt();

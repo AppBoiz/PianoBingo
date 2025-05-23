@@ -12,12 +12,71 @@
 
     <title>PianoBingo</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        html, body {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        #app{
+            display: flex;
+            align-items: center;
+            justify-content: top;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .logo-container {
+            padding: 80px 0;
+        }
+
+        button {
+            background-color: #F14D8A;
+            color: white;
+            border: none;
+            outline: none;
+            width: 315px;
+            height: 84px;
+            border-radius: 20px;
+            font-size: 30px;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 50px;
+            cursor: pointer;
+        }
+
+        .piano-banner{
+            position: absolute;
+            bottom: -100px;
+            right:-500px;
+            transform: rotate(-45deg);
+        }
+    </style>
 </head>
 <body>
     <div id="app">
-        <h1>Welcome to the PianoBingo POC</h1>
-        <button onclick="location.href='pages/pdf-reader'">Go to Music Sheet PDF Reader</button>
+        <div class="logo-container">
+            <img src="resources/images/logo.png" alt="PianoBingo Logo" id="logo" width="306px">
+        </div>
+        <button>
+            New Game
+        </button>
+        <button>
+            Manage Songs
+        </button>
+        <button>
+            Manage Playlists
+        </button>
+        <img class="piano-banner" src="resources/images/piano.png">
     </div>
     <script src="app.js"></script>
 </body>
