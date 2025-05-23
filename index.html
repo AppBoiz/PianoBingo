@@ -62,12 +62,12 @@
         }
     </style>
 </head>
-<body>
+<body onload="afterLoad()">
     <div id="app">
         <div class="logo-container">
             <img src="resources/images/logo.png" alt="PianoBingo Logo" id="logo" width="306px">
         </div>
-        <button>
+        <button onclick="newGameButtonHandler()">
             New Game
         </button>
         <button>
@@ -79,5 +79,18 @@
         <img class="piano-banner" src="resources/images/piano.png">
     </div>
     <script src="app.js"></script>
+    <script src="../resources/afterLoad.js"></script>
+    <script src="../resources/state-helpers/gameStorage.js"></script>  
+    <script>
+        function newGameButtonHandler() {
+            const state = startNewGame();
+            if (state) {
+                console.log("New game started");
+                window.location.href = 'pages/pack-select.html';
+            } else {
+                alert("Failed to start a new game");
+            }
+        }
+    </script>
 </body>
 </html>
