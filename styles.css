@@ -1,59 +1,23 @@
 /* General Styles */
 body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f8;
-    color: #333;
-    text-align: center;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-  
-  /* Specific layout for PDF page */
-  .pdf-page {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  
-  /* Headings */
-  h1 {
-    color: #2c3e50;
-    margin-bottom: 20px;
-  }
-  
-  /* Button Styling */
-  button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 20px;
-    align-self: center;
-  }
-  
-  button:hover {
-    background-color: #2980b9;
-  }
-  
-  /* PDF Container */
-  .pdf-container {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .pdf-container embed {
-    width: 90%;
-    height: 80vh;
-    border: none;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    border-radius: 12px;
-  }
-  
+  font-family: Arial, sans-serif;
+  background: #f4f4f8;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  height: 100%; /* ensures body uses full height */
+}
+
+#app-content-frame {
+  border: none;
+  width: 100vw; 
+  height: 100vh;
+}
