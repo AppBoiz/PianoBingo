@@ -9,12 +9,12 @@
 <body class="pdf-page">
   <h1>Your music, for your viewing pleasure</h1>
   <div id="pdf-viewer"></div>
-  <button onclick="location.href='../'">Back to First Page</button>
+  <button onclick="loadPage(PAGE.WELCOME)">Back to First Page</button>
 
   <!-- ✅ PDF.js via CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <!-- Import the external JS file containing the Base64 string -->
-  <script src="../resources/base64/introdutione-seconda.js"></script>  <!-- Add path if necessary -->
+  <script src="../../resources/base64/introdutione-seconda.js"></script>  <!-- Add path if necessary -->
 
   <script>
     // Ensure the pdfBase64 variable is available after the pdf-base64.js is imported
@@ -58,5 +58,6 @@
       });
     }
   </script>
+  <script src="../../services/navigation/navigation.js"></script>
 </body>
 </html>
