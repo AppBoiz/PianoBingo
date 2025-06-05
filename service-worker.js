@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-pwa-cache-v3.1.2';
+const CACHE_NAME = 'my-pwa-cache-v3.1.4';
 let urlPrefix;
 if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
     urlPrefix = ''
@@ -22,6 +22,10 @@ const urlsToCache = [
     urlPrefix + '/pages/welcome-page/welcome-page.css',
     urlPrefix + '/services/navigation/host.js',
     urlPrefix + '/services/navigation/navigation.js',
+    urlPrefix + '/resources/state-helpers/gameStorage.js',
+    urlPrefix + '/resources/afterLoad.js',
+    urlPrefix + '/pages/pdf-reader.html',
+    urlPrefix + '/pages/pack-select.html',
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",
 ];

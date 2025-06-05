@@ -14,9 +14,23 @@
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body onload="afterLoad()">
     <iframe id="app-content-frame" src="pages/welcome-page/welcome-page.html"></iframe>
     <script src="app.js"></script>
     <script src="services/navigation/host.js"></script>
-</body>
+
+    <script src="../resources/afterLoad.js"></script>
+    <script src="../resources/state-helpers/gameStorage.js"></script>  
+    <script>
+        function newGameButtonHandler() {
+            const state = startNewGame();
+            if (state) {
+                console.log("New game started");
+                window.location.href = 'pages/pack-select.html';
+            } else {
+                alert("Failed to start a new game");
+            }
+        }
+    </script>
+  </body>
 </html>
