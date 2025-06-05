@@ -1,3 +1,4 @@
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         let url;
@@ -40,3 +41,5 @@ window.addEventListener('beforeinstallprompt', (event) => {
         });
     });
 });
+
+
