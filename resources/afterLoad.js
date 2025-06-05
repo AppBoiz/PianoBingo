@@ -8,9 +8,7 @@ function afterLoad() {
         // Redirect to home screen
         console.log('No game state found, redirecting to home screen');
         // if not already on home screen
-        if (window.location.pathname !== '/') {
-            window.location.href = '/';
-        }
+
         return;
     }
 
@@ -18,10 +16,7 @@ function afterLoad() {
     if (!gameState.selectedSongPackId) {
         // Redirect to pack selection screen
         console.log('No pack selected, redirecting to pack selection screen');
-        if (window.location.pathname !== '/pages/pack-select') {
-            // if not already on pack selection screen
-            window.location.href = '/pages/pack-select';
-        }
+
         return;
     }
 

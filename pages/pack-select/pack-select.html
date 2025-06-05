@@ -11,15 +11,16 @@
 
 
     <title>PianoBingo</title>
-    <link rel="manifest" href="../manifest.json">
-    <link rel="stylesheet" href="../styles.css" />
+    <link rel="manifest" href="../../manifest.json">
+    <link rel="stylesheet" href="../../styles.css" />
 </head>
-<body onload="afterLoad()">
+<body>
     <div id="app">
         <h1>Create New Game</h1>
+        <button onclick="loadPage(PAGE.GAME)">To Game (Temp)</button>
     </div>
-    <script src="../app.js"></script>
-    <script src="../../resources/afterLoad.js"></script>
-    <script src="../../resources/state-helpers/gameStorage.js"></script>  
+    <script src="../../app.js"></script>
+    <script src="../../services/navigation/navigation.js"></script>
+    <script src="../../../resources/state-helpers/gameStorage.js"></script>  
 </body>
 </html>
