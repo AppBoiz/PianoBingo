@@ -33,6 +33,12 @@ function startNewGame(){
   return defaultGameState;
 }
 
+function selectPack(packId){
+  let tmpState = {...defaultGameState}
+  tmpState.selectedSongPackId = packId
+  saveGameState(tmpState)
+}
+
 function getCurrentSong(){
   const gameState = loadGameState();
   if (gameState) {

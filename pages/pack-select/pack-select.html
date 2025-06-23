@@ -17,8 +17,14 @@
 <body>
     <div id="app">
         <h1>Create New Game</h1>
-        <button onclick="loadPage(PAGE.GAME)">To Game (Temp)</button>
+        <button onclick="pickPack()">To Game (Temp)</button>
     </div>
+    <script>
+        function pickPack(){
+            selectPack(1)
+            loadPage(PAGE.GAME)
+        }
+    </script>
     <script src="../../app.js"></script>
     <script src="../../services/navigation/navigation.js"></script>
     <script src="../../../resources/state-helpers/gameStorage.js"></script>  

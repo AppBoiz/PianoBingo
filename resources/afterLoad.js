@@ -8,7 +8,7 @@ function afterLoad() {
         // Redirect to home screen
         console.log('No game state found, redirecting to home screen');
         // if not already on home screen
-
+        loadPage(PAGE.WELCOME)
         return;
     }
 
@@ -16,13 +16,14 @@ function afterLoad() {
     if (!gameState.selectedSongPackId) {
         // Redirect to pack selection screen
         console.log('No pack selected, redirecting to pack selection screen');
-
+        loadPage(PAGE.PACK_SELECT)
         return;
     }
 
-    // If there is game state with pack selected and song selected, go to game screen
-    
-
     // If there is game state with pack selected and no song selected, restart game corrupted game
+
+    // If there is game state with pack selected and song selected, go to game screen
+    loadPage(PAGE.GAME)
+    
 
 }

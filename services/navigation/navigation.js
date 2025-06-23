@@ -4,7 +4,13 @@ const PAGE = {
   PACK_SELECT: 'pages/pack-select/pack-select.html'
 };
 
+let last_page = "";
+
 function loadPage(page) {
-  const message = { type: 'goToPage', page };
-  window.parent.postMessage(message, '*');
+  if(page != last_page){
+    console.log("Here")
+    const message = { type: 'goToPage', page };
+    window.parent.postMessage(message, '*');
+  }
+  last_page = page
 }
