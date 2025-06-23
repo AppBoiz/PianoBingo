@@ -25,5 +25,4 @@ function afterLoad() {
     // If there is game state with pack selected and song selected, go to game screen
     loadPage(PAGE.GAME)
     
-
 }

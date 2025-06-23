@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <link rel="apple-touch-icon" sizes="512x512" href="../icons/icon-512x512.png">
     <meta name="theme-color" content="#ffffff">
-
+    <link rel="stylesheet" href="./pack-select.css" />
 
     <title>PianoBingo</title>
     <link rel="manifest" href="../../manifest.json">
@@ -16,13 +16,47 @@
 </head>
 <body>
     <div id="app">
+        <div class="back-container">
+            <button onclick="back()">Back</button>
+        </div>
         <h1>Create New Game</h1>
-        <button onclick="pickPack()">To Game (Temp)</button>
+        <h2>Select Song Pack</h2>
+        <div class="flex-col mb-40">
+            <div class="radios-container">
+                <label class="radio-label">
+                    <input type="radio" name="radio" value="1" checked="checked"/>
+                    Song pack 1
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="radio" value="2"/>
+                    This is a long pack name
+                </label>
+            </div>
+        </div>
+        <button class="select-button" onclick="pickPack()">Start Game</button>
+        <img class="piano-banner" src="../../resources/images/piano.png">
     </div>
     <script>
         function pickPack(){
-            selectPack(1)
+
+            var radios = document.getElementsByName('radio');
+            let radioVal = 1;
+
+            for (var i = 0, length = radios.length; i < length; i++) {
+                if (radios[i].checked) {
+                    radioVal = parseInt(radios[i].value)
+                    break;
+                }
+            }
+
+            selectPack(radioVal)
+            generateSong()
             loadPage(PAGE.GAME)
+        }
+
+        function back(){
+            clearGameState()
+            loadPage(PAGE.WELCOME)
         }
     </script>
     <script src="../../app.js"></script>
