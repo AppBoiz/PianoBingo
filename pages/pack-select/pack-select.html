@@ -23,14 +23,6 @@
         <h2>Select Song Pack</h2>
         <div class="flex-col mb-40">
             <div class="radios-container">
-                <label class="radio-label">
-                    <input type="radio" name="radio" value="1" checked="checked"/>
-                    Song pack 1
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="radio" value="2"/>
-                    This is a long pack name
-                </label>
             </div>
         </div>
         <button class="select-button" onclick="pickPack()">Start Game</button>
@@ -38,7 +30,6 @@
     </div>
     <script>
         function pickPack(){
-
             var radios = document.getElementsByName('radio');
             let radioVal = 1;
 
@@ -58,9 +49,22 @@
             clearGameState()
             loadPage(PAGE.WELCOME)
         }
+
+        function generateRadioButtonsFromPacks() {
+            const container = document.querySelector('.radios-container');
+            if (!container) return;
+
+            container.innerHTML = TEMP_PACK_DATA.map((pack, index) => `
+                <label class="radio-label">
+                <input type="radio" name="radio" value="${pack.packId}" ${index === 0 ? 'checked="checked"' : ''}/>
+                ${pack.packName}
+                </label>
+            `).join('');
+        }
     </script>
     <script src="../../app.js"></script>
     <script src="../../services/navigation/navigation.js"></script>
     <script src="../../../resources/state-helpers/gameStorage.js"></script>  
+    <script>generateRadioButtonsFromPacks()</script>
 </body>
 </html>

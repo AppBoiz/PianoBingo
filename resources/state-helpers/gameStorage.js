@@ -17,6 +17,9 @@ const TEMP_PACK_DATA = [
         pdfUrl: "/tmp/example2.pdf"
       }
     ]
+  },
+  {
+    "packName": "long pack name (dont select me)"
   }
 ]
 
