@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="../icons/icon-512x512.png">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="./game-history.css" />
+
+    <title>PianoBingo</title>
+    <link rel="manifest" href="../../manifest.json">
+    <link rel="stylesheet" href="../../styles.css" />
+</head>
+<body>
+    <div id="app">
+        <div class="back-container">
+            <button onclick="back()">Back</button>
+        </div>
+        <h1>Game History</h1>
+        <div class="box-container">
+        </div>
+    </div>
+    <script>
+        function back(){
+            loadPage(PAGE.GAME)
+        }
+
+        function generateBoxes() {
+            const container = document.querySelector('.box-container');
+            if (!container) return;
+
+            const usedIds = getShownSongIds();
+
+            container.innerHTML = ''; // Clear existing content
+
+            for (let i = 1; i <= 75; i++) {
+                const box = document.createElement('div');
+                box.classList.add('box');
+                if (usedIds.includes(i)) {
+                box.classList.add('highlighted');
+                }
+                box.textContent = i;
+                container.appendChild(box);
+            }
+        }
+    </script>
+    <script src="../../app.js"></script>
+    <script src="../../services/navigation/navigation.js"></script>
+    <script src="../../../resources/state-helpers/gameStorage.js"></script>  
+    <script>generateBoxes()</script>
+</body>
+</html>
