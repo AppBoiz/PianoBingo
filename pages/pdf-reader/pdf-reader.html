@@ -6,11 +6,20 @@
   <title>PDF Reader</title>
   <link rel="stylesheet" href="./pdf-reader.css" />
 </head>
-<body class="pdf-page">
-  <h1>Your music, for your viewing pleasure</h1>
+<body class="pdf-page" onload="load()">
+  <nav>
+    <button onclick="back()">Back</button>
+    <h1>Song 1 - Example title by example artist</h1>
+    <div style="width: 121px;"></div>
+  </nav>
+  
   <div id="pdf-viewer"></div>
-  <button onclick="loadPage(PAGE.WELCOME)">Back to First Page</button>
-  <button onclick="loadPage(PAGE.GAME_HISTORY)">Game History</button>
+
+  <footer>
+    <button onclick="loadPage(PAGE.WELCOME)">Back to First Page</button>
+    <button>Next Song</button>
+    <button onclick="loadPage(PAGE.GAME_HISTORY)">Game History</button>
+  </footer>
 
   <!-- ✅ PDF.js via CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
