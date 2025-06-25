@@ -48,6 +48,27 @@ button {
     justify-content: center;
     height: calc(100vh - 140px);
     width: 100%;
+    position: relative;
+}
+
+#pdf-viewer::after {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 50vw;
+    left:0px;
+    cursor: pointer;
+    background-color: #2600ff38;
+}
+
+#pdf-viewer::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 50vw;
+    left:50vw;
+    cursor: pointer;
+    background-color: #ff000038;
 }
 
 canvas {
