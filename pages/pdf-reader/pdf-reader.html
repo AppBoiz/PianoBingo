@@ -9,7 +9,7 @@
 <body class="pdf-page" onload="load()">
   <nav>
     <button onclick="back()">Back</button>
-    <h1>Song 1 - Example title by example artist</h1>
+    <h1 id="title"></h1>
     <div style="width: 121px;"></div>
   </nav>
   
@@ -21,6 +21,20 @@
     <button onclick="loadPage(PAGE.GAME_HISTORY)">Game History</button>
   </footer>
 
+  <script>
+    function back(){
+      startNewGame()
+      loadPage(PAGE.PACK_SELECT)
+    }
+
+    function load(){
+      loadPdf();
+      const gamedata = getCurrentSong();
+      console.log(gamedata)
+      document.getElementById("title").innerText = gamedata.id.toString() + " - " + gamedata.title.toString() + " by " + gamedata.artist.toString()
+    }
+  </script>
+
   <!-- ✅ PDF.js via CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <!-- Import the external JS file containing the Base64 string -->
@@ -28,5 +42,6 @@
 
   <script src="./pdf-reader.js"></script>
   <script src="../../services/navigation/navigation.js"></script>
+  <script src="../../../resources/state-helpers/gameStorage.js"></script>  
 </body>
 </html>

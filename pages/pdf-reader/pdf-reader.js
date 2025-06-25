@@ -1,7 +1,7 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-function load(){
+function loadPdf(){
     // Ensure the pdfBase64 variable is available after the pdf-base64.js is imported
     if (typeof pdfBase64 === 'undefined') {
         console.error('pdfBase64 is not defined. Make sure pdf-base64.js is properly loaded.');
