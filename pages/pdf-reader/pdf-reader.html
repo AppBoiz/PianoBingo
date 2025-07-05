@@ -13,11 +13,14 @@
     <div style="width: 121px;"></div>
   </nav>
   
-  <div id="pdf-viewer"></div>
+  <div id="pdf-viewer">
+    <span class="left" onclick="changePage(-1)"></span>
+    <span class="right" onclick="changePage(1)"></span>
+  </div>
 
   <footer>
     <button onclick="loadPage(PAGE.WELCOME)">Back to First Page</button>
-    <button>Next Song</button>
+    <button onclick="nextSong()">Next Song</button>
     <button onclick="loadPage(PAGE.GAME_HISTORY)">Game History</button>
   </footer>
 
@@ -30,15 +33,14 @@
     function load(){
       loadPdf();
       const gamedata = getCurrentSong();
-      console.log(gamedata)
-      document.getElementById("title").innerText = gamedata.id.toString() + " - " + gamedata.title.toString() + " by " + gamedata.artist.toString()
+      document.getElementById("title").innerText = gamedata.id.toString() + " - " + gamedata.title.toString()
     }
   </script>
 
   <!-- ✅ PDF.js via CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <!-- Import the external JS file containing the Base64 string -->
-  <script src="../../resources/base64/introdutione-seconda.js"></script>  <!-- Add path if necessary -->
+  <script src="../../resources/base64/pack_tom.js"></script>  <!-- Must Load before gameStorage -->
 
   <script src="./pdf-reader.js"></script>
   <script src="../../services/navigation/navigation.js"></script>

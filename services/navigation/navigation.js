@@ -9,7 +9,6 @@ let last_page = "";
 
 function loadPage(page) {
   if(page != last_page){
-    console.log("Here")
     const message = { type: 'goToPage', page };
     window.parent.postMessage(message, '*');
   }
