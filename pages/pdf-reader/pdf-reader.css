@@ -4,6 +4,7 @@
     margin: 0;
     overflow: hidden;
     height: 100vh;
+    height: 100dvh;    /* override if supported */
 }
 
 /* Headings */
