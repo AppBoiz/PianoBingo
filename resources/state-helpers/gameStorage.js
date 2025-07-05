@@ -487,3 +487,21 @@ function generateSong() {
 
   saveGameState(tmpState)
 }
+
+function setSongId(id){
+  const selectedPackId = getSelectedSongPackId();
+  const selectedPack = TEMP_PACK_DATA.find(pack => pack.packId === selectedPackId);
+
+  if (!selectedPack) {
+    console.warn("Selected pack not found");
+    return null;
+  }
+
+  const selectedSong = selectedPack.songs[id-1];
+
+  let tmpState = {...loadGameState()}
+
+  tmpState.currentSong = { ...selectedSong };
+
+  saveGameState(tmpState)
+}

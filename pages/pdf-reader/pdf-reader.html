@@ -10,7 +10,29 @@
   <nav>
     <button onclick="back()">Back</button>
     <h1 id="title"></h1>
-    <div style="width: 121px;"></div>
+    <div style="width: 121px;">
+      <div class="checkboxNav">
+        <div class="checkBoxBox">
+          <!-- Hidden checkbox drives the state -->
+          <input type="checkbox" id="menu-toggle">
+          
+          <!-- Icon -->
+          <label class="hamburger" for="menu-toggle">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </label>
+        
+          <!-- Links -->
+          <div class="menu">
+            <a href="#" onclick="nextSong()">Next Song</a>
+            <a href="#" onclick="prevSong()">Previous Song</a>
+            <a href="#" onclick="loadPage(PAGE.GAME_HISTORY)">Game History</a>
+            <a href="#" class="red" onclick="loadPage(PAGE.WELCOME)">End Game</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </nav>
   
   <div id="pdf-viewer">
@@ -19,9 +41,7 @@
   </div>
 
   <footer>
-    <button onclick="loadPage(PAGE.WELCOME)">Back to First Page</button>
     <button onclick="nextSong()">Next Song</button>
-    <button onclick="loadPage(PAGE.GAME_HISTORY)">Game History</button>
   </footer>
 
   <script>
