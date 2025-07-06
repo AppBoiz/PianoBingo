@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-pwa-cache-v3.2.1';
+const CACHE_NAME = 'my-pwa-cache-v3.2.3';
 
 
 const urlsToCache = [
@@ -29,7 +29,6 @@ const urlsToCache = [
     "/resources/base64/pack_tom.js",
     "/resources/images/logo.png",
     "/resources/images/piano.png",
-    "/resources/pdf/introdutione-seconda.pdf",
     "/resources/state-helpers/gameStorage.js",
     "/services/navigation/host.js",
     "/services/navigation/navigation.js",
