@@ -1,12 +1,7 @@
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        let url;
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            url = '/service-worker.js'
-        } else {
-            url = '/PianoBingo/service-worker.js'
-        }
+        url = '/service-worker.js'
 
         navigator.serviceWorker.register(url)
             .then((registration) => {
