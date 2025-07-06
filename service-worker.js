@@ -1,34 +1,42 @@
-const CACHE_NAME = 'my-pwa-cache-v3.1.5';
-let urlPrefix;
-if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
-    urlPrefix = ''
-} else {
-    urlPrefix = '/PianoBingo'
-}
+const CACHE_NAME = 'my-pwa-cache-v3.2.1';
+
+
 const urlsToCache = [
-    urlPrefix + '/',
-    urlPrefix + '/index.html',
-    urlPrefix + '/styles.css',
-    urlPrefix + '/app.js',
-    urlPrefix + '/icons/icon-192x192.png',
-    urlPrefix + '/icons/icon-512x512.png',
-    urlPrefix + '/resources/base64/introdutione-seconda.js',
-    urlPrefix + '/resources/images/logo.png',
-    urlPrefix + '/resources/images/piano.png',
-    urlPrefix + '/pages/pdf-reader/pdf-reader.html',
-    urlPrefix + '/pages/pdf-reader/pdf-reader.css',
-    urlPrefix + '/pages/pdf-reader/pdf-reader.js',
-    urlPrefix + '/pages/welcome-page/welcome-page.html',
-    urlPrefix + '/pages/welcome-page/welcome-page.css',
-    urlPrefix + '/services/navigation/host.js',
-    urlPrefix + '/services/navigation/navigation.js',
-    urlPrefix + '/resources/state-helpers/gameStorage.js',
-    urlPrefix + '/resources/afterLoad.js',
-    urlPrefix + '/pages/pdf-reader.html',
-    urlPrefix + '/pages/pack-select.html',
+    "/.gitignore",
+    "/app.js",
+    "/CNAME",
+    "/index.html",
+    "/manifest.json",
+    "/README.md",
+    "/service-worker.js",
+    "/styles.css",
+    "/icons/icon-192x192-old.png",
+    "/icons/icon-192x192.png",
+    "/icons/icon-512x512-old.png",
+    "/icons/icon-512x512.png",
+    "/resources/afterLoad.js",
+    "/pages/game-history/game-history.css",
+    "/pages/game-history/game-history.html",
+    "/pages/pack-select/pack-select.css",
+    "/pages/pack-select/pack-select.html",
+    "/pages/pdf-reader/pdf-reader.css",
+    "/pages/pdf-reader/pdf-reader.html",
+    "/pages/pdf-reader/pdf-reader.js",
+    "/pages/welcome-page/welcome-page.css",
+    "/pages/welcome-page/welcome-page.html",
+    "/resources/base64/all_pdfs.js",
+    "/resources/base64/introdutione-seconda.js",
+    "/resources/base64/pack_tom.js",
+    "/resources/images/logo.png",
+    "/resources/images/piano.png",
+    "/resources/pdf/introdutione-seconda.pdf",
+    "/resources/state-helpers/gameStorage.js",
+    "/services/navigation/host.js",
+    "/services/navigation/navigation.js",
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",
-];
+    "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  ];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
