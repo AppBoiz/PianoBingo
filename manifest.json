@@ -1,8 +1,8 @@
 {
     "name": "PianoBingo",
-    "short_name": "PB",
+    "short_name": "PianoBingo",
     "description": "App to automate generation of piano bingo pdf sheetmusic",
-    "start_url": "/PianoBingo/",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#000000",
