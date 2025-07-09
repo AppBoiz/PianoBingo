@@ -5,10 +5,11 @@ import random
 import string
 import json
 
-folder = r"D:\PianoBingo\utils\songs"
-output_file_path = os.path.join(os.path.dirname(__file__), "../resources/base64/pack_tom.js")
+folder = r"D:\PianoBingo\utils\songs_jack"
+output_file_path = os.path.join(os.path.dirname(__file__), "../resources/base64/pack_jack.js")
 
-pattern = re.compile(r'^(\d+)\.\s*(.+)\.pdf$', re.I)
+#pattern = re.compile(r'^(\d+)\.\s*(.+)\.pdf$', re.I)
+pattern = re.compile(r'^(\d+)\s*(.+)\s*pdf$', re.I)
 
 files_info = []
 
@@ -52,8 +53,8 @@ for idx, (number, name, path) in enumerate(files_info, start=1):
 
 # Build the pack object as a JS constant
 pack_obj = {
-    "packName": "Tom",
-    "packId": 1,
+    "packName": "Jack",
+    "packId": 2,
     "songCount": len(songs_array),
     "songs": songs_array
 }

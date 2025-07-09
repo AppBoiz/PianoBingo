@@ -27,6 +27,7 @@ const urlsToCache = [
     "/resources/base64/all_pdfs.js",
     "/resources/base64/introdutione-seconda.js",
     "/resources/base64/pack_tom.js",
+    "/resources/base64/pack_jack.js",
     "/resources/images/logo.png",
     "/resources/images/piano.png",
     "/resources/state-helpers/gameStorage.js",
