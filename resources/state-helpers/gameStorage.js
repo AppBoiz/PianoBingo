@@ -778,6 +778,21 @@ const defaultGameState = {
     }
 };
 
+function savePackData(packData) {
+  const packDataString = JSON.stringify(packData);
+  localStorage.setItem('packData', packDataString);
+}
+
+function loadPackData() {
+  const packDataString = localStorage.getItem('packData');
+  if (packDataString) {
+    const packData = JSON.parse(packDataString);
+    return packData
+  } else {
+    return [];
+  }
+}
+
 function saveGameState(gameState) {
   const gameStateString = JSON.stringify(gameState);
   localStorage.setItem('gameState', gameStateString);
@@ -838,9 +853,10 @@ function getSelectedSongPackId(){
 function generateSong() {
   const shownSongIds = getShownSongIds();
   const selectedPackId = getSelectedSongPackId();
+  const packData = loadPackData();
 
   // Find the selected pack
-  const selectedPack = TEMP_PACK_DATA.find(pack => pack.packId === selectedPackId);
+  const selectedPack = packData.find(pack => pack.packId === selectedPackId);
 
   if (!selectedPack) {
     console.warn("Selected pack not found");
@@ -869,7 +885,8 @@ function generateSong() {
 
 function setSongId(id){
   const selectedPackId = getSelectedSongPackId();
-  const selectedPack = TEMP_PACK_DATA.find(pack => pack.packId === selectedPackId);
+  const packData = loadPackData();
+  const selectedPack = packData.find(pack => pack.packId === selectedPackId);
 
   if (!selectedPack) {
     console.warn("Selected pack not found");

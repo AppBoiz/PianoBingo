@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <link rel="apple-touch-icon" sizes="512x512" href="../icons/icon-512x512.png">
     <meta name="theme-color" content="#ffffff">
-    <link rel="stylesheet" href="./pack-management.css" />
+    <link rel="stylesheet" href="./pack-edit.css" />
 
     <title>PianoBingo</title>
     <link rel="manifest" href="../../manifest.json">
@@ -42,9 +42,8 @@
         function generateRadioButtonsFromPacks() {
             const container = document.querySelector('.playlist-container');
             if (!container) return;
-
+            
             const packData = loadPackData();
-
              container.innerHTML = packData.map((pack, index) => {
                 
                 return `
@@ -71,7 +70,6 @@
         }
 
         function handleDeletePack(idToRemove) {
-            const packData = loadPackData();
             const newPacksList = packData.filter(pack => pack.packId != idToRemove);
             
             // TODO: Delete Pack From Local Storage
