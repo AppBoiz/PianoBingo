@@ -16,44 +16,78 @@
 </head>
 <body>
     <div id="app">
-        <div style="width:100%; display: flex; flex-direction: row; justify-content: center; align-items: center;">
-            <div class="back-container" style="position: absolute;left: 1rem;">
+        <div class="nav-bar">
+            <div class="back-container nav-bar-left">
                 <button onclick="back()">Back</button>
             </div>
-            <h1 class="nav-center">Manage Playlists</h1>
+            <h1>Manage Playlists</h1>
         </div>
-        <h1>Create New Game</h1>
-        <h2>Select Song Pack</h2>
-        <div class="flex-col mb-40">
-            <div class="radios-container">
+        <div>
+            <div id='playlust-container' class="playlist-container"></div>
+            <div style="width: 100%; display: flex; justify-content: center; align-items: center;">
+                <button class="create-button" onclick="handleCreateNewPack()">Create New</button>
             </div>
         </div>
-        <img class="piano-banner" src="../../resources/images/piano.png">
     </div>
     <script>
         
+        TEMP_PACK_DATA = [
+            {
+                packId: 1,
+                packName: "James' Pack"
+            }
+        ]
 
         function back(){
             loadPage(PAGE.WELCOME)
         }
 
+        function renderPage() {
+            generateRadioButtonsFromPacks();
+        }
+
         function generateRadioButtonsFromPacks() {
-            const container = document.querySelector('.radios-container');
+            const container = document.querySelector('.playlist-container');
             if (!container) return;
 
-            // container.innerHTML = TEMP_PACK_DATA.map((pack, index) => `
-            //     <label class="radio-label">
-            //     <input type="radio" name="radio" value="${pack.packId}" ${index === 0 ? 'checked="checked"' : ''}/>
-            //     ${pack.packName}
-            //     </label>
-            // `).join('');
+             container.innerHTML = TEMP_PACK_DATA.map((pack, index) => {
+                
+                return `
+                 <div class="playlist-row">
+                    <span class="playlist-name">${pack.packName}</span>
+                    <div class="playlist-actions">
+                    <button class="edit-btn">✏️</button>
+                    <button class="delete-btn" onClick="handleDeletePack(${pack.packId})">🗑️</button>
+                    </div>
+                </div>
+             `}).join('');
         }
+
+        function handleCreateNewPack() {
+            const maxPackId = Math.max(...TEMP_PACK_DATA.map(item => item.packId));
+            const newPack = {
+                packId: maxPackId + 1,
+                packName: "New Pack"
+            };
+            // TODO: Write Pack To Local Storage
+            TEMP_PACK_DATA.push(newPack);
+            renderPage();
+        }
+
+        function handleDeletePack(idToRemove) {
+            const newPacksList = TEMP_PACK_DATA.filter(pack => pack.packId != idToRemove);
+            
+            // TODO: Delete Pack From Local Storage
+            TEMP_PACK_DATA = newPacksList;
+            renderPage();
+        }
+
     </script>
     <script src="../../app.js"></script>
     <script src="../../services/navigation/navigation.js"></script>
     <script src="../../../resources/base64/pack_tom.js"></script>  <!-- Must Load before gameStorage -->
     <script src="../../resources/base64/pack_jack.js"></script>  <!-- Must Load before gameStorage -->
     <script src="../../../resources/state-helpers/gameStorage.js"></script>  
-    <script>generateRadioButtonsFromPacks()</script>
+    <script>renderPage()</script>
 </body>
 </html>

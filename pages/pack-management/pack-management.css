@@ -22,14 +22,18 @@ h2 {
     margin-bottom: 40px;
 }
 
-
 .nav-bar{
-    width: 100%;
-    padding: 30px 40px;
-    display: flex;
+    width:100%; 
+    display: flex; 
+    flex-direction: row; 
+    justify-content: center; 
     align-items: center;
 }
 
+.nav-bar-left {
+    position: absolute;
+    left: 1rem;
+}
 
 .back-container{
     width: 100%;
@@ -46,6 +50,84 @@ h2 {
     outline: none;
     border: none;
     cursor: pointer;
+}
+
+.playlist-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin: 1rem auto;
+  max-width: 500px;
+  padding: 0 1rem;
+}
+
+.playlist-row {
+  background-color: white;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.playlist-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.playlist-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn,
+.delete-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Edit button style */
+.edit-btn {
+  background-color: #ffcc00;
+  color: white;
+}
+
+/* Delete button style */
+.delete-btn {
+  background-color: #ff3366;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #e6b800;
+}
+
+.delete-btn:hover {
+  background-color: #cc294f;
+}
+
+
+.create-button {
+  background-color: #ff0080;      /* Bright pink background */
+  color: white;                   /* White text */
+  border: none;                   /* No border */
+  border-radius: 6px;             /* Slightly rounded corners */
+  padding: 10px 20px;             /* Space inside button */
+  font-size: 1rem;                /* Normal font size */
+  font-weight: 600;               /* Bold text */
+  cursor: pointer;                /* Pointer on hover */
+  transition: background-color 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+}
+
+.create-button:hover {
+  background-color: #e60073; /* Darker pink on hover */
 }
 
 .piano-banner{
