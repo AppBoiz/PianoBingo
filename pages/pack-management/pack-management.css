@@ -22,6 +22,15 @@ h2 {
     margin-bottom: 40px;
 }
 
+
+.nav-bar{
+    width: 100%;
+    padding: 30px 40px;
+    display: flex;
+    align-items: center;
+}
+
+
 .back-container{
     width: 100%;
     padding: 30px 40px;
