@@ -54,7 +54,9 @@
             const container = document.querySelector('.radios-container');
             if (!container) return;
 
-            container.innerHTML = TEMP_PACK_DATA.map((pack, index) => `
+            const packData = loadPackData();
+
+            container.innerHTML = packData.map((pack, index) => `
                 <label class="radio-label">
                 <input type="radio" name="radio" value="${pack.packId}" ${index === 0 ? 'checked="checked"' : ''}/>
                 ${pack.packName}

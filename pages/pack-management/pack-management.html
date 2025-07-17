@@ -51,7 +51,7 @@
                  <div class="playlist-row">
                     <span class="playlist-name">${pack.packName}</span>
                     <div class="playlist-actions">
-                    <button class="edit-btn">✏️</button>
+                    <button class="edit-btn" onClick=handleEditPack(${pack.packId})>✏️</button>
                     <button class="delete-btn" onClick="handleDeletePack(${pack.packId})">🗑️</button>
                     </div>
                 </div>
@@ -65,8 +65,9 @@
                 packId: maxPackId + 1,
                 packName: "New Pack"
             };
-            // TODO: Write Pack To Local Storage
+            
             packData.push(newPack);
+            savePackData(packData);
             renderPage();
         }
 
@@ -74,9 +75,13 @@
             const packData = loadPackData();
             const newPacksList = packData.filter(pack => pack.packId != idToRemove);
             
-            // TODO: Delete Pack From Local Storage
-            packData = newPacksList;
+            savePackData(newPacksList);
             renderPage();
+        }
+
+        function handleEditPack(packId) {
+            selectPack(packId);
+            loadPage(PAGE.PACK_EDIT);
         }
 
     </script>

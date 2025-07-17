@@ -20,7 +20,7 @@
             <div class="back-container nav-bar-left">
                 <button onclick="back()">Back</button>
             </div>
-            <h1>Manage Playlists</h1>
+            <h1>Edit Pack</h1>
         </div>
         <div>
             <div id='playlust-container' class="playlist-container"></div>
@@ -32,7 +32,8 @@
     <script>
 
         function back(){
-            loadPage(PAGE.WELCOME)
+            startNewGame();
+            loadPage(PAGE.PACK_MANAGEMENT);
         }
 
         function renderPage() {

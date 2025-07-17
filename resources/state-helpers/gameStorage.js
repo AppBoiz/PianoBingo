@@ -789,7 +789,8 @@ function loadPackData() {
     const packData = JSON.parse(packDataString);
     return packData
   } else {
-    return [];
+    savePackData(TEMP_PACK_DATA);
+    return TEMP_PACK_DATA;
   }
 }
 
