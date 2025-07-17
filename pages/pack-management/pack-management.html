@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="../icons/icon-512x512.png">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="./pack-management.css" />
+
+    <title>PianoBingo</title>
+    <link rel="manifest" href="../../manifest.json">
+    <link rel="stylesheet" href="../../styles.css" />
+</head>
+<body>
+    <div id="app">
+        <div class="back-container">
+            <button onclick="back()">Back</button>
+        </div>
+        <h1>Create New Game</h1>
+        <h2>Select Song Pack</h2>
+        <div class="flex-col mb-40">
+            <div class="radios-container">
+            </div>
+        </div>
+        <img class="piano-banner" src="../../resources/images/piano.png">
+    </div>
+    <script>
+        
+
+        function back(){
+            loadPage(PAGE.WELCOME)
+        }
+
+        function generateRadioButtonsFromPacks() {
+            const container = document.querySelector('.radios-container');
+            if (!container) return;
+
+            // container.innerHTML = TEMP_PACK_DATA.map((pack, index) => `
+            //     <label class="radio-label">
+            //     <input type="radio" name="radio" value="${pack.packId}" ${index === 0 ? 'checked="checked"' : ''}/>
+            //     ${pack.packName}
+            //     </label>
+            // `).join('');
+        }
+    </script>
+    <script src="../../app.js"></script>
+    <script src="../../services/navigation/navigation.js"></script>
+    <script src="../../../resources/base64/pack_tom.js"></script>  <!-- Must Load before gameStorage -->
+    <script src="../../resources/base64/pack_jack.js"></script>  <!-- Must Load before gameStorage -->
+    <script src="../../../resources/state-helpers/gameStorage.js"></script>  
+    <script>generateRadioButtonsFromPacks()</script>
+</body>
+</html>
