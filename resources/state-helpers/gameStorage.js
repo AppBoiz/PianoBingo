@@ -1,8 +1,9 @@
-const TEMP_PACK_DATA = [
+const BASE_PACK_DATA = [
   {
     packName: "Tom",
     packId: 1,
     songCount: 75,
+    version:1,
     songs: [
       {
         id: 1,
@@ -385,6 +386,7 @@ const TEMP_PACK_DATA = [
     packName: "Jack",
     packId: 2,
     songCount: 75,
+    version:1,
     songs: [
       {
         id: 1,
@@ -778,20 +780,92 @@ const defaultGameState = {
     }
 };
 
-function savePackData(packData) {
-  const packDataString = JSON.stringify(packData);
-  localStorage.setItem('packData', packDataString);
+const INDEXED_BD_CONFIG = {
+  DB_NAME: 'PianoBingoDB',
+  // If a change is made to the schema, update the version here
+  // Eg new schema etc
+  DB_VERSION: 1,
+  SCHEMAS: {
+    PACKS: 'packs'
+  }
 }
 
-function loadPackData() {
-  const packDataString = localStorage.getItem('packData');
-  if (packDataString) {
-    const packData = JSON.parse(packDataString);
-    return packData
-  } else {
-    savePackData(TEMP_PACK_DATA);
-    return TEMP_PACK_DATA;
-  }
+const DB_TRANSACTION_TYPES = {
+  READ_WRITE: 'readwrite',
+  READ: 'readonly'
+}
+
+function openDB() {
+  return new Promise(async (resolve, reject) => {
+    const request = indexedDB.open(INDEXED_BD_CONFIG.DB_NAME, INDEXED_BD_CONFIG.DB_NAME.DB_VERSION);
+
+    request.onupgradeneeded = () => {
+      const db = request.result;
+
+      // Define Schemas Here
+      if (!db.objectStoreNames.contains(INDEXED_BD_CONFIG.SCHEMAS.PACKS)) {
+        db.createObjectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS, { keyPath: "packId" });
+      }
+    };
+
+    // Define default values and version merging here
+    const packs = await loadAllPacks();
+    const packIds = packs.map(pack => pack.packId);
+    for(const BASE_PACK of BASE_PACK_DATA) {
+      if(packIds.includes(BASE_PACK.packId)) {
+        const pack = packs.find(p => p.packId == BASE_PACK.packId);
+
+        if (pack.version < BASE_PACK.version) {
+          // There is a newer version, so update it
+          await savePack(BASE_PACK);  
+        }
+        
+      }
+      else {
+        await savePack(BASE_PACK);
+      }
+
+    }
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+export async function savePack(pack) {
+  const db = await openDB();
+  const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ_WRITE);
+  const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS);
+  pack.version++; // Pack has been edited, so increment version
+  store.put(pack); // insert or update (object store already knows the id)
+  await tx.complete?.(); // wait for transaction to finish
+  db.close();
+}
+
+export async function loadPack(packId) {
+  const db = await openDB();
+  const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ);
+  const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS);
+
+  const request = store.get(packId);
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+export async function loadAllPacks() {
+  const db = await openDB();
+  const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ);
+  const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS);
+
+  const request = store.getAll();
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
 }
 
 function saveGameState(gameState) {
