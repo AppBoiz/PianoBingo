@@ -767,6 +767,460 @@ const BASE_PACK_DATA = [
   }
 ]
 
+const BASE_SONG_DATA = [
+  {
+    songId: 1,
+    title: "Colours in her Hair",
+    pdfUrl: t2t9h8uF,
+    version:1,
+  },
+  {
+    songId: 2,
+    title: "Angels",
+    pdfUrl: vGmcIpQy,
+    version:1
+  },
+  {
+    songId: 3,
+    title: "I want it that way",
+    pdfUrl: VQ84rjzX,
+    version:1
+  },
+  {
+    songId: 4,
+    title: "Tainted love",
+    pdfUrl: vgZ6ZoA3,
+    version:1
+  },
+  {
+    songId: 5,
+    title: "I will survive",
+    pdfUrl: gU0mVk24,
+    version:1
+  },
+  {
+    songId: 6,
+    title: "Friday I’m in love ",
+    pdfUrl: JcBMzrvW,
+    version:1
+  },
+  {
+    songId: 7,
+    title: "Agadoo",
+    pdfUrl: xuMfhMkZ,
+    version:1
+  },
+  {
+    songId: 8,
+    title: "Yellow",
+    pdfUrl: NtZcTtk5,
+    version:1
+  },
+  {
+    songId: 9,
+    title: "Pinball wizard",
+    pdfUrl: xUZXXHIn,
+    version:1
+  },
+  {
+    songId: 10,
+    title: "Shine",
+    pdfUrl: IrVRcDwk,
+    version:1
+  },
+  {
+    songId: 11,
+    title: "1999",
+    pdfUrl: DFQE4IqG,
+    version:1
+  },
+  {
+    songId: 12,
+    title: "must be love",
+    pdfUrl: JMnDEunX,
+    version:1
+  },
+  {
+    songId: 13,
+    title: "Zombie",
+    pdfUrl: Ezvt7wcm,
+    version:1
+  },
+  {
+    songId: 14,
+    title: "Money for nothing",
+    pdfUrl: iDT5t1TB,
+    version:1
+  },
+  {
+    songId: 15,
+    title: "Proud Mary",
+    pdfUrl: sJOW6lrq,
+    version:1
+  },
+  {
+    songId: 16,
+    title: "Hi Ho Silver Lining",
+    pdfUrl: HEAHizIm,
+    version:1
+  },
+  {
+    songId: 17,
+    title: "Tequila",
+    pdfUrl: E97GuiGU,
+    version:1
+  },
+  {
+    songId: 18,
+    title: "Fast car",
+    pdfUrl: S2oBbnww,
+    version:1
+  },
+  {
+    songId: 19,
+    title: "Viva la Vida ",
+    pdfUrl: hsSZacsv,
+    version:1
+  },
+  {
+    songId: 20,
+    title: "Iris",
+    pdfUrl: IaN1Z9S0,
+    version:1
+  },
+  {
+    songId: 21,
+    title: "Levitating",
+    pdfUrl: pgZlDppE,
+    version:1
+  },
+  {
+    songId: 22,
+    title: "What’s up",
+    pdfUrl: dzYDM7gq,
+    version:1
+  },
+  {
+    songId: 23,
+    title: "Babylon",
+    pdfUrl: iRw8USST,
+    version:1
+  },
+  {
+    songId: 24,
+    title: "I don’t wanna talk about it",
+    pdfUrl: kYCtYhkn,
+    version:1
+  },
+  {
+    songId: 25,
+    title: "Stand by me",
+    pdfUrl: Y1aj6VHJ,
+    version:1
+  },
+  {
+    songId: 26,
+    title: "Suspicious minds",
+    pdfUrl: XHAJmOKz,
+    version:1
+  },
+  {
+    songId: 27,
+    title: "Where is the love_ ",
+    pdfUrl: vqdWTl68,
+    version:1
+  },
+  {
+    songId: 28,
+    title: "Seven Nation Army",
+    pdfUrl: Me49goYY,
+    version:1
+  },
+  {
+    songId: 29,
+    title: "My Sharona",
+    pdfUrl: eixmZi0l,
+    version:1
+  },
+  {
+    songId: 30,
+    title: "Karma chameleon",
+    pdfUrl: DHlxjgyF,
+    version:1
+  },
+  {
+    songId: 31,
+    title: "Complicated ",
+    pdfUrl: T00KGZAQ,
+    version:1
+  },
+  {
+    songId: 32,
+    title: "Stick season",
+    pdfUrl: Q0q1j30C,
+    version:1
+  },
+  {
+    songId: 33,
+    title: "Escape (The Pina Colada Song)",
+    pdfUrl: _Oam7mS6,
+    version:1
+  },
+  {
+    songId: 34,
+    title: "Break my stride",
+    pdfUrl: BbOgFuyA,
+    version:1
+  },
+  {
+    songId: 35,
+    title: "Empire state of mind",
+    pdfUrl: Xc8Kr1bu,
+    version:1
+  },
+  {
+    songId: 36,
+    title: "Black velvet ",
+    pdfUrl: _0LErfZN,
+    version:1
+  },
+  {
+    songId: 37,
+    title: "American pie ",
+    pdfUrl: zdcnwoe5,
+    version:1
+  },
+  {
+    songId: 38,
+    title: "YMCA",
+    pdfUrl: q5DaFqXE,
+    version:1
+  },
+  {
+    songId: 39,
+    title: "Thunderstruck ",
+    pdfUrl: AAHmBOjZ,
+    version:1
+  },
+  {
+    songId: 40,
+    title: "Take me home, Country roads",
+    pdfUrl: d9cAYgi6,
+    version:1
+  },
+  {
+    songId: 41,
+    title: "Never gonna give you up",
+    pdfUrl: uawcQiWP,
+    version:1
+  },
+  {
+    songId: 42,
+    title: "9 to 5",
+    pdfUrl: P7I7EB6X,
+    version:1
+  },
+  {
+    songId: 43,
+    title: "Gold ",
+    pdfUrl: Ncur1AOv,
+    version:1
+  },
+  {
+    songId: 44,
+    title: "Amarillo",
+    pdfUrl: t11tVAv4,
+    version:1
+  },
+  {
+    songId: 45,
+    title: "Just can’t get enough",
+    pdfUrl: cyepfP14,
+    version:1
+  },
+  {
+    songId: 46,
+    title: "Fat bottomed girls (-2)",
+    pdfUrl: f1B9TYH0,
+    version:1
+  },
+  {
+    songId: 47,
+    title: "Let it be",
+    pdfUrl: PU6VJusG,
+    version:1
+  },
+  {
+    songId: 48,
+    title: "Don’t look back in anger",
+    pdfUrl: PVk3Fio6,
+    version:1
+  },
+  {
+    songId: 49,
+    title: "I don’t like Mondays",
+    pdfUrl: nrgopxsT,
+    version:1
+  },
+  {
+    songId: 50,
+    title: "Piano man",
+    pdfUrl: wQWj94Tj,
+    version:1
+  },
+  {
+    songId: 51,
+    title: "Don’t wanna miss a thing",
+    pdfUrl: ApwzLpnZ,
+    version:1
+  },
+  {
+    songId: 52,
+    title: "Love story",
+    pdfUrl: dS640cJd,
+    version:1
+  },
+  {
+    songId: 53,
+    title: "Breakeven",
+    pdfUrl: DNn97Szc,
+    version:1
+  },
+  {
+    songId: 54,
+    title: "Take on me",
+    pdfUrl: fUQyhmmg,
+    version:1
+  },
+  {
+    songId: 55,
+    title: "Somebody to love",
+    pdfUrl: yt0FUbWR,
+    version:1
+  },
+  {
+    songId: 56,
+    title: "Let me entertain you",
+    pdfUrl: FY72NFyP,
+    version:1
+  },
+  {
+    songId: 57,
+    title: "Rockin’ all over the world",
+    pdfUrl: TnZd1nDE,
+    version:1
+  },
+  {
+    songId: 58,
+    title: "I’m gonna be",
+    pdfUrl: mxh9CirY,
+    version:1
+  },
+  {
+    songId: 59,
+    title: "Werewolves of London",
+    pdfUrl: gYouwW3Z,
+    version:1
+  },
+  {
+    songId: 60,
+    title: "Crocodile rock",
+    pdfUrl: pXwZOHkz,
+    version:1
+  },
+  {
+    songId: 61,
+    title: "Delilah",
+    pdfUrl: pfafrhMg,
+    version:1
+  },
+  {
+    songId: 62,
+    title: "Half the world away",
+    pdfUrl: L8unoJPJ,
+    version:1
+  },
+  {
+    songId: 63,
+    title: "Annie’s song",
+    pdfUrl: iB6k7yTQ,
+    version:1
+  },
+  {
+    songId: 64,
+    title: "Wild rover ",
+    pdfUrl: QqQX0odt,
+    version:1
+  },
+  {
+    songId: 65,
+    title: "Ruby",
+    pdfUrl: t2KtKHvb,
+    version:1
+  },
+  {
+    songId: 66,
+    title: "Enter sandman (-1)",
+    pdfUrl: yh9jgen8,
+    version:1
+  },
+  {
+    songId: 67,
+    title: "Freedom (+5)",
+    pdfUrl: XBjZh0YA,
+    version:1
+  },
+  {
+    songId: 68,
+    title: "Everybody needs somebody to love ",
+    pdfUrl: pDINKolg,
+    version:1
+  },
+  {
+    songId: 69,
+    title: "Summer of 69 (-5)",
+    pdfUrl: KbW7Slzv,
+    version:1
+  },
+  {
+    songId: 70,
+    title: "Livin’ La Vida Loca",
+    pdfUrl: B0ynHpJZ,
+    version:1
+  },
+  {
+    songId: 71,
+    title: "Don’t you want me ",
+    pdfUrl: ehMIoT9C,
+    version:1
+  },
+  {
+    songId: 72,
+    title: "Chasing cars",
+    pdfUrl: kDXFMaMI,
+    version:1
+  },
+  {
+    songId: 73,
+    title: "A little respect",
+    pdfUrl: bu4B94it,
+    version:1
+  },
+  {
+    songId: 74,
+    title: "Bat out of hell (-3)",
+    pdfUrl: uD7wWIHf,
+    version:1
+  },
+  {
+    songId: 75,
+    title: "She’s always a woman (-2)",
+    pdfUrl: WmC0m7H7,
+    version:1
+  }
+    
+]
+
 // END OF TEMP
 
 const defaultGameState = {
@@ -789,7 +1243,8 @@ const INDEXED_BD_CONFIG = {
   // This is so we can separate centreal server data and the user's own locally created data
   PARTITION_SIZE: 10000,
   SCHEMAS: {
-    PACKS: 'packs'
+    PACKS: 'packs',
+    SONGS: 'songs'
   }
 }
 
@@ -811,6 +1266,9 @@ function openDB() {
       if (!db.objectStoreNames.contains(INDEXED_BD_CONFIG.SCHEMAS.PACKS)) {
         db.createObjectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS, { keyPath: "packId" });
       }
+      if (!db.objectStoreNames.contains(INDEXED_BD_CONFIG.SCHEMAS.SONGS)) {
+        db.createObjectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS, { keyPath: "songId" });
+      }
 
       // Optionally, you could seed BASE_PACK_DATA *here* using a transaction
     };
@@ -822,6 +1280,7 @@ function openDB() {
       if (firstTimeOpeningDB) {
         firstTimeOpeningDB = false;
 
+        // Song Packs
         const packs = await loadAllPacks();
         const packIds = packs.map(pack => pack.packId);
 
@@ -832,6 +1291,13 @@ function openDB() {
             await savePack(BASE_PACK);
           }
         }
+
+        // Songs
+        // Load all songs
+        const songs = await loadAllSongs();
+        // Check if any of the original songs are missing
+        // if so, add them
+
       }
 
       resolve(db);
@@ -883,6 +1349,55 @@ async function deletePack(packId) {
   const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS);
 
   const request = store.delete(packId);
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function saveSong(song) {
+  const db = await openDB();
+  const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ_WRITE);
+  const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS);
+  store.put(song); // insert or update (object store already knows the id)
+  await tx.complete?.(); // wait for transaction to finish
+  db.close();
+}
+
+
+async function loadSong(songId) {
+  const db = await openDB();
+  const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ);
+  const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS);
+
+  const request = store.get(songId);
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function loadAllSongs() {
+  const db = await openDB();
+  const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ);
+  const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS);
+
+  const request = store.getAll();
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function deleteSong(songId) {
+  const db = await openDB();
+  const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ_WRITE);
+  const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS);
+
+  const request = store.delete(songId);
 
   return new Promise((resolve, reject) => {
     request.onsuccess = () => resolve();
