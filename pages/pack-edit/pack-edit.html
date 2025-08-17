@@ -37,14 +37,16 @@
         }
 
         function renderPage() {
-            generateRadioButtonsFromPacks();
+            generateRadioButtonsFromSongs();
         }
 
-        async function generateRadioButtonsFromPacks() {
+        async function generateRadioButtonsFromSongs() {
             const container = document.querySelector('.playlist-container');
             if (!container) return;
             
-            const packData = await loadAllPacks();
+            debugger;
+            const selectedSongPackId = getSelectedSongPackId();
+            const packData = await loadPack(selectedSongPackId);
              container.innerHTML = packData.map((pack, index) => {
                 
                 return `
