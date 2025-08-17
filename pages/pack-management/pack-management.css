@@ -69,6 +69,7 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .playlist-name {
@@ -176,4 +177,22 @@ h2 {
     font-family: 'Inter', sans-serif;
     margin-top: 50px;
     cursor: pointer;
+}
+
+.playlist-name-input {
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #333;
+  padding: 4px 0;
+  width: 100%;
+  outline: none;
+  cursor: text;
+}
+
+/* Subtle highlight when focused */
+.playlist-name-input:focus {
+  border-bottom: 1px solid #888;
+  background: #f9f9f9;
 }

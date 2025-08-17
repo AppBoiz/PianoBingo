@@ -45,17 +45,22 @@
 
             const packData = await loadAllPacks();
 
-             container.innerHTML = packData.map((pack, index) => {
-                
+            container.innerHTML = packData.map((pack) => {
                 return `
-                 <div class="playlist-row">
-                    <span class="playlist-name">${pack.packName}</span>
+                <div class="playlist-row">
+                    <input 
+                        type="text" 
+                        class="playlist-name-input"
+                        value="${pack.packName}" 
+                        onblur="handleRenamePack(${pack.packId}, this.value)"
+                    />
                     <div class="playlist-actions">
-                    <button class="edit-btn" onClick=handleEditPack(${pack.packId})>✏️</button>
-                    <button class="delete-btn" onClick="handleDeletePack(${pack.packId})">🗑️</button>
+                        <button class="edit-btn" onClick="handleEditPack(${pack.packId})">✏️</button>
+                        <button class="delete-btn" onClick="handleDeletePack(${pack.packId})">🗑️</button>
                     </div>
                 </div>
-             `}).join('');
+            `;
+            }).join('');
         }
 
         async function handleCreateNewPack() {
@@ -79,6 +84,16 @@
             selectPack(packId);
             loadPage(PAGE.PACK_EDIT);
         }
+
+        async function handleRenamePack(packId, newName) {
+        const packs = await loadAllPacks();
+        const pack = packs.find(p => p.packId === packId);
+
+        if (pack) {
+            pack.packName = newName.trim() || "Untitled Pack"; // fallback if empty
+            await savePack(pack);
+        }
+    }
 
     </script>
     <script src="../../app.js"></script>

@@ -56,7 +56,6 @@
             if (!container) return;
 
             const packData = await loadAllPacks();
-            console.log(packData);
 
             container.innerHTML = packData.map((pack, index) => `
                 <label class="radio-label">
