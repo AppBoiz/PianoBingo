@@ -39,11 +39,11 @@
             generateRadioButtonsFromPacks();
         }
 
-        function generateRadioButtonsFromPacks() {
+        async function generateRadioButtonsFromPacks() {
             const container = document.querySelector('.playlist-container');
             if (!container) return;
 
-            const packData = loadPackData();
+            const packData = await loadAllPacks();
 
              container.innerHTML = packData.map((pack, index) => {
                 
@@ -58,25 +58,21 @@
              `}).join('');
         }
 
-        function handleCreateNewPack() {
-            const packData = loadPackData();
+        async function handleCreateNewPack() {
+            const packData = await loadAllPacks();
             const maxPackId = Math.max(...packData.map(item => item.packId));
             const newPack = {
-                packId: maxPackId + 1,
+                packId: Math.max(maxPackId + 1, INDEXED_BD_CONFIG.PARTITION_SIZE),
                 packName: "New Pack"
             };
-            
-            packData.push(newPack);
-            savePackData(packData);
-            renderPage();
+
+            await savePack(newPack);
+            await renderPage();
         }
 
-        function handleDeletePack(idToRemove) {
-            const packData = loadPackData();
-            const newPacksList = packData.filter(pack => pack.packId != idToRemove);
-            
-            savePackData(newPacksList);
-            renderPage();
+        async function handleDeletePack(idToRemove) {
+            await deletePack(idToRemove);
+            await renderPage();
         }
 
         function handleEditPack(packId) {

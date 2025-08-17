@@ -801,8 +801,8 @@ const DB_TRANSACTION_TYPES = {
 let firstTimeOpeningDB = true;
 
 function openDB() {
-  return new Promise(async (resolve, reject) => {
-    const request = indexedDB.open(INDEXED_BD_CONFIG.DB_NAME, INDEXED_BD_CONFIG.DB_NAME.DB_VERSION);
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(INDEXED_BD_CONFIG.DB_NAME, INDEXED_BD_CONFIG.DB_VERSION);
 
     request.onupgradeneeded = () => {
       const db = request.result;
@@ -811,31 +811,32 @@ function openDB() {
       if (!db.objectStoreNames.contains(INDEXED_BD_CONFIG.SCHEMAS.PACKS)) {
         db.createObjectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS, { keyPath: "packId" });
       }
+
+      // Optionally, you could seed BASE_PACK_DATA *here* using a transaction
     };
 
-    if (firstTimeOpeningDB) {
-      firstTimeOpeningDB = false;
-      // Define default values and version merging here
-      const packs = await loadAllPacks();
-      const packIds = packs.map(pack => pack.packId);
-      for(const BASE_PACK of BASE_PACK_DATA) {
-        if(packIds.includes(BASE_PACK.packId)) {
-          const pack = packs.find(p => p.packId == BASE_PACK.packId);
-  
-          if (pack.version < BASE_PACK.version) {
-            // There is a newer version, so update it
-            await savePack(BASE_PACK);  
-          }
-          
-        }
-        else {
-          await savePack(BASE_PACK);
-        }
-  
-      }
-    }
+    request.onsuccess = async () => {
+      const db = request.result;
 
-    request.onsuccess = () => resolve(request.result);
+      // Only seed/update packs the first time
+      if (firstTimeOpeningDB) {
+        firstTimeOpeningDB = false;
+
+        const packs = await loadAllPacks();
+        const packIds = packs.map(pack => pack.packId);
+
+        for (const BASE_PACK of BASE_PACK_DATA) {
+          const existing = packs.find(p => p.packId === BASE_PACK.packId);
+
+          if (!existing || existing.version < BASE_PACK.version) {
+            await savePack(BASE_PACK);
+          }
+        }
+      }
+
+      resolve(db);
+    };
+
     request.onerror = () => reject(request.error);
   });
 }

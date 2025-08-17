@@ -58,12 +58,7 @@ function removeAllCanvases() {
     container.querySelectorAll('canvas').forEach(canvas => canvas.remove());
 }
 
-
-function prevSong(){
-
-}
-
-function nextSong() {
+async function nextSong() {
     const currentSongId = getCurrentSong().id
     const ids = getShownSongIds();
     const i = ids.indexOf(currentSongId);
@@ -71,17 +66,17 @@ function nextSong() {
     if (i === -1) return console.error("Current song ID not found.");
 
     if (i === ids.length - 1) {
-        generateSong();
+        await generateSong();
         location.reload(true);
     } else {
         const nextId = ids[i + 1];
 
-        setSongId(nextId);
+        await setSongId(nextId);
         location.reload(true);
     }
 }
 
-function prevSong() {
+async function prevSong() {
     const currentSongId = getCurrentSong().id
     const ids = getShownSongIds();
     const i   = ids.indexOf(currentSongId);
@@ -91,7 +86,7 @@ function prevSong() {
   
     const prevId = ids[i - 1];
 
-    setSongId(prevId)
+    await setSongId(prevId)
     location.reload(true);
 
 }

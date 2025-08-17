@@ -29,32 +29,34 @@
         <img class="piano-banner" src="../../resources/images/piano.png">
     </div>
     <script>
-        function pickPack(){
+        async function pickPack(){
             var radios = document.getElementsByName('radio');
             let radioVal = 1;
 
             for (var i = 0, length = radios.length; i < length; i++) {
                 if (radios[i].checked) {
-                    radioVal = parseInt(radios[i].value)
+                    radioVal = parseInt(radios[i].value);
                     break;
                 }
             }
 
-            selectPack(radioVal)
-            generateSong()
-            loadPage(PAGE.GAME)
+            selectPack(radioVal);
+            await generateSong();
+            loadPage(PAGE.GAME);
         }
 
         function back(){
-            clearGameState()
-            loadPage(PAGE.WELCOME)
+            clearGameState();
+            loadPage(PAGE.WELCOME);
         }
 
-        function generateRadioButtonsFromPacks() {
+        async function generateRadioButtonsFromPacks() {
+            debugger;
             const container = document.querySelector('.radios-container');
             if (!container) return;
 
-            const packData = loadPackData();
+            const packData = await loadAllPacks();
+            console.log(packData);
 
             container.innerHTML = packData.map((pack, index) => `
                 <label class="radio-label">

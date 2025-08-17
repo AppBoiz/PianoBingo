@@ -40,11 +40,11 @@
             generateRadioButtonsFromPacks();
         }
 
-        function generateRadioButtonsFromPacks() {
+        async function generateRadioButtonsFromPacks() {
             const container = document.querySelector('.playlist-container');
             if (!container) return;
             
-            const packData = loadPackData();
+            const packData = await loadAllPacks();
              container.innerHTML = packData.map((pack, index) => {
                 
                 return `
@@ -59,10 +59,9 @@
         }
 
         function handleCreateNewPack() {
-            const packData = loadPackData();
             const maxPackId = Math.max(...packData.map(item => item.packId));
             const newPack = {
-                packId: maxPackId + 1,
+                packId: Math.max(maxPackId + 1, INDEXED_BD_CONFIG.PARTITION_SIZE),
                 packName: "New Pack"
             };
             // TODO: Write Pack To Local Storage
