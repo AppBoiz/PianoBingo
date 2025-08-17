@@ -785,6 +785,9 @@ const INDEXED_BD_CONFIG = {
   // If a change is made to the schema, update the version here
   // Eg new schema etc
   DB_VERSION: 1,
+  // New local objects are given ids starting from this number (PARTITION_SIZE)
+  // This is so we can separate centreal server data and the user's own locally created data
+  PARTITION_SIZE: 10000,
   SCHEMAS: {
     PACKS: 'packs'
   }
@@ -794,6 +797,8 @@ const DB_TRANSACTION_TYPES = {
   READ_WRITE: 'readwrite',
   READ: 'readonly'
 }
+
+let firstTimeOpeningDB = true;
 
 function openDB() {
   return new Promise(async (resolve, reject) => {
@@ -808,23 +813,26 @@ function openDB() {
       }
     };
 
-    // Define default values and version merging here
-    const packs = await loadAllPacks();
-    const packIds = packs.map(pack => pack.packId);
-    for(const BASE_PACK of BASE_PACK_DATA) {
-      if(packIds.includes(BASE_PACK.packId)) {
-        const pack = packs.find(p => p.packId == BASE_PACK.packId);
-
-        if (pack.version < BASE_PACK.version) {
-          // There is a newer version, so update it
-          await savePack(BASE_PACK);  
+    if (firstTimeOpeningDB) {
+      firstTimeOpeningDB = false;
+      // Define default values and version merging here
+      const packs = await loadAllPacks();
+      const packIds = packs.map(pack => pack.packId);
+      for(const BASE_PACK of BASE_PACK_DATA) {
+        if(packIds.includes(BASE_PACK.packId)) {
+          const pack = packs.find(p => p.packId == BASE_PACK.packId);
+  
+          if (pack.version < BASE_PACK.version) {
+            // There is a newer version, so update it
+            await savePack(BASE_PACK);  
+          }
+          
         }
-        
+        else {
+          await savePack(BASE_PACK);
+        }
+  
       }
-      else {
-        await savePack(BASE_PACK);
-      }
-
     }
 
     request.onsuccess = () => resolve(request.result);
@@ -832,7 +840,7 @@ function openDB() {
   });
 }
 
-export async function savePack(pack) {
+async function savePack(pack) {
   const db = await openDB();
   const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ_WRITE);
   const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS);
@@ -842,7 +850,7 @@ export async function savePack(pack) {
   db.close();
 }
 
-export async function loadPack(packId) {
+async function loadPack(packId) {
   const db = await openDB();
   const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ);
   const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS);
@@ -855,7 +863,7 @@ export async function loadPack(packId) {
   });
 }
 
-export async function loadAllPacks() {
+async function loadAllPacks() {
   const db = await openDB();
   const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ);
   const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS);
@@ -864,6 +872,19 @@ export async function loadAllPacks() {
 
   return new Promise((resolve, reject) => {
     request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function deletePack(packId) {
+  const db = await openDB();
+  const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ_WRITE);
+  const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS);
+
+  const request = store.delete(packId);
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
   });
 }
@@ -925,10 +946,10 @@ function getSelectedSongPackId(){
   }
 }
 
-function generateSong() {
+async function generateSong() {
   const shownSongIds = getShownSongIds();
   const selectedPackId = getSelectedSongPackId();
-  const packData = loadPackData();
+  const packData = await loadAllPacks();
 
   // Find the selected pack
   const selectedPack = packData.find(pack => pack.packId === selectedPackId);
@@ -958,10 +979,9 @@ function generateSong() {
   saveGameState(tmpState)
 }
 
-function setSongId(id){
+async function setSongId(id){
   const selectedPackId = getSelectedSongPackId();
-  const packData = loadPackData();
-  const selectedPack = packData.find(pack => pack.packId === selectedPackId);
+  const selectedPack = await loadPack(selectedPackId);
 
   if (!selectedPack) {
     console.warn("Selected pack not found");
