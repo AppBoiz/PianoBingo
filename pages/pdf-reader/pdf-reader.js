@@ -59,7 +59,7 @@ function removeAllCanvases() {
 }
 
 async function nextSong() {
-    const currentSongId = getCurrentSong().id
+    const currentSongId = getCurrentSong().songId
     const ids = getShownSongIds();
     const i = ids.indexOf(currentSongId);
 
@@ -77,7 +77,7 @@ async function nextSong() {
 }
 
 async function prevSong() {
-    const currentSongId = getCurrentSong().id
+    const currentSongId = getCurrentSong().songId
     const ids = getShownSongIds();
     const i   = ids.indexOf(currentSongId);
   

@@ -44,7 +44,6 @@
             const container = document.querySelector('.playlist-container');
             if (!container) return;
             
-            debugger;
             const selectedSongPackId = getSelectedSongPackId();
             const packData = await loadPack(selectedSongPackId);
              container.innerHTML = packData.map((pack, index) => {
