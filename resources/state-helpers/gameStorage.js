@@ -1217,6 +1217,456 @@ const BASE_SONG_DATA = [
     title: "She’s always a woman (-2)",
     pdfUrl: WmC0m7H7,
     version:1
+  },
+  {
+    songId: 76,
+    title: "Jack.",
+    pdfUrl: fPfBXGLP,
+    version: 1
+  },
+  {
+    songId: 77,
+    title: "Jack.",
+    pdfUrl: CmC3vxGU,
+    version: 1
+  },
+  {
+    songId: 78,
+    title: "Jack.",
+    pdfUrl: bkA8OMsM,
+    version: 1
+  },
+  {
+    songId: 79,
+    title: "Jack.",
+    pdfUrl: zsdzs0SZ,
+    version: 1
+  },
+  {
+    songId: 80,
+    title: "Jack.",
+    pdfUrl: WIjz1hLv,
+    version: 1
+  },
+  {
+    songId: 81,
+    title: "Jack.",
+    pdfUrl: k5HRjnfW,
+    version: 1
+  },
+  {
+    songId: 82,
+    title: "Jack.",
+    pdfUrl: GvzjkMLL,
+    version: 1
+  },
+  {
+    songId: 83,
+    title: "Jack.",
+    pdfUrl: VUUd6mhn,
+    version: 1
+  },
+  {
+    songId: 84,
+    title: "Jack.",
+    pdfUrl: cjqL3lhO,
+    version: 1
+  },
+  {
+    songId: 85,
+    title: "Jack.",
+    pdfUrl: JmytEVsm,
+    version: 1
+  },
+  {
+    songId: 86,
+    title: "Jack.",
+    pdfUrl: j05TLqFJ,
+    version: 1
+  },
+  {
+    songId: 87,
+    title: "Jack.",
+    pdfUrl: fczvkUQa,
+    version: 1
+  },
+  {
+    songId: 88,
+    title: "Jack.",
+    pdfUrl: lqpVmJuJ,
+    version: 1
+  },
+  {
+    songId: 89,
+    title: "Jack.",
+    pdfUrl: UFeKNQot,
+    version: 1
+  },
+  {
+    songId: 90,
+    title: "Jack.",
+    pdfUrl: OW7106u9,
+    version: 1
+  },
+  {
+    songId: 91,
+    title: "Jack.",
+    pdfUrl: BanWQsmO,
+    version: 1
+  },
+  {
+    songId: 92,
+    title: "Jack.",
+    pdfUrl: r7BPFnSn,
+    version: 1
+  },
+  {
+    songId: 93,
+    title: "Jack.",
+    pdfUrl: ksKbNbwB,
+    version: 1
+  },
+  {
+    songId: 94,
+    title: "Jack.",
+    pdfUrl: PFbps3JJ,
+    version: 1
+  },
+  {
+    songId: 95,
+    title: "Jack.",
+    pdfUrl: ru9HOcSJ,
+    version: 1
+  },
+  {
+    songId: 96,
+    title: "Jack.",
+    pdfUrl: Mgc96C0j,
+    version: 1
+  },
+  {
+    songId: 97,
+    title: "Jack.",
+    pdfUrl: nNAvty21,
+    version: 1
+  },
+  {
+    songId: 98,
+    title: "Jack.",
+    pdfUrl: Q5a08YVh,
+    version: 1
+  },
+  {
+    songId: 99,
+    title: "Jack.",
+    pdfUrl: H0rZVSCW,
+    version: 1
+  },
+  {
+    songId: 100,
+    title: "Jack.",
+    pdfUrl: Wm5Cs4kB,
+    version: 1
+  },
+  {
+    songId: 101,
+    title: "Jack.",
+    pdfUrl: IG7zhyr9,
+    version: 1
+  },
+  {
+    songId: 102,
+    title: "Jack.",
+    pdfUrl: mv5VjHU2,
+    version: 1
+  },
+  {
+    songId: 103,
+    title: "Jack.",
+    pdfUrl: W7sKX8DQ,
+    version: 1
+  },
+  {
+    songId: 104,
+    title: "Jack.",
+    pdfUrl: fnCb8MBU,
+    version: 1
+  },
+  {
+    songId: 105,
+    title: "Jack.",
+    pdfUrl: z8RhHbH1,
+    version: 1
+  },
+  {
+    songId: 106,
+    title: "Jack.",
+    pdfUrl: cWctTnK4,
+    version: 1
+  },
+  {
+    songId: 107,
+    title: "Jack.",
+    pdfUrl: znACq7Ia,
+    version: 1
+  },
+  {
+    songId: 108,
+    title: "Jack.",
+    pdfUrl: sWnnhg66,
+    version: 1
+  },
+  {
+    songId: 109,
+    title: "Jack.",
+    pdfUrl: GggfiKOw,
+    version: 1
+  },
+  {
+    songId: 110,
+    title: "Jack.",
+    pdfUrl: DYWO9h4p,
+    version: 1
+  },
+  {
+    songId: 111,
+    title: "Jack.",
+    pdfUrl: axQyzObr,
+    version: 1
+  },
+  {
+    songId: 112,
+    title: "Jack.",
+    pdfUrl: Xu4jSCnJ,
+    version: 1
+  },
+  {
+    songId: 113,
+    title: "Jack.",
+    pdfUrl: N1JpCAWl,
+    version: 1
+  },
+  {
+    songId: 114,
+    title: "Jack.",
+    pdfUrl: GAx7TmjT,
+    version: 1
+  },
+  {
+    songId: 115,
+    title: "Jack.",
+    pdfUrl: brL0lepF,
+    version: 1
+  },
+  {
+    songId: 116,
+    title: "Jack.",
+    pdfUrl: _Qroiyh8,
+    version: 1
+  },
+  {
+    songId: 117,
+    title: "Jack.",
+    pdfUrl: iNOshzSq,
+    version: 1
+  },
+  {
+    songId: 118,
+    title: "Jack.",
+    pdfUrl: t4CEdDDH,
+    version: 1
+  },
+  {
+    songId: 119,
+    title: "Jack.",
+    pdfUrl: hEgbFPY1,
+    version: 1
+  },
+  {
+    songId: 120,
+    title: "Jack.",
+    pdfUrl: lv3Qd43h,
+    version: 1
+  },
+  {
+    songId: 121,
+    title: "Jack.",
+    pdfUrl: a9e7Poyt,
+    version: 1
+  },
+  {
+    songId: 122,
+    title: "Jack.",
+    pdfUrl: PBUA77rz,
+    version: 1
+  },
+  {
+    songId: 123,
+    title: "Jack.",
+    pdfUrl: hUylbVAC,
+    version: 1
+  },
+  {
+    songId: 124,
+    title: "Jack.",
+    pdfUrl: Y0CbTFre,
+    version: 1
+  },
+  {
+    songId: 125,
+    title: "Jack.",
+    pdfUrl: y2P8jxvD,
+    version: 1
+  },
+  {
+    songId: 126,
+    title: "Jack.",
+    pdfUrl: mXTkt8ki,
+    version: 1
+  },
+  {
+    songId: 127,
+    title: "Jack.",
+    pdfUrl: W4aCSHJ6,
+    version: 1
+  },
+  {
+    songId: 128,
+    title: "Jack.",
+    pdfUrl: PDhH1wGY,
+    version: 1
+  },
+  {
+    songId: 129,
+    title: "Jack.",
+    pdfUrl: mqisy5Q4,
+    version: 1
+  },
+  {
+    songId: 130,
+    title: "Jack.",
+    pdfUrl: NxB8QQZW,
+    version: 1
+  },
+  {
+    songId: 131,
+    title: "Jack.",
+    pdfUrl: THZ2rCH5,
+    version: 1
+  },
+  {
+    songId: 132,
+    title: "Jack.",
+    pdfUrl: HcZm90bq,
+    version: 1
+  },
+  {
+    songId: 133,
+    title: "Jack.",
+    pdfUrl: LVhu2alN,
+    version: 1
+  },
+  {
+    songId: 134,
+    title: "Jack.",
+    pdfUrl: Bv9L8e9b,
+    version: 1
+  },
+  {
+    songId: 135,
+    title: "Jack.",
+    pdfUrl: DxsYvk8O,
+    version: 1
+  },
+  {
+    songId: 136,
+    title: "Jack.",
+    pdfUrl: s8O9rOP1,
+    version: 1
+  },
+  {
+    songId: 137,
+    title: "Jack.",
+    pdfUrl: qwPxXA6r,
+    version: 1
+  },
+  {
+    songId: 138,
+    title: "Jack.",
+    pdfUrl: x4AfvzV6,
+    version: 1
+  },
+  {
+    songId: 139,
+    title: "Jack.",
+    pdfUrl: yDSb2r49,
+    version: 1
+  },
+  {
+    songId: 140,
+    title: "Jack.",
+    pdfUrl: SDO69ctw,
+    version: 1
+  },
+  {
+    songId: 141,
+    title: "Jack.",
+    pdfUrl: IGeYRc38,
+    version: 1
+  },
+  {
+    songId: 142,
+    title: "Jack.",
+    pdfUrl: jb8iJPYa,
+    version: 1
+  },
+  {
+    songId: 143,
+    title: "Jack.",
+    pdfUrl: chkxfLJa,
+    version: 1
+  },
+  {
+    songId: 144,
+    title: "Jack.",
+    pdfUrl: CSFgpwTQ,
+    version: 1
+  },
+  {
+    songId: 145,
+    title: "Jack.",
+    pdfUrl: NJnndijl,
+    version: 1
+  },
+  {
+    songId: 146,
+    title: "Jack.",
+    pdfUrl: XfekGGLS,
+    version: 1
+  },
+  {
+    songId: 147,
+    title: "Jack.",
+    pdfUrl: JoAH9HEs,
+    version: 1
+  },
+  {
+    songId: 148,
+    title: "Jack.",
+    pdfUrl: ZWAqzjPV,
+    version: 1
+  },
+  {
+    songId: 149,
+    title: "Jack.",
+    pdfUrl: ShnVrzBd,
+    version: 1
+  },
+  {
+    songId: 150,
+    title: "Jack.",
+    pdfUrl: cp9jpjZK,
+    version: 1
   }
     
 ]
@@ -1282,8 +1732,7 @@ function openDB() {
 
         // Song Packs
         const packs = await loadAllPacks();
-        const packIds = packs.map(pack => pack.packId);
-
+          
         for (const BASE_PACK of BASE_PACK_DATA) {
           const existing = packs.find(p => p.packId === BASE_PACK.packId);
 
@@ -1297,6 +1746,13 @@ function openDB() {
         const songs = await loadAllSongs();
         // Check if any of the original songs are missing
         // if so, add them
+        for (const BASE_SONG of BASE_SONG_DATA) {
+          const existing = songs.find(p => p.packId === BASE_SONG.songId);
+
+          if (!existing || existing.version < BASE_SONG.version) {
+            await saveSong(BASE_SONG);
+          }
+        }
 
       }
 
@@ -1360,6 +1816,7 @@ async function saveSong(song) {
   const db = await openDB();
   const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ_WRITE);
   const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS);
+  pack.version++; // Pack has been edited, so increment version
   store.put(song); // insert or update (object store already knows the id)
   await tx.complete?.(); // wait for transaction to finish
   db.close();
