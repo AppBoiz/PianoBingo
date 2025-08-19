@@ -23,7 +23,7 @@
             <h1>Edit Pack</h1>
             <div id="song-counter" class="nav-bar-right">0/75</div>
         </div>
-        
+
         <!-- scrollable section -->
         <div class="main-content">
             <div id="playlust-container" class="playlist-container" style="flex-grow: 1;"></div>
@@ -45,23 +45,34 @@
             generateRadioButtonsFromSongs();
         }
 
-        async function generateRadioButtonsFromSongs() {
+        function renderPage() {
+            generateCheckListFromSongs();
+        }
+
+        async function generateCheckListFromSongs() {
             const container = document.querySelector('.playlist-container');
+            const counterEl = document.getElementById("song-counter");
             if (!container) return;
             
             const selectedSongPackId = getSelectedSongPackId();
             const packData = await loadPack(selectedSongPackId);
             const songData = await loadAllSongs();
 
-            container.innerHTML = songData.map((song, index) => {
-            
+            // update the counter (example: 5 selected out of total songs)
+            const total = 75;
+            const selected = packData.songs ? packData.songs.length : 0;
+            counterEl.textContent = `${selected}/${total}`;
+
+            container.innerHTML = songData.map((song) => {
+                const isChecked = packData.songs?.includes(song.songId) ? "checked" : "";
                 return `
                     <div class="playlist-row">
                         <span class="playlist-name">${song.songId}</span>
                         <span class="playlist-name">${song.label}</span>
-                        <input type="checkbox" class="playlist-checkbox" />
+                        <input type="checkbox" class="playlist-checkbox" ${isChecked} />
                     </div>
-                `}).join('');
+                `;
+            }).join('');
         }
 
         function handleCreateNewPack() {
