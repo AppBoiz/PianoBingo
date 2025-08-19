@@ -50,13 +50,19 @@
             generateCheckListFromSongs();
         }
 
+        let packData = undefined;
+
         async function generateCheckListFromSongs() {
             const container = document.querySelector('.playlist-container');
             const counterEl = document.getElementById("song-counter");
+            const okButton = document.querySelector(".primary-btn"); // get Ok button
             if (!container) return;
             
             const selectedSongPackId = getSelectedSongPackId();
-            const packData = await loadPack(selectedSongPackId);
+
+            if (packData === undefined) {
+                packData = await loadPack(selectedSongPackId);
+            }
             const songData = await loadAllSongs();
 
             if (!packData.songs) {
@@ -66,7 +72,18 @@
             const total = 75;
             const selected = packData.songs.length;
             counterEl.textContent = `${selected}/${total}`;
-            debugger;
+
+            // ✅ enable/disable Ok button
+            okButton.disabled = selected !== total;
+
+            // attach callback to Ok button
+            okButton.onclick = () => {
+                if (selected === total) {
+                    savePack(packData);  // save the pack
+                    loadPage(PAGE.PACK_MANAGEMENT); // go back to pack management
+                }
+            };
+
             container.innerHTML = songData.map((song) => {
                 const isChecked = packData.songs.includes(song.songId) ? "checked" : "";
                 return `
@@ -92,7 +109,7 @@
                             packData.songs.push(songId);
                         }
                     } else {
-                        packData.songs = packData.songs.filter(id => id !== songId);
+                        packData.songs = packData.songs.filter(id => parseInt(id, 10) !== songId);
                     }
                     savePack(packData);
                     renderPage(); // re-render to update counter + state

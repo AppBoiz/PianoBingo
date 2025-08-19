@@ -265,3 +265,9 @@ h2 {
     background-color: #c2185b;
     transform: scale(0.97);
 }
+
+.primary-btn:disabled {
+    background-color: #f8a5c2; /* lighter pink */
+    cursor: not-allowed;
+    opacity: 0.6;
+}
