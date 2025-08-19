@@ -59,6 +59,8 @@ h2 {
   margin: 1rem auto;
   max-width: 500px;
   padding: 0 1rem;
+  overflow-y: auto;
+
 }
 
 .playlist-row {

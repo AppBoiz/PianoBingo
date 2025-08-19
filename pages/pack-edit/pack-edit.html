@@ -15,18 +15,25 @@
     <link rel="stylesheet" href="../../styles.css" />
 </head>
 <body>
-    <div id="app">
-        <div class="nav-bar">
+    <div id="app"> 
+        <div class="nav-bar" style="height: 113px;">
             <div class="back-container nav-bar-left">
                 <button onclick="back()">Back</button>
             </div>
             <h1>Edit Pack</h1>
         </div>
-        <div>
-            <div id='playlust-container' class="playlist-container"></div>
+
+        <!-- scrollable section -->
+        <div class="main-content">
+            <div id="playlust-container" class="playlist-container" style="flex-grow: 1;"></div>
             <div style="width: 100%; display: flex; justify-content: center; align-items: center;">
                 <button class="create-button" onclick="handleCreateNewPack()">Create New</button>
             </div>
+        </div>
+
+        <!-- footer -->
+        <div>
+            <button>Ok</button>
         </div>
     </div>
     <script>
@@ -46,17 +53,20 @@
             
             const selectedSongPackId = getSelectedSongPackId();
             const packData = await loadPack(selectedSongPackId);
-             container.innerHTML = packData.map((pack, index) => {
-                
+            const songData = await loadAllSongs();
+
+            container.innerHTML = songData.map((song, index) => {
+            
                 return `
-                 <div class="playlist-row">
-                    <span class="playlist-name">${pack.packName}</span>
+                    <div class="playlist-row">
+                    <span class="playlist-name">${song.songId}</span>
+                    <span class="playlist-name">${song.label}</span>
                     <div class="playlist-actions">
                     <button class="edit-btn">✏️</button>
-                    <button class="delete-btn" onClick="handleDeletePack(${pack.packId})">🗑️</button>
+                    <button class="delete-btn" onClick="handleDeletePack(${song.packId})">🗑️</button>
                     </div>
                 </div>
-             `}).join('');
+                `}).join('');
         }
 
         function handleCreateNewPack() {
