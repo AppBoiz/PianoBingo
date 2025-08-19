@@ -111,7 +111,6 @@
                     } else {
                         packData.songs = packData.songs.filter(id => parseInt(id, 10) !== songId);
                     }
-                    savePack(packData);
                     renderPage(); // re-render to update counter + state
                 });
             });
