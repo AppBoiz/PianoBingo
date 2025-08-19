@@ -58,21 +58,45 @@
             const packData = await loadPack(selectedSongPackId);
             const songData = await loadAllSongs();
 
-            // update the counter (example: 5 selected out of total songs)
-            const total = 75;
-            const selected = packData.songs ? packData.songs.length : 0;
-            counterEl.textContent = `${selected}/${total}`;
+            if (!packData.songs) {
+                packData.songs = []; // ensure songs array exists
+            }
 
+            const total = 75;
+            const selected = packData.songs.length;
+            counterEl.textContent = `${selected}/${total}`;
+            debugger;
             container.innerHTML = songData.map((song) => {
-                const isChecked = packData.songs?.includes(song.songId) ? "checked" : "";
+                const isChecked = packData.songs.includes(song.songId) ? "checked" : "";
                 return `
                     <div class="playlist-row">
                         <span class="playlist-name">${song.songId}</span>
-                        <span class="playlist-name">${song.label}</span>
-                        <input type="checkbox" class="playlist-checkbox" ${isChecked} />
+                        <span class="playlist-name">${song.title}</span>
+                        <input 
+                            type="checkbox" 
+                            class="playlist-checkbox" 
+                            data-song-id="${song.songId}"
+                            ${isChecked} 
+                        />
                     </div>
                 `;
             }).join('');
+
+            // attach listeners to checkboxes
+            container.querySelectorAll(".playlist-checkbox").forEach(checkbox => {
+                checkbox.addEventListener("change", (e) => {
+                    const songId = parseInt(e.target.getAttribute("data-song-id"), 10); // convert to integer
+                    if (e.target.checked) {
+                        if (!packData.songs.includes(songId)) {
+                            packData.songs.push(songId);
+                        }
+                    } else {
+                        packData.songs = packData.songs.filter(id => id !== songId);
+                    }
+                    savePack(packData);
+                    renderPage(); // re-render to update counter + state
+                });
+            });
         }
 
         function handleCreateNewPack() {
