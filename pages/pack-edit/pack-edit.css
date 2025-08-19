@@ -87,8 +87,34 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;          /* stretch across container */
+  width: 100%;
   box-sizing: border-box;
+}
+
+.playlist-checkbox {
+  appearance: none;             /* remove default */
+  width: 22px;
+  height: 22px;
+  border: 2px solid #F14D8A;    /* pink border */
+  border-radius: 6px;           /* rounded square */
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.playlist-checkbox:checked {
+  background-color: #F14D8A;
+  border-color: #F14D8A;
+}
+
+.playlist-checkbox:checked::after {
+  content: "✓";
+  position: absolute;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  left: 3px;
+  top: -1px;
 }
 
 .playlist-name {
