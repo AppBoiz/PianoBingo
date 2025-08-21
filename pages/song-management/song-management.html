@@ -42,10 +42,6 @@
         }
 
         function renderPage() {
-            generateRadioButtonsFromSongs();
-        }
-
-        function renderPage() {
             generateCheckListFromSongs();
         }
 
@@ -67,7 +63,7 @@
                             type="text" 
                             class="playlist-name-input"
                             value="${song.title}" 
-                            onblur="handleRenamePack(${song.songId}, this.value)"
+                            onblur="handleRenameSong(${song.songId}, this.value)"
                         />
                         <div class="playlist-actions">
                             ${hasPdf 
@@ -85,17 +81,7 @@
 
             // 🎵 Title editing listeners
             container.querySelectorAll(".playlist-title-input").forEach(input => {
-                input.addEventListener("blur", (e) => {
-                    const songId = parseInt(e.target.getAttribute("data-song-id"), 10);
-                    const song = songData.find(s => s.songId === songId);
-                    if (song) {
-                        song.title = e.target.value.trim() || "Untitled Song";
-                        saveSong(song);
-                        // no need to re-render on every blur (keeps input focus)
-                    }
-                });
-
-                // Optional: Save on Enter
+                // Save on Enter
                 input.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") {
                         e.target.blur(); // triggers blur handler
@@ -107,15 +93,15 @@
             container.querySelectorAll(".pdf-upload").forEach(input => {
                 input.addEventListener("change", async (e) => {
                     const songId = parseInt(e.target.getAttribute("data-song-id"), 10);
-                    debugger;
                     const file = e.target.files[0];
                     if (file) {
                         const base64 = await fileToBase64(file);
                         const song = songData.find(s => s.songId === songId);
                         if (song) {
                             song.pdfUrl = base64.split(",")[1];
-                            saveSong(song);
-                            renderPage(); // re-render to show "View PDF" button
+                            saveSong(song).then(()=>{
+                                renderPage(); // re-render to show "View PDF" button
+                            });
                         }
                     }
                 });
@@ -128,16 +114,26 @@
                     const song = songData.find(s => s.songId === songId);
                     if (song) {
                         song.pdfUrl = null; // remove PDF
-                        saveSong(song);
-                        renderPage(); // refresh row to show upload input again
+                        saveSong(song).then(()=>{
+                            renderPage(); // refresh row to show upload input again
+                        });
                     }
                 });
             });
             
         }
 
+        async function handleRenameSong(songId, newName) {
+            const song = await loadSong(songId);
+            if (song) {
+                song.title = newName;
+                await saveSong(song);
+                renderPage(); // re-render to show "View PDF" button
+            }
+        }
+
         function handleCreateNewSong() {
-            loadAllSongs().then(songData => {
+            loadAllSongs().then(async songData => {
                 const maxSongId = songData.length > 0 ? Math.max(...songData.map(item => item.songId)) : 0;
                 const newSong = {
                     songId: maxSongId + 1,
@@ -145,7 +141,7 @@
                     pdfUrl: null
                 };
 
-                saveSong(newSong); // <-- persist new song
+                await saveSong(newSong); // <-- persist new song
                 renderPage(); // refresh to show it
             });
         }
@@ -156,8 +152,9 @@
         }
 
         function handleDeleteSong(songId) {
-            deleteSong(songId);
-            renderPage(); // re-render list after deletion
+            deleteSong(songId).then(()=>{
+                renderPage(); // re-render list after deletion
+            });
         }
 
         function fileToBase64(file) {
