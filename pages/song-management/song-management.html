@@ -63,7 +63,12 @@
                 return `
                     <div class="playlist-row">
                         <span class="playlist-name">${song.songId}</span>
-                        <span class="playlist-name">${song.title}</span>
+                        <input 
+                            type="text" 
+                            class="playlist-name-input"
+                            value="${song.title}" 
+                            onblur="handleRenamePack(${song.songId}, this.value)"
+                        />
                         <div class="playlist-actions">
                             ${hasPdf 
                                 ? `
@@ -78,7 +83,26 @@
                 `;
             }).join('');
 
-            
+            // 🎵 Title editing listeners
+            container.querySelectorAll(".playlist-title-input").forEach(input => {
+                input.addEventListener("blur", (e) => {
+                    const songId = parseInt(e.target.getAttribute("data-song-id"), 10);
+                    const song = songData.find(s => s.songId === songId);
+                    if (song) {
+                        song.title = e.target.value.trim() || "Untitled Song";
+                        saveSong(song);
+                        // no need to re-render on every blur (keeps input focus)
+                    }
+                });
+
+                // Optional: Save on Enter
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.target.blur(); // triggers blur handler
+                    }
+                });
+            });
+
             // attach listeners to PDF upload inputs
             container.querySelectorAll(".pdf-upload").forEach(input => {
                 input.addEventListener("change", async (e) => {

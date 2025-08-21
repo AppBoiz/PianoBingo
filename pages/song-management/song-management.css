@@ -132,6 +132,25 @@ h2 {
   color: #333;
 }
 
+.playlist-name-input {
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #333;
+  padding: 4px 8px;     /* ⬅ add horizontal padding inside input */
+  margin: 0 8px;        /* ⬅ add space on left/right outside input */
+  flex: 1;              /* ⬅ let it nicely stretch between name and actions */
+  outline: none;
+  cursor: text;
+}
+
+/* Subtle highlight when focused */
+.playlist-name-input:focus {
+  border-bottom: 1px solid #888;
+  background: #f9f9f9;
+}
+
 .playlist-actions {
   display: flex;
   gap: 0.5rem;
