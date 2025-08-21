@@ -4,34 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PDF Reader</title>
-  <link rel="stylesheet" href="./pdf-reader.css" />
+  <link rel="stylesheet" href="./song-view.css" />
 </head>
 <body class="pdf-page" onload="load()">
   <nav>
+    <button onclick="back()">Back</button>
     <h1 id="title"></h1>
-    <div style="width: 121px;">
-      <div class="checkboxNav">
-        <div class="checkBoxBox">
-          <!-- Hidden checkbox drives the state -->
-          <input type="checkbox" id="menu-toggle">
-          
-          <!-- Icon -->
-          <label class="hamburger" for="menu-toggle">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-          </label>
-        
-          <!-- Links -->
-          <div class="menu">
-            <a href="#" onclick="nextSong()">Next Song</a>
-            <a href="#" onclick="prevSong()">Previous Song</a>
-            <a href="#" onclick="loadPage(PAGE.GAME_HISTORY)">Game History</a>
-            <a href="#" class="red" onclick="loadPage(PAGE.WELCOME)">End Game</a>
-          </div>
-        </div>
-      </div>
-    </div>
   </nav>
   
   <div id="pdf-viewer">
@@ -39,11 +17,11 @@
     <span class="right" onclick="changePage(1)"></span>
   </div>
 
-  <footer>
-    <button onclick="nextSong()">Next Song</button>
-  </footer>
-
   <script>
+    function back(){
+      startNewGame();
+      loadPage(PAGE.SONG_MANAGEMENT);
+    }
 
     function load(){
       loadPdf();

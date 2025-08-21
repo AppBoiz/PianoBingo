@@ -10,3 +10,9 @@ Internally, it uses events to communicate between origins, telling the parent wh
 ## PDF Compilation
 
 To compile pdfs into a bundled .js file, there is a python util. This is a workaround for localhost to avoid cors issues.
+
+## Running local http server
+
+```npx http-server -c-1 -p 3000 -o```
+
+This command stops the browser from caching the web pages, so code can be edited and tested in real-time.

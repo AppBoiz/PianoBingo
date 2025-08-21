@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="../icons/icon-512x512.png">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="./pack-edit.css" />
+
+    <title>PianoBingo</title>
+    <link rel="manifest" href="../../manifest.json">
+    <link rel="stylesheet" href="../../styles.css" />
+</head>
+<body>
+    <div id="app"> 
+        <div class="nav-bar">
+            <div class="back-container nav-bar-left">
+                <button onclick="back()">Back</button>
+            </div>
+            <h1>Edit Pack</h1>
+            <div id="song-counter" class="nav-bar-right">0/75</div>
+        </div>
+
+        <!-- scrollable section -->
+        <div class="main-content">
+            <div id="playlust-container" class="playlist-container" style="flex-grow: 1;"></div>
+        </div>
+
+        <!-- footer -->
+        <div class="footer">
+            <button class="primary-btn">Ok</button>
+        </div>
+
+    </div>
+    <script>
+
+        function back(){
+            startNewGame();
+            loadPage(PAGE.PACK_MANAGEMENT);
+        }
+
+        function renderPage() {
+            generateRadioButtonsFromSongs();
+        }
+
+        function renderPage() {
+            generateCheckListFromSongs();
+        }
+
+        let packData = undefined;
+
+        async function generateCheckListFromSongs() {
+            const container = document.querySelector('.playlist-container');
+            const counterEl = document.getElementById("song-counter");
+            const okButton = document.querySelector(".primary-btn"); // get Ok button
+            if (!container) return;
+            
+            const selectedSongPackId = getSelectedSongPackId();
+
+            if (packData === undefined) {
+                packData = await loadPack(selectedSongPackId);
+            }
+            const songData = await loadAllSongs();
+
+            if (!packData.songs) {
+                packData.songs = []; // ensure songs array exists
+            }
+
+            const total = 75;
+            const selected = packData.songs.length;
+            counterEl.textContent = `${selected}/${total}`;
+
+            // ✅ enable/disable Ok button
+            okButton.disabled = selected !== total;
+
+            // attach callback to Ok button
+            okButton.onclick = () => {
+                if (selected === total) {
+                    savePack(packData);  // save the pack
+                    loadPage(PAGE.PACK_MANAGEMENT); // go back to pack management
+                }
+            };
+
+            container.innerHTML = songData.map((song) => {
+                const isChecked = packData.songs.includes(song.songId) ? "checked" : "";
+                return `
+                    <div class="playlist-row" data-song-id="${song.songId}">
+                        <span class="playlist-name">${song.songId}</span>
+                        <span class="playlist-name">${song.title}</span>
+                        <input 
+                            type="checkbox" 
+                            class="playlist-checkbox" 
+                            ${isChecked} 
+                        />
+                    </div>
+                `;
+            }).join('');
+
+            // Add row click listeners to toggle checkbox
+            container.querySelectorAll(".playlist-row").forEach(row => {
+                row.addEventListener("click", (e) => {
+                    // Prevent toggling if user clicked directly on the checkbox
+                    if (e.target.classList.contains("playlist-checkbox")) return;
+
+                    const checkbox = row.querySelector(".playlist-checkbox");
+                    if (!checkbox) return;
+
+                    checkbox.checked = !checkbox.checked;
+
+                    const songId = parseInt(row.getAttribute("data-song-id"), 10);
+                    if (checkbox.checked) {
+                        if (!packData.songs.includes(songId)) {
+                            packData.songs.push(songId);
+                        }
+                    } else {
+                        packData.songs = packData.songs.filter(id => parseInt(id, 10) !== songId);
+                    }
+
+                    renderPage(); // re-render to update counter + state
+                });
+            });
+
+            // Attach separate listener to checkboxes directly
+            container.querySelectorAll(".playlist-checkbox").forEach(checkbox => {
+                checkbox.addEventListener("change", (e) => {
+                    const row = checkbox.closest(".playlist-row");
+                    const songId = parseInt(row.getAttribute("data-song-id"), 10);
+
+                    if (checkbox.checked) {
+                        if (!packData.songs.includes(songId)) {
+                            packData.songs.push(songId);
+                        }
+                    } else {
+                        packData.songs = packData.songs.filter(id => parseInt(id, 10) !== songId);
+                    }
+
+                    renderPage(); // update counter + state
+                });
+            });
+        }
+
+        function handleCreateNewPack() {
+            const maxPackId = Math.max(...packData.map(item => item.packId));
+            const newPack = {
+                packId: Math.max(maxPackId + 1, INDEXED_BD_CONFIG.PARTITION_SIZE),
+                packName: "New Pack"
+            };
+            // TODO: Write Pack To Local Storage
+            packData.push(newPack);
+            renderPage();
+        }
+
+        function handleDeletePack(idToRemove) {
+            const newPacksList = packData.filter(pack => pack.packId != idToRemove);
+            
+            // TODO: Delete Pack From Local Storage
+            packData = newPacksList;
+            renderPage();
+        }
+
+    </script>
+    <script src="../../app.js"></script>
+    <script src="../../services/navigation/navigation.js"></script>
+    <script src="../../../resources/base64/pack_tom.js"></script>  <!-- Must Load before gameStorage -->
+    <script src="../../resources/base64/pack_jack.js"></script>  <!-- Must Load before gameStorage -->
+    <script src="../../../resources/state-helpers/gameStorage.js"></script>  
+    <script>renderPage()</script>
+</body>
+</html>

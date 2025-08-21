@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-pwa-cache-v3.2.3';
+const CACHE_NAME = 'my-pwa-cache-v3.2.4';
 
 
 const urlsToCache = [
@@ -24,6 +24,15 @@ const urlsToCache = [
     "/pages/pdf-reader/pdf-reader.js",
     "/pages/welcome-page/welcome-page.css",
     "/pages/welcome-page/welcome-page.html",
+    "/pages/pack-edit/pack-edit.html",
+    "/pages/pack-edit/pack-edit.css",
+    "/pages/pack-management/pack-management.html",
+    "/pages/pack-management/pack-management.css",
+    "/pages/song-management/song-management.html",
+    "/pages/song-management/song-management.css",
+    "/pages/song-view/song-view.html",
+    "/pages/song-view/song-view.css",
+    "/pages/song-view/pdf-reader.js",
     "/resources/base64/all_pdfs.js",
     "/resources/base64/introdutione-seconda.js",
     "/resources/base64/pack_tom.js",
