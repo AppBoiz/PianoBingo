@@ -9,8 +9,8 @@ let container;
 function loadPdf(){
     let currentSong = getCurrentSong();
     // Ensure the pdfBase64 variable is available after the pdf-base64.js is imported
-    if (typeof JknQXhQ0 === 'undefined') {
-        console.error('JknQXhQ0 is not defined. Make sure pdf-base64.js is properly loaded.');
+    if (typeof t2t9h8uF === 'undefined') {
+        console.error('t2t9h8uF is not defined. Make sure pdf-base64.js is properly loaded.');
     } else {
         container = document.getElementById('pdf-viewer');
 
