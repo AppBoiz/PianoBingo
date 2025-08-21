@@ -8,7 +8,6 @@
 </head>
 <body class="pdf-page" onload="load()">
   <nav>
-    <button onclick="back()">Back</button>
     <h1 id="title"></h1>
     <div style="width: 121px;">
       <div class="checkboxNav">
@@ -45,10 +44,6 @@
   </footer>
 
   <script>
-    function back(){
-      startNewGame()
-      loadPage(PAGE.PACK_SELECT)
-    }
 
     function load(){
       loadPdf();
