@@ -30,7 +30,7 @@
 
         <!-- footer -->
         <div class="footer">
-            <button class="primary-btn">Ok</button>
+            <button class="primary-btn" onclick="handleCreateNewSong()">➕ New Song</button>
         </div>
 
     </div>
@@ -66,8 +66,12 @@
                         <span class="playlist-name">${song.title}</span>
                         <div class="playlist-actions">
                             ${hasPdf 
-                                ? `<button class="pdf-btn" data-song-id="${song.songId}">📄 View PDF</button>` 
-                                : `<input type="file" accept="application/pdf" class="pdf-upload" data-song-id="${song.songId}"/>`}
+                                ? `
+                                    <button class="pdf-btn" data-song-id="${song.songId}">📄 View PDF</button>
+                                    <button class="remove-pdf-btn" data-song-id="${song.songId}">❌ Remove PDF</button>
+                                `
+                                : `<input type="file" accept="application/pdf" class="pdf-upload" data-song-id="${song.songId}"/>`
+                            }
                             <button class="delete-btn" onClick="handleDeleteSong(${song.songId})">🗑️</button>
                         </div>
                     </div>
@@ -96,15 +100,26 @@
             container.querySelectorAll(".pdf-btn").forEach(btn => {
                 btn.addEventListener("click", (e) => {
                     const songId = parseInt(e.target.getAttribute("data-song-id"), 10);
-
-                    // View PDF... Open PDF reader with contents
                     const song = songData.find(s => s.songId === songId);
-                    if (song && song.pdfBase64) {
+                    if (song && song.pdfUrl) {
                         const link = document.createElement("a");
-                        link.href = song.pdfBase64;
+                        link.href = song.pdfUrl;
                         link.download = `${song.title || "song"}.pdf`;
                         link.target = "_blank";
                         link.click();
+                    }
+                });
+            });
+
+            // attach listeners to PDF remove buttons
+            container.querySelectorAll(".remove-pdf-btn").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const songId = parseInt(e.target.getAttribute("data-song-id"), 10);
+                    const song = songData.find(s => s.songId === songId);
+                    if (song) {
+                        song.pdfUrl = null; // remove PDF
+                        saveSong(song);
+                        renderPage(); // refresh row to show upload input again
                     }
                 });
             });
@@ -112,14 +127,17 @@
         }
 
         function handleCreateNewSong() {
-            const maxPackId = Math.max(...packData.map(item => item.packId));
-            const newPack = {
-                packId: Math.max(maxPackId + 1, INDEXED_BD_CONFIG.PARTITION_SIZE),
-                packName: "New Pack"
-            };
-            // TODO: Write Pack To Local Storage
-            packData.push(newPack);
-            renderPage();
+            loadAllSongs().then(songData => {
+                const maxSongId = songData.length > 0 ? Math.max(...songData.map(item => item.songId)) : 0;
+                const newSong = {
+                    songId: maxSongId + 1,
+                    title: "New Song",
+                    pdfUrl: null
+                };
+
+                saveSong(newSong); // <-- persist new song
+                renderPage(); // refresh to show it
+            });
         }
 
         function handleEditSong(songId) {
