@@ -113,7 +113,7 @@
                         const base64 = await fileToBase64(file);
                         const song = songData.find(s => s.songId === songId);
                         if (song) {
-                            song.pdfUrl = base64;
+                            song.pdfUrl = base64.split(",")[1];
                             saveSong(song);
                             renderPage(); // re-render to show "View PDF" button
                         }
