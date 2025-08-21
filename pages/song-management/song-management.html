@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="../icons/icon-512x512.png">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="./song-management.css" />
+
+    <title>PianoBingo</title>
+    <link rel="manifest" href="../../manifest.json">
+    <link rel="stylesheet" href="../../styles.css" />
+</head>
+<body>
+    <div id="app"> 
+        <div class="nav-bar">
+            <div class="back-container nav-bar-left">
+                <button onclick="back()">Back</button>
+            </div>
+            <h1>Manage Songs</h1>
+        </div>
+
+        <!-- scrollable section -->
+        <div class="main-content">
+            <div id="playlust-container" class="playlist-container" style="flex-grow: 1;"></div>
+        </div>
+
+        <!-- footer -->
+        <div class="footer">
+            <button class="primary-btn">Ok</button>
+        </div>
+
+    </div>
+    <script>
+
+        function back(){
+            startNewGame();
+            loadPage(PAGE.WELCOME);
+        }
+
+        function renderPage() {
+            generateRadioButtonsFromSongs();
+        }
+
+        function renderPage() {
+            generateCheckListFromSongs();
+        }
+
+        let packData = undefined;
+
+        async function generateCheckListFromSongs() {
+            const container = document.querySelector('.playlist-container');
+            const okButton = document.querySelector(".primary-btn");
+            if (!container) return;
+
+            const songData = await loadAllSongs();
+
+            container.innerHTML = songData.map((song) => {
+                const hasPdf = !!song.pdfUrl;
+                return `
+                    <div class="playlist-row">
+                        <span class="playlist-name">${song.songId}</span>
+                        <span class="playlist-name">${song.title}</span>
+                        <div class="playlist-actions">
+                            ${hasPdf 
+                                ? `<button class="pdf-btn" data-song-id="${song.songId}">📄 View PDF</button>` 
+                                : `<input type="file" accept="application/pdf" class="pdf-upload" data-song-id="${song.songId}"/>`}
+                            <button class="delete-btn" onClick="handleDeleteSong(${song.songId})">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            
+            // attach listeners to PDF upload inputs
+            container.querySelectorAll(".pdf-upload").forEach(input => {
+                input.addEventListener("change", async (e) => {
+                    const songId = parseInt(e.target.getAttribute("data-song-id"), 10);
+                    const file = e.target.files[0];
+                    if (file) {
+                        const base64 = await fileToBase64(file);
+                        const song = songData.find(s => s.songId === songId);
+                        if (song) {
+                            song.pdfUrl = base64;
+                            saveSong(song);
+                            renderPage(); // re-render to show "View PDF" button
+                        }
+                    }
+                });
+            });
+
+            // attach listeners to PDF view buttons
+            container.querySelectorAll(".pdf-btn").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const songId = parseInt(e.target.getAttribute("data-song-id"), 10);
+
+                    // View PDF... Open PDF reader with contents
+                    const song = songData.find(s => s.songId === songId);
+                    if (song && song.pdfBase64) {
+                        const link = document.createElement("a");
+                        link.href = song.pdfBase64;
+                        link.download = `${song.title || "song"}.pdf`;
+                        link.target = "_blank";
+                        link.click();
+                    }
+                });
+            });
+            
+        }
+
+        function handleCreateNewSong() {
+            const maxPackId = Math.max(...packData.map(item => item.packId));
+            const newPack = {
+                packId: Math.max(maxPackId + 1, INDEXED_BD_CONFIG.PARTITION_SIZE),
+                packName: "New Pack"
+            };
+            // TODO: Write Pack To Local Storage
+            packData.push(newPack);
+            renderPage();
+        }
+
+        function handleEditSong(songId) {
+            // selectPack(packId);
+            loadPage(PAGE.SONG_EDIT);
+        }
+
+        function handleDeleteSong(songId) {
+            deleteSong(songId);
+            renderPage(); // re-render list after deletion
+        }
+
+    </script>
+    <script src="../../app.js"></script>
+    <script src="../../services/navigation/navigation.js"></script>
+    <script src="../../../resources/base64/pack_tom.js"></script>  <!-- Must Load before gameStorage -->
+    <script src="../../resources/base64/pack_jack.js"></script>  <!-- Must Load before gameStorage -->
+    <script src="../../../resources/state-helpers/gameStorage.js"></script>  
+    <script>renderPage()</script>
+</body>
+</html>

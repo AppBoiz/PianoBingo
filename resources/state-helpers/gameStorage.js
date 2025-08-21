@@ -971,7 +971,7 @@ const INDEXED_BD_CONFIG = {
   DB_VERSION: 1,
   // New local objects are given ids starting from this number (PARTITION_SIZE)
   // This is so we can separate centreal server data and the user's own locally created data
-  PARTITION_SIZE: 10000,
+  PARTITION_SIZE: 1000000,
   SCHEMAS: {
     PACKS: 'packs',
     SONGS: 'songs'
@@ -1233,17 +1233,19 @@ async function generateSong() {
 }
 
 async function setSongId(songId){
-  const selectedPackId = getSelectedSongPackId();
-  const selectedPack = await loadPack(selectedPackId);
+  // TODO: Move checks to a game state specific getter / setter file - is currently being used to know which song is being edited in song management view
 
-  if (!selectedPack) {
-    console.warn("Selected pack not found");
-    return null;
-  }
+  // const selectedPackId = getSelectedSongPackId();
+  // const selectedPack = await loadPack(selectedPackId);
 
-  if (!selectedPack.songs.includes(songId)) {
-    console.warn("Selected song not in pack")
-  }
+  // if (!selectedPack) {
+  //   console.warn("Selected pack not found");
+  //   return null;
+  // }
+
+  // if (!selectedPack.songs.includes(songId)) {
+  //   console.warn("Selected song not in pack")
+  // }
 
   const selectedSong = await loadSong(songId);
 

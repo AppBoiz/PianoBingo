@@ -4,7 +4,9 @@ const PAGE = {
   PACK_SELECT: '../pages/pack-select/pack-select.html',
   GAME_HISTORY: 'pages/game-history/game-history.html',
   PACK_MANAGEMENT: 'pages/pack-management/pack-management.html',
-  PACK_EDIT: 'pages/pack-edit/pack-edit.html'
+  PACK_EDIT: 'pages/pack-edit/pack-edit.html',
+  SONG_MANAGEMENT: 'pages/song-management/song-management.html',
+  SONG_EDIT: 'pages/song-edit/song-edit.html'
 };
 
 let last_page = "";
