@@ -1,14 +1,47 @@
-body {
+body, html {
+    height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden;
-    font-family: 'Inter', sans-serif;
-    background: white;
-    color: #333;
-    text-align: center;
-    box-sizing: border-box;
 }
 
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* prevent double scrollbars */
+    width: 100%;      /* container is full width so scrollbar is at far right */
+}
+
+.playlist-container {
+    flex-grow: 1;
+    overflow-y: auto;          /* enable vertical scroll */
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;               /* container is full width */
+    box-sizing: border-box;
+    padding: 0;                /* no horizontal padding here */
+}
+
+.playlist-row {
+    max-width: 500px;          /* content width */
+    margin: 0 auto;            /* center content inside container */
+    padding: 0.75rem 1rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    box-sizing: border-box;
+}
 h1 {
     font-size: 45px;
     font-family: 'Inter', sans-serif;
@@ -52,27 +85,6 @@ h2 {
     cursor: pointer;
 }
 
-.playlist-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  margin: 1rem auto;
-  max-width: 500px;
-  padding: 0 1rem;
-  overflow-y: auto;
-
-}
-
-.playlist-row {
-  background-color: white;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-}
 
 .playlist-name {
   font-size: 1rem;
