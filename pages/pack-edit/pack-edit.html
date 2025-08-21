@@ -87,31 +87,57 @@
             container.innerHTML = songData.map((song) => {
                 const isChecked = packData.songs.includes(song.songId) ? "checked" : "";
                 return `
-                    <div class="playlist-row">
+                    <div class="playlist-row" data-song-id="${song.songId}">
                         <span class="playlist-name">${song.songId}</span>
                         <span class="playlist-name">${song.title}</span>
                         <input 
                             type="checkbox" 
                             class="playlist-checkbox" 
-                            data-song-id="${song.songId}"
                             ${isChecked} 
                         />
                     </div>
                 `;
             }).join('');
 
-            // attach listeners to checkboxes
-            container.querySelectorAll(".playlist-checkbox").forEach(checkbox => {
-                checkbox.addEventListener("change", (e) => {
-                    const songId = parseInt(e.target.getAttribute("data-song-id"), 10); // convert to integer
-                    if (e.target.checked) {
+            // Add row click listeners to toggle checkbox
+            container.querySelectorAll(".playlist-row").forEach(row => {
+                row.addEventListener("click", (e) => {
+                    // Prevent toggling if user clicked directly on the checkbox
+                    if (e.target.classList.contains("playlist-checkbox")) return;
+
+                    const checkbox = row.querySelector(".playlist-checkbox");
+                    if (!checkbox) return;
+
+                    checkbox.checked = !checkbox.checked;
+
+                    const songId = parseInt(row.getAttribute("data-song-id"), 10);
+                    if (checkbox.checked) {
                         if (!packData.songs.includes(songId)) {
                             packData.songs.push(songId);
                         }
                     } else {
                         packData.songs = packData.songs.filter(id => parseInt(id, 10) !== songId);
                     }
+
                     renderPage(); // re-render to update counter + state
+                });
+            });
+
+            // Attach separate listener to checkboxes directly
+            container.querySelectorAll(".playlist-checkbox").forEach(checkbox => {
+                checkbox.addEventListener("change", (e) => {
+                    const row = checkbox.closest(".playlist-row");
+                    const songId = parseInt(row.getAttribute("data-song-id"), 10);
+
+                    if (checkbox.checked) {
+                        if (!packData.songs.includes(songId)) {
+                            packData.songs.push(songId);
+                        }
+                    } else {
+                        packData.songs = packData.songs.filter(id => parseInt(id, 10) !== songId);
+                    }
+
+                    renderPage(); // update counter + state
                 });
             });
         }
