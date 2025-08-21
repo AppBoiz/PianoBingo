@@ -79,16 +79,6 @@
                 `;
             }).join('');
 
-            // 🎵 Title editing listeners
-            container.querySelectorAll(".playlist-title-input").forEach(input => {
-                // Save on Enter
-                input.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter") {
-                        e.target.blur(); // triggers blur handler
-                    }
-                });
-            });
-
             // attach listeners to PDF upload inputs
             container.querySelectorAll(".pdf-upload").forEach(input => {
                 input.addEventListener("change", async (e) => {
