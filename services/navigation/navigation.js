@@ -6,7 +6,7 @@ const PAGE = {
   PACK_MANAGEMENT: 'pages/pack-management/pack-management.html',
   PACK_EDIT: 'pages/pack-edit/pack-edit.html',
   SONG_MANAGEMENT: 'pages/song-management/song-management.html',
-  SONG_EDIT: 'pages/song-edit/song-edit.html'
+  SONG_VIEW: 'pages/song-view/song-view.html'
 };
 
 let last_page = "";
