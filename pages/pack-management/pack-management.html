@@ -87,8 +87,7 @@
         }
 
         async function handleRenamePack(packId, newName) {
-            const packs = await loadAllPacks();
-            const pack = packs.find(p => p.packId === packId);
+            const pack = await loadPack(packId);
 
             if (pack) {
                 pack.packName = newName.trim() || "Untitled Pack"; // fallback if empty
