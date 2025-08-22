@@ -13,6 +13,7 @@
     <title>PianoBingo</title>
     <link rel="manifest" href="../../manifest.json">
     <link rel="stylesheet" href="../../styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
     <div id="app"> 
@@ -99,7 +100,7 @@
                     return a.songId - b.songId; // neither in pack → sort by songId
                 }
             });
-            debugger;
+
             container.innerHTML = songData.map((song) => {
                 const songIdInPack = packData.songs.findIndex(songId => songId === song.songId) + 1;
                 const isChecked = songIdInPack !== 0 ? "checked" : ""; // 0 is, the song was not found in pack
@@ -159,6 +160,8 @@
                     renderPage(); // update counter + state
                 });
             });
+
+            enableDragAndDrop();
         }
 
         function handleCreateNewPack() {
@@ -178,6 +181,39 @@
             // TODO: Delete Pack From Local Storage
             packData = newPacksList;
             renderPage();
+        }
+
+        let sortableInstance = null;
+
+        function enableDragAndDrop() {
+            const container = document.querySelector('.playlist-container');
+            if (sortableInstance) return; // don't re-init each render
+
+            sortableInstance = Sortable.create(container, {
+                animation: 150,
+                handle: ".playlist-name",
+                onEnd: function () {
+                    const newOrder = Array.from(container.querySelectorAll(".playlist-row"))
+                        .map(row => parseInt(row.getAttribute("data-song-id"), 10))
+                        .filter(songId => packData.songs.includes(songId));
+
+                    packData.songs = newOrder;
+                    // ❌ don’t call renderPage() here → that kills Sortable
+                    // Instead just update numbers in DOM:
+                    updateSongOrderNumbers();
+                }
+            });
+        }
+
+        function updateSongOrderNumbers() {
+            const rows = document.querySelectorAll(".playlist-row");
+            rows.forEach((row, index) => {
+                const songId = parseInt(row.getAttribute("data-song-id"), 10);
+                if (packData.songs.includes(songId)) {
+                    // set position number
+                    row.querySelector(".playlist-name").textContent = index + 1;
+                }
+            });
         }
 
     </script>
