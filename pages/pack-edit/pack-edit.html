@@ -200,9 +200,6 @@
                         .filter(songId => packData.songs.includes(songId));
 
                     packData.songs = newOrder;
-                    // ❌ don’t call renderPage() here → that kills Sortable
-                    // Instead just update numbers in DOM:
-                    // updateSongOrderNumbers();
                     renderPage();
                 }
             });
