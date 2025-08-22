@@ -58,7 +58,6 @@
                 const hasPdf = !!song.pdfUrl;
                 return `
                     <div class="playlist-row">
-                        <span class="playlist-name">${song.songId}</span>
                         <input 
                             type="text" 
                             class="playlist-name-input"
@@ -124,7 +123,7 @@
 
         function handleCreateNewSong() {
             loadAllSongs().then(async songData => {
-                const maxSongId = songData.length > 0 ? Math.max(...songData.map(item => item.songId)) : 0;
+                const maxSongId = Math.max(songData.length > 0 ? Math.max(...songData.map(item => item.songId)) : 0, INDEXED_BD_CONFIG.PARTITION_SIZE);
                 const newSong = {
                     songId: maxSongId + 1,
                     title: "New Song",
