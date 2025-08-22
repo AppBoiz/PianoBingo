@@ -100,6 +100,16 @@ h2 {
   box-sizing: border-box;
 }
 
+.drag-handle {
+    cursor: grab;
+    font-weight: bold;
+    width: 30px;
+    display: inline-block;
+    text-align: center;
+    margin-right: 10px;
+    color: #F14D8A;
+}
+
 .playlist-checkbox {
   appearance: none;             /* remove default */
   width: 22px;

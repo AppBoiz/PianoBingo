@@ -103,17 +103,19 @@
 
             container.innerHTML = songData.map((song) => {
                 const songIdInPack = packData.songs.findIndex(songId => songId === song.songId) + 1;
-                const isChecked = songIdInPack !== 0 ? "checked" : ""; // 0 is, the song was not found in pack
+                const isChecked = songIdInPack !== 0; // 0 is, the song was not found in pack
                 return `
                     <div class="playlist-row" data-song-id="${song.songId}">
                         ${
-                            isChecked ? `<span class="playlist-name">${songIdInPack}</span>` : ""
+                            isChecked
+                            ? `<span class="drag-handle">${songIdInPack}</span>`
+                            : "<div></div>"
                         }
                         <span class="playlist-name">${song.title}</span>
                         <input 
                             type="checkbox" 
                             class="playlist-checkbox" 
-                            ${isChecked} 
+                            ${isChecked ? "checked" : ""} 
                         />
                     </div>
                 `;
@@ -191,7 +193,7 @@
 
             sortableInstance = Sortable.create(container, {
                 animation: 150,
-                handle: ".playlist-name",
+                handle: ".drag-handle",
                 onEnd: function () {
                     const newOrder = Array.from(container.querySelectorAll(".playlist-row"))
                         .map(row => parseInt(row.getAttribute("data-song-id"), 10))
@@ -200,18 +202,8 @@
                     packData.songs = newOrder;
                     // ❌ don’t call renderPage() here → that kills Sortable
                     // Instead just update numbers in DOM:
-                    updateSongOrderNumbers();
-                }
-            });
-        }
-
-        function updateSongOrderNumbers() {
-            const rows = document.querySelectorAll(".playlist-row");
-            rows.forEach((row, index) => {
-                const songId = parseInt(row.getAttribute("data-song-id"), 10);
-                if (packData.songs.includes(songId)) {
-                    // set position number
-                    row.querySelector(".playlist-name").textContent = index + 1;
+                    // updateSongOrderNumbers();
+                    renderPage();
                 }
             });
         }
