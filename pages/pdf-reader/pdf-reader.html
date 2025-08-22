@@ -8,21 +8,17 @@
 </head>
 <body class="pdf-page" onload="load()">
   <nav>
+    <div style="width:121px;"></div> <!-- left spacer (same width as right menu) -->
     <h1 id="title"></h1>
-    <div style="width: 121px;">
+    <div style="width:121px;">
       <div class="checkboxNav">
         <div class="checkBoxBox">
-          <!-- Hidden checkbox drives the state -->
           <input type="checkbox" id="menu-toggle">
-          
-          <!-- Icon -->
           <label class="hamburger" for="menu-toggle">
             <span class="bar"></span>
             <span class="bar"></span>
             <span class="bar"></span>
           </label>
-        
-          <!-- Links -->
           <div class="menu">
             <a href="#" onclick="nextSong()">Next Song</a>
             <a href="#" onclick="prevSong()">Previous Song</a>
@@ -33,7 +29,7 @@
       </div>
     </div>
   </nav>
-  
+    
   <div id="pdf-viewer">
     <span class="left" onclick="changePage(-1)"></span>
     <span class="right" onclick="changePage(1)"></span>
@@ -46,7 +42,6 @@
   <script>
 
     async function load(){
-      debugger;
       loadPdf();
       const gamedata = getCurrentSong();
       const selectedPackId = getSelectedSongPackId();
