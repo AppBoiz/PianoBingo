@@ -28,19 +28,23 @@
             loadPage(PAGE.GAME)
         }
 
-        function generateBoxes() {
+        async function generateBoxes() {
             const container = document.querySelector('.box-container');
             if (!container) return;
 
-            const usedIds = getShownSongIds();
+            const selectedPackId = getSelectedSongPackId();
+            const packData = await loadPack(selectedPackId);
 
+            const usedIds = getShownSongIds();
+            const songsIds = packData.songs;
             container.innerHTML = ''; // Clear existing content
 
             for (let i = 1; i <= 75; i++) {
                 const box = document.createElement('div');
+                const songId = songsIds[i - 1];
                 box.classList.add('box');
-                if (usedIds.includes(i)) {
-                box.classList.add('highlighted');
+                if (usedIds.includes(songId)) {
+                    box.classList.add('highlighted');
                 }
                 box.textContent = i;
                 container.appendChild(box);

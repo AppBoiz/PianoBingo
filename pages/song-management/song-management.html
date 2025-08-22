@@ -58,7 +58,6 @@
                 const hasPdf = !!song.pdfUrl;
                 return `
                     <div class="playlist-row">
-                        <span class="playlist-name">${song.songId}</span>
                         <input 
                             type="text" 
                             class="playlist-name-input"
@@ -68,10 +67,13 @@
                         <div class="playlist-actions">
                             ${hasPdf 
                                 ? `
-                                    <button class="pdf-btn" onClick="handleViewSong(${song.songId})">📄 View PDF</button>
-                                    <button class="remove-pdf-btn" data-song-id="${song.songId}">❌ Remove PDF</button>
+                                    <button class="pdf-btn" onClick="handleViewSong(${song.songId})">📄 View</button>
+                                    <button class="remove-pdf-btn" data-song-id="${song.songId}">❌ PDF</button>
                                 `
-                                : `<input type="file" accept="application/pdf" class="pdf-upload" data-song-id="${song.songId}"/>`
+                                : `
+                                    <label class="pdf-upload-label" for="upload-${song.songId}">📤 Upload PDF</label>
+                                    <input type="file" accept="application/pdf" class="pdf-upload" id="upload-${song.songId}" data-song-id="${song.songId}"/>
+                                `
                             }
                             <button class="delete-btn" onClick="handleDeleteSong(${song.songId})">🗑️</button>
                         </div>
@@ -124,7 +126,7 @@
 
         function handleCreateNewSong() {
             loadAllSongs().then(async songData => {
-                const maxSongId = songData.length > 0 ? Math.max(...songData.map(item => item.songId)) : 0;
+                const maxSongId = Math.max(songData.length > 0 ? Math.max(...songData.map(item => item.songId)) : 0, INDEXED_BD_CONFIG.PARTITION_SIZE);
                 const newSong = {
                     songId: maxSongId + 1,
                     title: "New Song",

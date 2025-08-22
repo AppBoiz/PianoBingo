@@ -13,6 +13,7 @@
     <title>PianoBingo</title>
     <link rel="manifest" href="../../manifest.json">
     <link rel="stylesheet" href="../../styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
     <div id="app"> 
@@ -84,16 +85,37 @@
                 }
             };
 
+            // 🔹 Sort songs: first by presence in pack, then by order in pack, then by songId
+            const sortedSongs = songData.sort((a, b) => {
+                const indexA = packData.songs.findIndex(songId => songId === a.songId);
+                const indexB = packData.songs.findIndex(songId => songId === b.songId);
+
+                if (indexA !== -1 && indexB !== -1) {
+                    return indexA - indexB; // both in pack → keep pack order
+                } else if (indexA !== -1) {
+                    return -1; // a is in pack → comes first
+                } else if (indexB !== -1) {
+                    return 1; // b is in pack → comes first
+                } else {
+                    return a.songId - b.songId; // neither in pack → sort by songId
+                }
+            });
+
             container.innerHTML = songData.map((song) => {
-                const isChecked = packData.songs.includes(song.songId) ? "checked" : "";
+                const songIdInPack = packData.songs.findIndex(songId => songId === song.songId) + 1;
+                const isChecked = songIdInPack !== 0; // 0 is, the song was not found in pack
                 return `
-                    <div class="playlist-row" data-song-id="${song.songId}">
-                        <span class="playlist-name">${song.songId}</span>
+                    <div class="playlist-row ${isChecked ? '' : 'unchecked'}" data-song-id="${song.songId}">
+                        ${
+                            isChecked
+                            ? `<span class="drag-handle">${songIdInPack}</span>`
+                            : "<span class='drag-handle'>&nbsp;</span>"
+                        }
                         <span class="playlist-name">${song.title}</span>
                         <input 
                             type="checkbox" 
                             class="playlist-checkbox" 
-                            ${isChecked} 
+                            ${isChecked ? "checked" : ""} 
                         />
                     </div>
                 `;
@@ -140,6 +162,8 @@
                     renderPage(); // update counter + state
                 });
             });
+
+            enableDragAndDrop();
         }
 
         function handleCreateNewPack() {
@@ -159,6 +183,26 @@
             // TODO: Delete Pack From Local Storage
             packData = newPacksList;
             renderPage();
+        }
+
+        let sortableInstance = null;
+
+        function enableDragAndDrop() {
+            const container = document.querySelector('.playlist-container');
+            if (sortableInstance) return; // don't re-init each render
+
+            sortableInstance = Sortable.create(container, {
+                animation: 150,
+                handle: ".drag-handle",
+                onEnd: function () {
+                    const newOrder = Array.from(container.querySelectorAll(".playlist-row"))
+                        .map(row => parseInt(row.getAttribute("data-song-id"), 10))
+                        .filter(songId => packData.songs.includes(songId));
+
+                    packData.songs = newOrder;
+                    renderPage();
+                }
+            });
         }
 
     </script>

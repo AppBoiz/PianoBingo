@@ -100,6 +100,26 @@ h2 {
   box-sizing: border-box;
 }
 
+.playlist-row.unchecked {
+    opacity: 0.5;               /* makes it look faded */
+    color: #999;                 /* optional: fade text color */
+}
+
+.playlist-row.unchecked .playlist-name,
+.playlist-row.unchecked .drag-handle {
+    color: #999;                /* fade handle and song number too */
+}
+
+.drag-handle {
+    cursor: grab;
+    font-weight: bold;
+    width: 30px;
+    display: inline-block;
+    text-align: center;
+    margin-right: 10px;
+    color: #F14D8A;
+}
+
 .playlist-checkbox {
   appearance: none;             /* remove default */
   width: 22px;
