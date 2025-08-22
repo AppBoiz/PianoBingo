@@ -84,11 +84,30 @@
                 }
             };
 
+            // 🔹 Sort songs: first by presence in pack, then by order in pack, then by songId
+            const sortedSongs = songData.sort((a, b) => {
+                const indexA = packData.songs.findIndex(songId => songId === a.songId);
+                const indexB = packData.songs.findIndex(songId => songId === b.songId);
+
+                if (indexA !== -1 && indexB !== -1) {
+                    return indexA - indexB; // both in pack → keep pack order
+                } else if (indexA !== -1) {
+                    return -1; // a is in pack → comes first
+                } else if (indexB !== -1) {
+                    return 1; // b is in pack → comes first
+                } else {
+                    return a.songId - b.songId; // neither in pack → sort by songId
+                }
+            });
+            debugger;
             container.innerHTML = songData.map((song) => {
-                const isChecked = packData.songs.includes(song.songId) ? "checked" : "";
+                const songIdInPack = packData.songs.findIndex(songId => songId === song.songId) + 1;
+                const isChecked = songIdInPack !== 0 ? "checked" : ""; // 0 is, the song was not found in pack
                 return `
                     <div class="playlist-row" data-song-id="${song.songId}">
-                        <span class="playlist-name">${song.songId}</span>
+                        ${
+                            isChecked ? `<span class="playlist-name">${songIdInPack}</span>` : ""
+                        }
                         <span class="playlist-name">${song.title}</span>
                         <input 
                             type="checkbox" 
