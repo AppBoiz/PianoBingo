@@ -1027,7 +1027,7 @@ function openDB() {
         // Check if any of the original songs are missing
         // if so, add them
         for (const BASE_SONG of BASE_SONG_DATA) {
-          const existing = songs.find(p => p.packId === BASE_SONG.songId);
+          const existing = songs.find(s => s.songId === BASE_SONG.songId);
 
           if (!existing || existing.version < BASE_SONG.version) {
             await saveSong(BASE_SONG);
