@@ -100,6 +100,16 @@ h2 {
   box-sizing: border-box;
 }
 
+.playlist-row.unchecked {
+    opacity: 0.5;               /* makes it look faded */
+    color: #999;                 /* optional: fade text color */
+}
+
+.playlist-row.unchecked .playlist-name,
+.playlist-row.unchecked .drag-handle {
+    color: #999;                /* fade handle and song number too */
+}
+
 .drag-handle {
     cursor: grab;
     font-weight: bold;

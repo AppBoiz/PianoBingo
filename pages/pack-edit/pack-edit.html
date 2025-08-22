@@ -105,11 +105,11 @@
                 const songIdInPack = packData.songs.findIndex(songId => songId === song.songId) + 1;
                 const isChecked = songIdInPack !== 0; // 0 is, the song was not found in pack
                 return `
-                    <div class="playlist-row" data-song-id="${song.songId}">
+                    <div class="playlist-row ${isChecked ? '' : 'unchecked'}" data-song-id="${song.songId}">
                         ${
                             isChecked
                             ? `<span class="drag-handle">${songIdInPack}</span>`
-                            : "<div></div>"
+                            : "<span class='drag-handle'>&nbsp;</span>"
                         }
                         <span class="playlist-name">${song.title}</span>
                         <input 
