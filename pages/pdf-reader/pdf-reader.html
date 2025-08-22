@@ -45,10 +45,15 @@
 
   <script>
 
-    function load(){
+    async function load(){
+      debugger;
       loadPdf();
       const gamedata = getCurrentSong();
-      document.getElementById("title").innerText = gamedata.id.toString() + " - " + gamedata.title.toString()
+      const selectedPackId = getSelectedSongPackId();
+      const packData = await loadPack(selectedPackId);
+      const index = packData.songs.findIndex(songId => songId === gamedata.songId)
+      const songIdInPack = index + 1;
+      document.getElementById("title").innerText = songIdInPack + " - " + gamedata.title.toString()
     }
   </script>
 

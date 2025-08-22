@@ -32,8 +32,6 @@
             const container = document.querySelector('.box-container');
             if (!container) return;
 
-            debugger;
-
             const selectedPackId = getSelectedSongPackId();
             const packData = await loadPack(selectedPackId);
 
@@ -43,7 +41,7 @@
 
             for (let i = 1; i <= 75; i++) {
                 const box = document.createElement('div');
-                const songId = songsIds[i];
+                const songId = songsIds[i - 1];
                 box.classList.add('box');
                 if (usedIds.includes(songId)) {
                     box.classList.add('highlighted');
