@@ -67,10 +67,13 @@
                         <div class="playlist-actions">
                             ${hasPdf 
                                 ? `
-                                    <button class="pdf-btn" onClick="handleViewSong(${song.songId})">📄 View PDF</button>
-                                    <button class="remove-pdf-btn" data-song-id="${song.songId}">❌ Remove PDF</button>
+                                    <button class="pdf-btn" onClick="handleViewSong(${song.songId})">📄 View</button>
+                                    <button class="remove-pdf-btn" data-song-id="${song.songId}">❌ PDF</button>
                                 `
-                                : `<input type="file" accept="application/pdf" class="pdf-upload" data-song-id="${song.songId}"/>`
+                                : `
+                                    <label class="pdf-upload-label" for="upload-${song.songId}">📤 Upload PDF</label>
+                                    <input type="file" accept="application/pdf" class="pdf-upload" id="upload-${song.songId}" data-song-id="${song.songId}"/>
+                                `
                             }
                             <button class="delete-btn" onClick="handleDeleteSong(${song.songId})">🗑️</button>
                         </div>
