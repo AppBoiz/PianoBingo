@@ -13,7 +13,6 @@
     <title>PianoBingo</title>
     <link rel="manifest" href="../../manifest.json">
     <link rel="stylesheet" href="../../styles.css" />
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
     <div id="app"> 
@@ -44,19 +43,15 @@
         }
 
         function renderPage() {
-            generateRadioButtonsFromSongs();
-        }
-
-        function renderPage() {
-            generateCheckListFromSongs();
+            generateSongSlots();
         }
 
         let packData = undefined;
 
-        async function generateCheckListFromSongs() {
+        async function generateSongSlots() {
             const container = document.querySelector('.playlist-container');
             const counterEl = document.getElementById("song-counter");
-            const okButton = document.querySelector(".primary-btn"); // get Ok button
+            const okButton = document.querySelector(".primary-btn");
             if (!container) return;
             
             const selectedSongPackId = getSelectedSongPackId();
@@ -67,149 +62,63 @@
             const songData = await loadAllSongs();
 
             if (!packData.songs) {
-                packData.songs = []; // ensure songs array exists
+                packData.songs = []; // array of songIds by slot
+            }
+
+            // ensure the songs array always has 75 slots
+            if (packData.songs.length < 75) {
+                packData.songs.length = 75; // fills missing entries with undefined
             }
 
             const total = 75;
-            const selected = packData.songs.length;
+            const selected = packData.songs.filter(id => id !== undefined && id !== null).length;
             counterEl.textContent = `${selected}/${total}`;
 
-            // ✅ enable/disable Ok button
+            // enable/disable Ok button
             okButton.disabled = selected !== total;
 
             // attach callback to Ok button
             okButton.onclick = () => {
                 if (selected === total) {
-                    savePack(packData);  // save the pack
-                    loadPage(PAGE.PACK_MANAGEMENT); // go back to pack management
+                    savePack(packData);  
+                    loadPage(PAGE.PACK_MANAGEMENT); 
                 }
             };
 
-            // 🔹 Sort songs: first by presence in pack, then by order in pack, then by songId
-            const sortedSongs = songData.sort((a, b) => {
-                const indexA = packData.songs.findIndex(songId => songId === a.songId);
-                const indexB = packData.songs.findIndex(songId => songId === b.songId);
-
-                if (indexA !== -1 && indexB !== -1) {
-                    return indexA - indexB; // both in pack → keep pack order
-                } else if (indexA !== -1) {
-                    return -1; // a is in pack → comes first
-                } else if (indexB !== -1) {
-                    return 1; // b is in pack → comes first
-                } else {
-                    return a.songId - b.songId; // neither in pack → sort by songId
-                }
-            });
-
-            container.innerHTML = songData.map((song) => {
-                const songIdInPack = packData.songs.findIndex(songId => songId === song.songId) + 1;
-                const isChecked = songIdInPack !== 0; // 0 is, the song was not found in pack
+            // render 75 slots (with blanks where no song is assigned)
+            container.innerHTML = packData.songs.map((songId, index) => {
+                const song = songData.find(s => s.songId === songId);
                 return `
-                    <div class="playlist-row ${isChecked ? '' : 'unchecked'}" data-song-id="${song.songId}">
-                        ${
-                            isChecked
-                            ? `<span class="drag-handle">${songIdInPack}</span>`
-                            : "<span class='drag-handle'>&nbsp;</span>"
-                        }
-                        <span class="playlist-name">${song.title}</span>
-                        <input 
-                            type="checkbox" 
-                            class="playlist-checkbox" 
-                            ${isChecked ? "checked" : ""} 
-                        />
+                    <div class="playlist-row" data-song-id="${songId || ''}">
+                        <span>${index + 1}</span>
+                        <span class="playlist-name">${song ? song.title : ""}</span>
                     </div>
                 `;
             }).join('');
-
-            // Add row click listeners to toggle checkbox
-            container.querySelectorAll(".playlist-row").forEach(row => {
-                row.addEventListener("click", (e) => {
-                    // Prevent toggling if user clicked directly on the checkbox
-                    if (e.target.classList.contains("playlist-checkbox")) return;
-
-                    const checkbox = row.querySelector(".playlist-checkbox");
-                    if (!checkbox) return;
-
-                    checkbox.checked = !checkbox.checked;
-
-                    const songId = parseInt(row.getAttribute("data-song-id"), 10);
-                    if (checkbox.checked) {
-                        if (!packData.songs.includes(songId)) {
-                            packData.songs.push(songId);
-                        }
-                    } else {
-                        packData.songs = packData.songs.filter(id => parseInt(id, 10) !== songId);
-                    }
-
-                    renderPage(); // re-render to update counter + state
-                });
-            });
-
-            // Attach separate listener to checkboxes directly
-            container.querySelectorAll(".playlist-checkbox").forEach(checkbox => {
-                checkbox.addEventListener("change", (e) => {
-                    const row = checkbox.closest(".playlist-row");
-                    const songId = parseInt(row.getAttribute("data-song-id"), 10);
-
-                    if (checkbox.checked) {
-                        if (!packData.songs.includes(songId)) {
-                            packData.songs.push(songId);
-                        }
-                    } else {
-                        packData.songs = packData.songs.filter(id => parseInt(id, 10) !== songId);
-                    }
-
-                    renderPage(); // update counter + state
-                });
-            });
-
-            enableDragAndDrop();
         }
 
         function handleCreateNewPack() {
             const maxPackId = Math.max(...packData.map(item => item.packId));
             const newPack = {
                 packId: Math.max(maxPackId + 1, INDEXED_BD_CONFIG.PARTITION_SIZE),
-                packName: "New Pack"
+                packName: "New Pack",
+                songs: new Array(75).fill(undefined) // create 75 empty slots
             };
-            // TODO: Write Pack To Local Storage
             packData.push(newPack);
             renderPage();
         }
 
         function handleDeletePack(idToRemove) {
             const newPacksList = packData.filter(pack => pack.packId != idToRemove);
-            
-            // TODO: Delete Pack From Local Storage
             packData = newPacksList;
             renderPage();
-        }
-
-        let sortableInstance = null;
-
-        function enableDragAndDrop() {
-            const container = document.querySelector('.playlist-container');
-            if (sortableInstance) return; // don't re-init each render
-
-            sortableInstance = Sortable.create(container, {
-                animation: 150,
-                handle: ".drag-handle",
-                onEnd: function () {
-                    const newOrder = Array.from(container.querySelectorAll(".playlist-row"))
-                        .map(row => parseInt(row.getAttribute("data-song-id"), 10))
-                        .filter(songId => packData.songs.includes(songId));
-
-                    packData.songs = newOrder;
-                    renderPage();
-                }
-            });
         }
 
     </script>
     <script src="../../app.js"></script>
     <script src="../../services/navigation/navigation.js"></script>
-    <script src="../../../resources/base64/pack_tom.js"></script>  <!-- Must Load before gameStorage -->
-    <script src="../../resources/base64/pack_jack.js"></script>  <!-- Must Load before gameStorage -->
+    <script src="../../../resources/base64/pack_tom.js"></script>
+    <script src="../../resources/base64/pack_jack.js"></script>
     <script src="../../../resources/state-helpers/gameStorage.js"></script>  
     <script>renderPage()</script>
 </body>
