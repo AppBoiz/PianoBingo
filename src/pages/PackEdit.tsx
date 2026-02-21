@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react'
-import '/legacy-pages/pack-edit/pack-edit.css'
 import Sortable from 'sortablejs'
 import { getSelectedSongPackId, loadPack, loadAllSongs, savePack, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'

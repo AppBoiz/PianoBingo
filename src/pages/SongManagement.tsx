@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import '/legacy-pages/song-management/song-management.css'
 import { loadAllSongs, saveSong, deleteSong, loadSong, setSongId, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 

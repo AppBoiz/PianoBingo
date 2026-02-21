@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import '/legacy-pages/pack-management/pack-management.css'
 import { loadAllPacks, savePack, deletePack, loadPack, selectPack } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 

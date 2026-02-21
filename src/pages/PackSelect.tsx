@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import '/legacy-pages/pack-select/pack-select.css'
 import { loadAllPacks, selectPack, generateSong, clearGameState } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 
