@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import PDFViewer from '../components/PDFViewer'
 import { getCurrentSong, getShownSongIds, nextSong as storageNextSong, prevSong as storagePrevSong } from '../storage/indexedDb'
+import { useNavigation } from '../context/NavigationContext'
 
 export default function PdfReader(){
   const [base64, setBase64] = useState<string | null>(null)
   const [songId, setSongId] = useState<number | null>(null)
+  const { loadPage } = useNavigation()
 
   useEffect(() => {
     const song = getCurrentSong();
@@ -36,7 +38,11 @@ export default function PdfReader(){
       <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
         <button onClick={prevSong}>Prev Song</button>
         <h2>PDF Reader</h2>
-        <button onClick={nextSong}>Next Song</button>
+        <div>
+          <button onClick={() => loadPage('GAME_HISTORY')}>Game History</button>
+          <button className="red" onClick={() => loadPage('WELCOME')}>End Game</button>
+          <button onClick={nextSong}>Next Song</button>
+        </div>
       </div>
       <PDFViewer base64={base64} />
     </div>

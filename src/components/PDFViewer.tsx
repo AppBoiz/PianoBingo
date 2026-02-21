@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { getDocument } from 'pdfjs-dist'
+// We'll dynamically import `pdfjs-dist` to keep the heavy PDF library out of the main bundle
 
 type Props = {
   base64: string | null | undefined
@@ -12,19 +12,7 @@ export default function PDFViewer({ base64 }: Props){
   const [currentPage, setCurrentPage] = useState<number>(1)
 
   useEffect(() => {
-    // set worker src from package
-    try {
-      // @ts-ignore
-      import('pdfjs-dist/build/pdf.worker.entry').then((workerModule) => {
-        // workerModule path is resolved by bundler; pdfjs will auto-use worker if available
-        // explicit worker setting for safety:
-        // @ts-ignore
-        (window as any).pdfjsLib = (window as any).pdfjsLib || {};
-        // no-op: Vite handles worker import
-      })
-    } catch (e) {
-      console.warn('Could not set pdf worker via package import', e)
-    }
+    // noop: we'll create a dedicated Worker when loading each document
   }, [])
 
   useEffect(() => {
@@ -35,8 +23,12 @@ export default function PDFViewer({ base64 }: Props){
       const len = binary.length;
       const bytes = new Uint8Array(len);
       for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
-
-      const loadingTask = getDocument({ data: bytes });
+      // Dynamically load pdfjs to keep it code-split
+      const pdfjs = await import('pdfjs-dist')
+      const { getDocument } = pdfjs as any
+      // Use the packaged pdfjs worker via Vite's URL handling (bundles the worker).
+      const worker = new Worker(new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url), { type: 'module' });
+      const loadingTask = getDocument({ data: bytes, worker });
       const pdfDoc = await loadingTask.promise;
       setPdf(pdfDoc);
       setTotalPages(pdfDoc.numPages);

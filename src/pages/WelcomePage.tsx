@@ -1,12 +1,14 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useNavigation } from '../context/NavigationContext'
 
 export default function WelcomePage(){
   const nav = useNavigate()
+  const { loadPage } = useNavigation()
 
   function newGameButtonHandler(){
     // placeholder: will call startNewGame from storage when ported
-    nav('/pack-select')
+    loadPage('PACK_SELECT')
   }
 
   return (
@@ -15,8 +17,8 @@ export default function WelcomePage(){
         <img src="/resources/images/logo.png" alt="PianoBingo Logo" id="logo" style={{width:306}} />
       </div>
       <button onClick={newGameButtonHandler}>New Game</button>
-      <button onClick={() => nav('/song-management')}>Manage Songs</button>
-      <button onClick={() => nav('/pack-management')}>Manage Playlists</button>
+      <button onClick={() => loadPage('SONG_MANAGEMENT')}>Manage Songs</button>
+      <button onClick={() => loadPage('PACK_MANAGEMENT')}>Manage Playlists</button>
       <img className="piano-banner" src="/resources/images/piano.png" />
     </div>
   )

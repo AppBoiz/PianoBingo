@@ -288,3 +288,24 @@ export async function setSongId(songId: number) {
   tmpState.currentSong = { ...selectedSong };
   saveGameState(tmpState);
 }
+
+// Convenience helpers to match legacy API used by some pages
+export async function nextSong() {
+  await generateSong();
+  return getCurrentSong();
+}
+
+export async function prevSong() {
+  const gameState = loadGameState() || { shownSongIds: [] };
+  const shown = gameState.shownSongIds || [];
+  if (shown.length <= 1) return null;
+  // previous song id is the one before the last shown
+  const prevId = shown[shown.length - 2];
+  const prevSong = await loadSong(prevId);
+  const tmpState = { ...(gameState || {}) };
+  tmpState.currentSong = { ...prevSong };
+  // remove the last shown entry (going back)
+  tmpState.shownSongIds = shown.slice(0, shown.length - 1);
+  saveGameState(tmpState);
+  return tmpState.currentSong;
+}

@@ -1,0 +1,5 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Original `/styles.css` is imported separately in `src/main.tsx` to preserve visual parity. */

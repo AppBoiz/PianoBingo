@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Reader</title>
+  <link rel="stylesheet" href="./pdf-reader.css" />
+</head>
+<body class="pdf-page" onload="load()">
+  <nav>
+    <div style="width:121px;"></div> <!-- left spacer (same width as right menu) -->
+    <h1 id="title"></h1>
+    <div style="width:121px;">
+      <div class="checkboxNav">
+        <div class="checkBoxBox">
+          <input type="checkbox" id="menu-toggle">
+          <label class="hamburger" for="menu-toggle">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </label>
+          <div class="menu">
+            <a href="#" onclick="nextSong()">Next Song</a>
+            <a href="#" onclick="prevSong()">Previous Song</a>
+            <a href="#" onclick="loadPage(PAGE.GAME_HISTORY)">Game History</a>
+            <a href="#" class="red" onclick="loadPage(PAGE.WELCOME)">End Game</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+    
+  <div id="pdf-viewer">
+    <span class="left" onclick="changePage(-1)"></span>
+    <span class="right" onclick="changePage(1)"></span>
+  </div>
+
+  <footer>
+    <button onclick="nextSong()">Next Song</button>
+  </footer>
+
+  <script>
+
+    async function load(){
+      loadPdf();
+      const gamedata = getCurrentSong();
+      const selectedPackId = getSelectedSongPackId();
+      const packData = await loadPack(selectedPackId);
+      const index = packData.songs.findIndex(songId => songId === gamedata.songId)
+      const songIdInPack = index + 1;
+      document.getElementById("title").innerText = songIdInPack + " - " + gamedata.title.toString()
+    }
+  </script>
+
+  <!-- ✅ PDF.js via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- Import the external JS file containing the Base64 string -->
+  <script src="/resources/base64/pack_tom.js"></script>
+  <script src="/resources/base64/pack_jack.js"></script>
+
+  <script src="./pdf-reader.js"></script>
+  <script src="/services/navigation/navigation.js"></script>
+  <script src="/resources/state-helpers/gameStorage.js"></script>  
+</body>
+</html>

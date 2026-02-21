@@ -1,81 +1,67 @@
-const CACHE_NAME = 'my-pwa-cache-v3.2.4';
+const CACHE_NAME = 'pianobingo-cache-v1';
 
-
+// Keep a small precache list for core shell assets (legacy entries kept where useful)
 const urlsToCache = [
-    "/.gitignore",
-    "/app.js",
-    "/CNAME",
-    "/index.html",
-    "/manifest.json",
-    "/README.md",
-    "/service-worker.js",
-    "/styles.css",
-    "/icons/icon-192x192-old.png",
-    "/icons/icon-192x192.png",
-    "/icons/icon-512x512-old.png",
-    "/icons/icon-512x512.png",
-    "/resources/afterLoad.js",
-    "/pages/game-history/game-history.css",
-    "/pages/game-history/game-history.html",
-    "/pages/pack-select/pack-select.css",
-    "/pages/pack-select/pack-select.html",
-    "/pages/pdf-reader/pdf-reader.css",
-    "/pages/pdf-reader/pdf-reader.html",
-    "/pages/pdf-reader/pdf-reader.js",
-    "/pages/welcome-page/welcome-page.css",
-    "/pages/welcome-page/welcome-page.html",
-    "/pages/pack-edit/pack-edit.html",
-    "/pages/pack-edit/pack-edit.css",
-    "/pages/pack-management/pack-management.html",
-    "/pages/pack-management/pack-management.css",
-    "/pages/song-management/song-management.html",
-    "/pages/song-management/song-management.css",
-    "/pages/song-view/song-view.html",
-    "/pages/song-view/song-view.css",
-    "/pages/song-view/pdf-reader.js",
-    "/resources/base64/all_pdfs.js",
-    "/resources/base64/introdutione-seconda.js",
-    "/resources/base64/pack_tom.js",
-    "/resources/base64/pack_jack.js",
-    "/resources/images/logo.png",
-    "/resources/images/piano.png",
-    "/resources/state-helpers/gameStorage.js",
-    "/services/navigation/host.js",
-    "/services/navigation/navigation.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",
-    "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-  ];
+  '/index.html',
+  '/manifest.json',
+  '/styles.css',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png'
+];
 
 self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                return cache.addAll(urlsToCache);
-            })
-    );
+  // On install, attempt to fetch generated sw-manifest.json (created at build time)
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      let extra = [];
+      try {
+        const resp = await fetch('/sw-manifest.json');
+        if (resp && resp.ok) {
+          extra = await resp.json();
+        }
+      } catch (e) {
+        // ignore — manifest may not exist in dev
+      }
+      const toCache = urlsToCache.concat(Array.isArray(extra) ? extra : []);
+      await cache.addAll(toCache);
+    })()
+  );
 });
 
+// Runtime caching strategy:
+// - Cache-first for built assets under /assets/ (ensures pdf.worker.* and pdf chunks are stored on first fetch)
+// - Cache-first for same-origin requests that were precached
+// - Network fallback for everything else
 self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
+  const url = new URL(req.url);
+
+  // Serve and cache built assets placed under /assets/
+  if (url.origin === location.origin && url.pathname.startsWith('/assets/')) {
     event.respondWith(
-        caches.match(event.request)
-            .then((cachedResponse) => {
-                return cachedResponse || fetch(event.request);
-            })
+      caches.open(CACHE_NAME).then(cache =>
+        cache.match(req).then(cached => cached || fetch(req).then(res => { try { cache.put(req, res.clone()); } catch(e){}; return res; }))
+      )
     );
+    return;
+  }
+
+  // Serve precached assets cache-first
+  event.respondWith(
+    caches.match(req).then(cachedResponse => cachedResponse || fetch(req))
+  );
 });
 
 self.addEventListener('activate', (event) => {
-    const cacheWhitelist = [CACHE_NAME];
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (!cacheWhitelist.includes(cacheName)) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
-    );
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then((cacheNames) => Promise.all(
+      cacheNames.map((cacheName) => {
+        if (!cacheWhitelist.includes(cacheName)) return caches.delete(cacheName);
+      })
+    ))
+  );
 });

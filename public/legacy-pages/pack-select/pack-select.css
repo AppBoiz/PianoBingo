@@ -1,0 +1,88 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    background: white;
+    color: #333;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+h1 {
+    font-size: 45px;
+    font-family: 'Inter', sans-serif;
+    color: black;
+}
+
+h2 {
+    font-size: 35px;
+    color: #7F7F7F;
+    margin-top:60px;
+    margin-bottom: 40px;
+}
+
+.back-container{
+    width: 100%;
+    padding: 30px 40px;
+    display: flex;
+    align-items: center;
+}
+
+.back-container button{
+    color: #F14D8A;
+    font-size: 30px;
+    font-weight: bold;
+    background: none;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
+
+.piano-banner{
+    position: absolute;
+    bottom: -100px;
+    right:-500px;
+    transform: rotate(-45deg);
+    z-index: -100;
+}
+
+.flex-col{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mb-40{
+    margin-bottom: 40px;
+}
+
+.radios-container{
+    display: flex;
+    flex-direction: column;
+    accent-color: #F14D8A;
+    font-size: 25px;
+    font-family: 'Inter', sans-serif;
+    width: fit-content;
+}
+
+.radio-label{
+    display: grid;
+    grid-template-columns: 1em max-content;
+    gap: 0.5em;
+    margin-bottom: 30px;
+}
+
+.select-button {
+    background-color: #F14D8A;
+    color: white;
+    border: none;
+    outline: none;
+    width: 250px;
+    height: 70px;
+    border-radius: 20px;
+    font-size: 25px;
+    font-family: 'Inter', sans-serif;
+    margin-top: 50px;
+    cursor: pointer;
+}

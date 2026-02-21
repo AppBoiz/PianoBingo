@@ -4,19 +4,28 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build && node scripts/generate-sw-manifest.js && node scripts/generate-workbox-sw.js",
+    "preview": "vite preview",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "latest",
-    "pdfjs-dist": "latest"
+    "pdfjs-dist": "latest",
+    "sortablejs": "latest"
   },
   "devDependencies": {
     "typescript": "latest",
     "vite": "latest",
+    "@vitejs/plugin-react": "latest",
     "@types/react": "latest",
-    "@types/react-dom": "latest"
+    "@types/react-dom": "latest",
+    "tailwindcss": "latest",
+    "postcss": "latest",
+    "autoprefixer": "latest",
+    "@tailwindcss/postcss": "latest",
+    "workbox-build": "latest",
+    "@playwright/test": "latest"
   }
 }
