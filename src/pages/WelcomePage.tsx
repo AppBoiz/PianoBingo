@@ -1,13 +1,10 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useNavigation } from '../context/NavigationContext'
 
 export default function WelcomePage(){
-  const nav = useNavigate()
   const { loadPage } = useNavigation()
 
   function newGameButtonHandler(){
-    // placeholder: will call startNewGame from storage when ported
+    // TODO: will call startNewGame from storage when ported
     loadPage('PACK_SELECT')
   }
 

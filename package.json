@@ -9,23 +9,25 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "pdfjs-dist": "latest",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "latest",
-    "pdfjs-dist": "latest",
     "sortablejs": "latest"
   },
   "devDependencies": {
-    "typescript": "latest",
-    "vite": "latest",
-    "@vitejs/plugin-react": "latest",
+    "@playwright/test": "latest",
+    "@tailwindcss/postcss": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "tailwindcss": "latest",
-    "postcss": "latest",
+    "@vitejs/plugin-react": "latest",
     "autoprefixer": "latest",
-    "@tailwindcss/postcss": "latest",
-    "workbox-build": "latest",
-    "@playwright/test": "latest"
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0",
+    "postcss": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "workbox-build": "latest"
   }
 }
