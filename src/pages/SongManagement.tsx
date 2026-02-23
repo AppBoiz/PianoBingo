@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { loadAllSongs, saveSong, deleteSong, loadSong, setSongId, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
+import Header from '../components/Header'
 
 export default function SongManagement(){
   const [songs, setSongs] = useState<any[]>([])
@@ -63,12 +64,7 @@ export default function SongManagement(){
 
   return (
     <div id="app">
-      <div className="nav-bar">
-        <div className="back-container nav-bar-left">
-          <button onClick={() => { startNewGame(); loadPage('WELCOME') }}>Back</button>
-        </div>
-        <h1>Manage Songs</h1>
-      </div>
+      <Header title="Manage Songs" backAction={() => { startNewGame(); loadPage('WELCOME') }} />
 
       <div className="main-content">
         <div className="playlist-container">

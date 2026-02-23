@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { loadAllPacks, savePack, deletePack, loadPack, selectPack } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
+import Header from '../components/Header'
 
 export default function PackManagement(){
   const [packs, setPacks] = useState<any[]>([])
@@ -45,12 +46,8 @@ export default function PackManagement(){
 
   return (
     <div id="app">
-      <div className="nav-bar">
-        <div className="back-container nav-bar-left">
-          <button onClick={() => loadPage('WELCOME')}>Back</button>
-        </div>
-        <h1>Manage Playlists</h1>
-      </div>
+      <Header title="Manage Playlists" backAction={() => loadPage('WELCOME')} />
+
       <div className="main-content">
         <div id="playlist-container" className="playlist-container">
           {packs.map(pack => (

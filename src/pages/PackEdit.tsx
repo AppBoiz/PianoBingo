@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Sortable from 'sortablejs'
 import { getSelectedSongPackId, loadPack, loadAllSongs, savePack, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
+import Header from '../components/Header'
 
 export default function PackEdit(){
   const [packData, setPackData] = useState<any | null>(null)
@@ -66,13 +67,11 @@ export default function PackEdit(){
 
   return (
     <div id="app">
-      <div className="nav-bar">
-        <div className="back-container nav-bar-left">
-          <button onClick={() => { startNewGame(); loadPage('PACK_MANAGEMENT') }}>Back</button>
-        </div>
-        <h1>Edit Pack</h1>
-        <div id="song-counter" className="nav-bar-right">{selectedCount}/{total}</div>
-      </div>
+      <Header 
+        title="Edit Pack" 
+        backAction={() => { startNewGame(); loadPage('PACK_MANAGEMENT') }}
+        rightContent={<div id="song-counter">{selectedCount}/{total}</div>}
+      />
 
       <div className="main-content">
         <div ref={containerRef} className="playlist-container" style={{flexGrow:1}}>

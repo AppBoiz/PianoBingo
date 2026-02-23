@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { loadGameState } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
+import Header from '../components/Header'
 
 export default function GameHistory(){
   const [history, setHistory] = useState<any[]>([])
@@ -18,10 +19,7 @@ export default function GameHistory(){
 
   return (
     <div className="game-history-root">
-      <div className="nav-bar">
-        <button onClick={() => loadPage('WELCOME')}>Back</button>
-        <h1>Game History</h1>
-      </div>
+      <Header title="Game History" backAction={() => loadPage('WELCOME')} withContainers={false} />
       <div className="history-list">
         {history.length === 0 && <div className="empty">No history available</div>}
         {history.map((h, idx) => (
