@@ -12,6 +12,11 @@ Last updated: 2026-02-24
 - If something is important enough for long-term reference, add it directly to this context file.
 - If this file grows too large, we'll create a structured documentation library at that time.
 
+**Documentation file management**:
+- When analysis/audit reports or other documentation MUST be created as separate .md files, save them to `docs/agent/` directory alongside this context file.
+- Keep root directory clean - README.md is the only .md file that should remain in project root.
+- Use descriptive filenames with uppercase and underscores (e.g., `TEST_COVERAGE_ANALYSIS.md`, `MIGRATION_STATUS.md`).
+
 
 ## 1) Project purpose and product functionality
 
