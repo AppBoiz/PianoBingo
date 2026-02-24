@@ -1,34 +1,69 @@
 import React, { useEffect, useState } from 'react'
-import { loadGameState } from '../storage/indexedDb'
+import { loadGameState, loadPack } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import Header from '../components/Header'
 
+interface Pack {
+  packId: number
+  packName: string
+  songs: number[]
+}
+
 export default function GameHistory(){
-  const [history, setHistory] = useState<any[]>([])
+  const [pack, setPack] = useState<Pack | null>(null)
+  const [shownSongIds, setShownSongIds] = useState<number[]>([])
   const { loadPage } = useNavigation()
 
-  useEffect(() => { fetchHistory() }, [])
+  useEffect(() => { 
+    fetchGameData() 
+  }, [])
 
-  function fetchHistory(){
-    // The legacy app stored only the current game state in localStorage.
-    // We'll display the current state as a minimal history entry to preserve parity.
+  async function fetchGameData(){
     const state = loadGameState()
-    if (state) setHistory([state])
-    else setHistory([])
+    if (!state || !state.selectedSongPackId) {
+      return
+    }
+    
+    const packData = await loadPack(state.selectedSongPackId)
+    if (packData) {
+      setPack(packData)
+      setShownSongIds(state.shownSongIds || [])
+    }
+  }
+
+  function renderBoxes(){
+    if (!pack) return null
+    
+    const boxes = []
+    for (let i = 1; i <= 75; i++) {
+      const songId = pack.songs[i - 1]
+      const isHighlighted = shownSongIds.includes(songId)
+      
+      boxes.push(
+        <div 
+          key={i} 
+          className={`box ${isHighlighted ? 'highlighted' : ''}`}
+        >
+          {i}
+        </div>
+      )
+    }
+    return boxes
   }
 
   return (
     <div className="game-history-root">
-      <Header title="Game History" backAction={() => loadPage('WELCOME')} withContainers={false} />
-      <div className="history-list">
-        {history.length === 0 && <div className="empty">No history available</div>}
-        {history.map((h, idx) => (
-          <div key={idx} className="history-row">
-            <div>Selected pack: {h.selectedSongPackId}</div>
-            <div>Shown songs: {(h.shownSongIds || []).length}</div>
-          </div>
-        ))}
-      </div>
+      <Header title="Game History" backAction={() => loadPage('GAME')} withContainers={false} />
+      <h1 style={{ textAlign: 'center', marginTop: '20px' }}>Game History</h1>
+      {!pack ? (
+        <div style={{ textAlign: 'center', marginTop: '40px', color: '#6b7280' }}>
+          No active game. Start a game to see history.
+        </div>
+      ) : (
+        <div className="box-container">
+          {renderBoxes()}
+        </div>
+      )}
     </div>
   )
 }

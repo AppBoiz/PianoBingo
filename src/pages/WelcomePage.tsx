@@ -1,10 +1,11 @@
 import { useNavigation } from '../context/NavigationContext'
+import { startNewGame } from '../storage/indexedDb'
 
 export default function WelcomePage(){
   const { loadPage } = useNavigation()
 
   function newGameButtonHandler(){
-    // TODO: will call startNewGame from storage when ported
+    startNewGame()
     loadPage('PACK_SELECT')
   }
 

@@ -153,16 +153,6 @@ h2 {
     z-index: -100;
 }
 
-.flex-col{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.mb-40{
-    margin-bottom: 40px;
-}
-
 .radios-container{
     display: flex;
     flex-direction: column;
@@ -170,6 +160,7 @@ h2 {
     font-size: 25px;
     font-family: 'Inter', sans-serif;
     width: fit-content;
+    margin: 0 auto;
 }
 
 .radio-label{

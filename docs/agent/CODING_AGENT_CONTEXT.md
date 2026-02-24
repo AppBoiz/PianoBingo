@@ -51,11 +51,10 @@ Migration goal is parity-first: preserve behavior, styling, mobile UX, and local
 
 ## 3) Feature parity snapshot (important migration status)
 
-- `WelcomePage`, `PackSelect`, `PackManagement`, `PackEdit`, `SongManagement`: mostly high parity with legacy flows.
-- `PdfReader`: core functionality works, but some legacy contextual UI/metadata display differs.
-- `GameHistory`: currently simplified in React compared with legacy 75-cell history presentation.
-- `SongView`: behavior differs from legacy in navigation semantics (return target/controls).
-- `WelcomePage` currently has a TODO where legacy used to initialize game state before navigation.
+- `WelcomePage`, `PackSelect`, `PackManagement`, `PackEdit`, `SongManagement`: high parity with legacy flows.
+- `PdfReader`: **✅ Full parity achieved** - contextual UI, song title with pack index, hamburger menu, and footer button match legacy.
+- `GameHistory`: **✅ Full parity achieved** - 75-box grid with highlighting and proper navigation.
+- `SongView`: **✅ Full parity achieved** - preview mode navigation (back to Song Management with game reset), song ID in title, no game controls.
 
 
 ## 4) Technical implementation details
@@ -167,8 +166,7 @@ Migration rule: keep DOM/class/id contracts aligned with legacy CSS until each p
 ## 9) Known risks / hotspots
 
 - Multiple SW implementations in repo can cause confusion and drift.
-- Legacy and React defaults for some game-state fields may differ in edge cases.
-- Some React pages are intentionally incomplete vs legacy (`GameHistory`, `SongView` semantics, parts of `PdfReader` UI context).
+- Legacy and React defaults for some game-state fields have been aligned (currentSong.songId, selectedSongPackId null default).
 - Root-absolute URL assumptions can break non-root static deployments.
 
 
@@ -211,27 +209,29 @@ Each migration PR should include:
 - Test evidence (targeted checks + relevant Playwright run).
 
 
-## 12) Migration checklist (incomplete work)
+## 12) Migration checklist
 
-This lists items that still need work before legacy can be removed:
+### Completed ✅
+- **Storage compatibility fixes (2026-02-24)**: Resolved `currentSong.id` → `currentSong.songId` field mismatch between React and legacy surfaces. Added auto-migration in loadGameState(), aligned selectedSongPackId defaults to null, fixed version increment bug in seeding logic. Changes applied to `src/storage/indexedDb.ts`, `resources/state-helpers/gameStorage.js`, and `public/legacy-pages/song-view/song-view.html`. Test coverage: 4 critical compatibility tests passing in `tests/storage-compatibility.spec.ts`.
+- **WelcomePage initialization**: Resolved TODO - now calls `startNewGame()` before navigating to Pack Select to ensure proper game state setup.
+- **Early migration trigger**: Added `loadGameState()` call in `src/main.tsx` to run migrations on every app load.
+- **GameHistory page (2026-02-24)**: Implemented 75-box bingo grid matching legacy behavior. Shows numbered boxes 1-75 with highlighting for shown songs. Added missing CSS for both React (`src/styles/legacy/game-history.css`) and legacy (`public/legacy-pages/game-history/game-history.css`) surfaces. Back button correctly navigates to PDF reader (game page). Mobile-responsive grid with adaptive box sizing.
+- **PdfReader UX enhancements (2026-02-24)**: Added contextual UI matching legacy. Nav bar now displays song title with pack index (e.g., "3 - Moonlight Sonata"). Implemented hamburger menu (checkbox-based dropdown) with Next/Previous Song, Game History, and End Game options. Added footer with "Next Song" button. Removed redundant page navigation buttons from PDFViewer component (kept left/right click areas for page turning). Updated in `src/pages/PdfReader.tsx` and `src/components/PDFViewer.tsx`.
+- **SongView navigation alignment (2026-02-24)**: Fixed navigation semantics to match legacy preview behavior. Back button now calls `startNewGame()` and navigates to Song Management (not Welcome). Removed Next/Prev song buttons (SongView is for single-song preview from management UI, not game progression). Added song ID to title display (e.g., "3 - Moonlight Sonata"). Created missing CSS file for legacy page. Updated in `src/pages/SongView.tsx`, `src/styles/legacy/song-view.css`, and `public/legacy-pages/song-view/song-view.css`.
 
-### 12.1 Feature parity gaps to close
-- [ ] **GameHistory page**: implement 75-cell visual history grid matching legacy behavior.
-- [ ] **SongView page**: align navigation behavior with legacy (Back → Song Management, remove Next/Prev controls if not legacy-intended).
-- [ ] **PdfReader page**: add missing contextual UI (song title header, pack index/progress display).
-- [ ] **WelcomePage**: resolve TODO and ensure game state initialization parity before Pack Select navigation.
+### Incomplete work
 
-### 12.2 Offline/cache cleanup
+#### 12.1 Offline/cache cleanup
 - [ ] **Retire manual SW files**: Remove or clearly document `service-worker.js` and `src/sw-template.js` to prevent drift from generated Workbox SW.
 - [ ] **Legacy cache cleanup**: Add explicit cache migration/cleanup logic to purge old `pianobingo-cache-v1` or other legacy cache names when users upgrade.
 - [ ] **Legacy PDF CDN worker**: Replace CDN worker URL in `public/legacy-pages/pdf-reader/pdf-reader.js` with bundled worker path, or explicitly document legacy offline limitations.
 
-### 12.3 Testing coverage
+#### 12.2 Testing coverage
 - [ ] **Extend offline PDF test**: Add actual PDF render lifecycle validation (worker startup + first page render) to `tests/offline-pdf.spec.ts`.
 - [ ] **Add mobile viewport E2E**: Validate key flows on mobile viewport sizes.
 - [ ] **Add parity smoke tests**: Automated comparison of React vs legacy page behavior for regression detection.
 
-### 12.4 Final migration tasks
+#### 12.3 Final migration tasks
 - [ ] **Remove legacy surface**: Once all above complete, remove `public/legacy-pages/*`, `app.js`, `services/navigation/*`, and legacy nav/iframe logic.
 - [ ] **Clean unused CSS**: Remove legacy CSS imports from `src/main.tsx` and consolidate into Tailwind where practical.
 

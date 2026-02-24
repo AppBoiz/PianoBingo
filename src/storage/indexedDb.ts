@@ -53,7 +53,13 @@ export function openDB(): Promise<IDBDatabase> {
             for (const BASE_PACK of (window as any).BASE_PACK_DATA) {
               const existing = packs.find((p: any) => p.packId === BASE_PACK.packId);
               if (!existing || existing.version < BASE_PACK.version) {
-                await savePack(BASE_PACK);
+                // Seed directly without incrementing version
+                const db2 = await openDB();
+                const tx = db2.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode);
+                const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS);
+                store.put(BASE_PACK);  // Insert base pack with original version
+                await (tx as any).complete?.();
+                db2.close();
               }
             }
           }
@@ -65,7 +71,13 @@ export function openDB(): Promise<IDBDatabase> {
             for (const BASE_SONG of (window as any).BASE_SONG_DATA) {
               const existing = songs.find((s: any) => s.songId === BASE_SONG.songId);
               if (!existing || existing.version < BASE_SONG.version) {
-                await saveSong(BASE_SONG);
+                // Seed directly without incrementing version
+                const db2 = await openDB();
+                const tx = db2.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode);
+                const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS);
+                store.put(BASE_SONG);  // Insert base song with original version
+                await (tx as any).complete?.();
+                db2.close();
               }
             }
           }
@@ -212,9 +224,9 @@ export async function deleteSong(songId: number): Promise<void> {
 
 // Simple localStorage-backed game state (mirrors original)
 const defaultGameState = {
-  selectedSongPackId: 1,
+  selectedSongPackId: null,  // Changed from 1 to null to match legacy behavior - forces explicit pack selection
   shownSongIds: [],
-  currentSong: { songId: null, title: '', pdfUrl: '', version: 0 }
+  currentSong: { songId: null, title: '', pdfUrl: '' }  // Removed unused 'version' field from gameState (songs in DB have version)
 };
 
 export function saveGameState(gameState: any) {
@@ -224,7 +236,18 @@ export function saveGameState(gameState: any) {
 
 export function loadGameState() {
   const gameStateString = localStorage.getItem('gameState');
-  if (gameStateString) return JSON.parse(gameStateString);
+  if (gameStateString) {
+    const gameState = JSON.parse(gameStateString);
+    // Migrate legacy data: rename currentSong.id to currentSong.songId
+    if (gameState.currentSong && gameState.currentSong.id !== undefined && gameState.currentSong.songId === undefined) {
+      gameState.currentSong.songId = gameState.currentSong.id;
+      delete gameState.currentSong.id;
+      // Save migrated state back
+      saveGameState(gameState);
+      console.log('Migrated legacy gameState: id → songId');
+    }
+    return gameState;
+  }
   return null;
 }
 
