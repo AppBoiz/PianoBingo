@@ -1,3 +1,15 @@
+/**
+ * ⚠️ DEPRECATED: This Workbox template is NO LONGER USED.
+ * 
+ * The build process uses workbox-build.generateSW() (not injectManifest),
+ * which generates a complete service worker without needing this template.
+ * 
+ * See scripts/generate-workbox-sw.js for the actual SW generation logic.
+ * 
+ * This file is kept only for reference and will be removed once the React
+ * migration is complete.
+ */
+
 /* Workbox service worker template used by workbox-build.injectManifest.
    The injectManifest step will replace self.__WB_MANIFEST with the precache manifest.
 */

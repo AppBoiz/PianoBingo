@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test'
+import fs from 'fs'
+import path from 'path'
 
 test('service worker precaches pdf assets and serves them offline', async ({ page, context }) => {
   // load app (webServer in playwright.config starts server and runs build)
@@ -41,6 +43,46 @@ test('service worker precaches pdf assets and serves them offline', async ({ pag
   const anyCached = Object.values(cached).some(Boolean)
   expect(anyCached).toBeTruthy()
 
+  // Prepare a currentSong entry so PdfReader can render a PDF
+  const pdfPath = path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
+  const base64 = fs.readFileSync(pdfPath).toString('base64')
+
+  expect(base64).toBeTruthy()
+
+  await page.evaluate((pdf) => {
+    const gameState = {
+      selectedSongPackId: 1,
+      shownSongIds: [1],
+      currentSong: { songId: 1, title: 'Test Song', pdfUrl: pdf }
+    }
+    localStorage.setItem('gameState', JSON.stringify(gameState))
+    ;(window as any).__PDF_RENDERED__ = false
+    ;(window as any).__PDF_RENDER_ERROR__ = null
+  }, base64)
+
+  // Verify first-page render while online
+  await page.evaluate(() => {
+    window.history.pushState({}, '', '/pdf-reader')
+    window.dispatchEvent(new PopStateEvent('popstate'))
+  })
+  await page.waitForSelector('#pdf-viewer', { state: 'attached', timeout: 30000 })
+  await page.waitForFunction(
+    () => (window as any).__PDF_RENDERED__ || (window as any).__PDF_RENDER_ERROR__,
+    null,
+    { timeout: 30000 }
+  )
+  const renderError = await page.evaluate(() => (window as any).__PDF_RENDER_ERROR__)
+  expect(renderError).toBeFalsy()
+  await page.waitForSelector('#pdf-viewer canvas', { state: 'attached', timeout: 30000 })
+  const initialCanvas = await page.evaluate(() => {
+    const canvas = document.querySelector('#pdf-viewer canvas') as HTMLCanvasElement | null
+    if (!canvas) return null
+    return { width: canvas.width, height: canvas.height }
+  })
+  expect(initialCanvas).not.toBeNull()
+  expect(initialCanvas!.width).toBeGreaterThan(0)
+  expect(initialCanvas!.height).toBeGreaterThan(0)
+
   // Now go offline and attempt to fetch one of the assets via fetch (should succeed from SW cache)
   await context.setOffline(true)
   const assetToFetch = assets[0]
@@ -52,4 +94,32 @@ test('service worker precaches pdf assets and serves them offline', async ({ pag
   }, assetToFetch)
 
   expect(status).toBe(200)
+
+  // Reload PdfReader offline and confirm render still works from cache
+  await page.evaluate(() => {
+    ;(window as any).__PDF_RENDERED__ = false
+    ;(window as any).__PDF_RENDER_ERROR__ = null
+  })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  await page.evaluate(() => {
+    window.history.pushState({}, '', '/pdf-reader')
+    window.dispatchEvent(new PopStateEvent('popstate'))
+  })
+  await page.waitForSelector('#pdf-viewer', { state: 'attached', timeout: 30000 })
+  await page.waitForFunction(
+    () => (window as any).__PDF_RENDERED__ || (window as any).__PDF_RENDER_ERROR__,
+    null,
+    { timeout: 30000 }
+  )
+  const offlineRenderError = await page.evaluate(() => (window as any).__PDF_RENDER_ERROR__)
+  expect(offlineRenderError).toBeFalsy()
+  await page.waitForSelector('#pdf-viewer canvas', { state: 'attached', timeout: 30000 })
+  const offlineCanvas = await page.evaluate(() => {
+    const canvas = document.querySelector('#pdf-viewer canvas') as HTMLCanvasElement | null
+    if (!canvas) return null
+    return { width: canvas.width, height: canvas.height }
+  })
+  expect(offlineCanvas).not.toBeNull()
+  expect(offlineCanvas!.width).toBeGreaterThan(0)
+  expect(offlineCanvas!.height).toBeGreaterThan(0)
 })

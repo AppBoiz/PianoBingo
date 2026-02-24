@@ -28,7 +28,8 @@ async function buildSW(){
         }
       ],
       skipWaiting: true,
-      clientsClaim: true
+      clientsClaim: true,
+      cleanupOutdatedCaches: true  // Clean up old cache names like 'pianobingo-cache-v1'
     })
     if (warnings && warnings.length) console.warn('Workbox warnings:', warnings)
     console.log(`Generated SW and precached ${count} files, total ${size} bytes into ${swDest}`)

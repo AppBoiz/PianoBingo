@@ -49,16 +49,26 @@ export default function PDFViewer({ base64 }: Props){
       for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
       // Dynamically load pdfjs to keep it code-split
       const pdfjs = await import('pdfjs-dist')
-      const { getDocument } = pdfjs as any
+      const { getDocument, GlobalWorkerOptions } = pdfjs as any
       // Use the packaged pdfjs worker via Vite's URL handling (bundles the worker).
-      const worker = new Worker(new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url), { type: 'module' });
-      const loadingTask = getDocument({ data: bytes, worker });
+      const workerUrl = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url)
+      GlobalWorkerOptions.workerSrc = workerUrl.toString()
+      const loadingTask = getDocument({ data: bytes });
       const pdfDoc = await loadingTask.promise;
       setPdf(pdfDoc);
       setTotalPages(pdfDoc.numPages);
       setCurrentPage(1);
+      if (typeof window !== 'undefined') {
+        (window as any).__PDF_LOADED__ = true;
+        (window as any).__PDF_RENDER_ERROR__ = null;
+      }
     }
-    load().catch(err => console.error(err))
+    load().catch(err => {
+      if (typeof window !== 'undefined') {
+        (window as any).__PDF_RENDER_ERROR__ = String(err);
+      }
+      console.error(err)
+    })
     return () => {
       setPdf(null);
       setTotalPages(0);
@@ -83,8 +93,16 @@ export default function PDFViewer({ base64 }: Props){
       container.querySelectorAll('canvas').forEach(c => c.remove());
       container.appendChild(canvas);
       await page.render({ canvasContext: context, viewport }).promise;
+      if (typeof window !== 'undefined') {
+        (window as any).__PDF_RENDERED__ = true;
+      }
     }
-    renderPage(currentPage).catch(err => console.error(err))
+    renderPage(currentPage).catch(err => {
+      if (typeof window !== 'undefined') {
+        (window as any).__PDF_RENDER_ERROR__ = String(err);
+      }
+      console.error(err)
+    })
   }, [pdf, currentPage])
 
   if (!pdfBase64) return <div>Loading PDF…</div>
