@@ -91,7 +91,8 @@ Current runtime caching strategy (Workbox-generated):
 ### 4.3 PDF reader implementation
 
 - React PDF rendering uses `pdfjs-dist` via dynamic import in `src/components/PDFViewer.tsx`.
-- Worker is loaded from bundled assets (`pdf.worker` chunk) for offline-capable modern path.
+- Worker is loaded from bundled assets (`pdf.worker` chunk) via `GlobalWorkerOptions.workerSrc` for offline-capable modern path.
+- PDF rendering exposes lightweight test hooks: `window.__PDF_RENDERED__` and `window.__PDF_RENDER_ERROR__` for Playwright render validation.
 - **Legacy PDF limitation**: Legacy pages (`public/legacy-pages/pdf-reader/` and `song-view/`) use CDN-hosted PDF.js worker from cdnjs.cloudflare.com. This breaks offline functionality for legacy pages. Since the legacy surface will be removed soon, this limitation is documented rather than fixed. React pages have full offline support via bundled worker.
 
 ### 4.4 Mobile compatibility
@@ -113,7 +114,7 @@ Do not refactor structure or selector names casually during migration; layout pa
 - Data/storage: IndexedDB + localStorage.
 - PDF rendering: `pdfjs-dist`.
 - Drag reorder: `sortablejs`.
-- Testing: Playwright E2E (`tests/offline-pdf.spec.ts` focuses on offline PDF/cache behavior).
+- Testing: Playwright E2E (`tests/offline-pdf.spec.ts`, `tests/game-history.spec.ts`, `tests/mobile-viewport.spec.ts`).
 
 
 ## 6) Deployment model and steps (GitHub Pages/static hosting)
@@ -226,13 +227,14 @@ Each migration PR should include:
 - **PdfReader UX enhancements (2026-02-24)**: Added contextual UI matching legacy. Nav bar now displays song title with pack index (e.g., "3 - Moonlight Sonata"). Implemented hamburger menu (checkbox-based dropdown) with Next/Previous Song, Game History, and End Game options. Added footer with "Next Song" button. Removed redundant page navigation buttons from PDFViewer component (kept left/right click areas for page turning). Updated in `src/pages/PdfReader.tsx` and `src/components/PDFViewer.tsx`.
 - **SongView navigation alignment (2026-02-24)**: Fixed navigation semantics to match legacy preview behavior. Back button now calls `startNewGame()` and navigates to Song Management (not Welcome). Removed Next/Prev song buttons (SongView is for single-song preview from management UI, not game progression). Added song ID to title display (e.g., "3 - Moonlight Sonata"). Created missing CSS file for legacy page. Updated in `src/pages/SongView.tsx`, `src/styles/legacy/song-view.css`, and `public/legacy-pages/song-view/song-view.css`.
 - **Service worker cleanup (2026-02-24)**: Added deprecation notices to manual SW files (`/service-worker.js`, `src/sw-template.js`) clarifying they are no longer used in production. Enabled `cleanupOutdatedCaches: true` in Workbox generation to automatically purge old cache names like `pianobingo-cache-v1`. Updated documentation in context file explaining the SW architecture. Documented legacy PDF CDN worker limitation (affects offline for legacy pages only, will be resolved when legacy surface is removed).
+- **Testing coverage improvements (2026-02-24)**: Extended offline PDF test to validate render lifecycle (worker + first page render) in `tests/offline-pdf.spec.ts`. Added mobile viewport E2E coverage in `tests/mobile-viewport.spec.ts`.
+- **Playwright suite status (2026-02-24)**: 12 passed, 1 skipped (skipped: `base seed data uses version 1` test in `tests/storage-compatibility.spec.ts`).
 
 ### Incomplete work
 
 #### 12.1 Testing coverage
-- [ ] **Extend offline PDF test**: Add actual PDF render lifecycle validation (worker startup + first page render) to `tests/offline-pdf.spec.ts`.
-- [ ] **Add mobile viewport E2E**: Validate key flows on mobile viewport sizes.
 - [ ] **Add parity smoke tests**: Automated comparison of React vs legacy page behavior for regression detection.
+   - Note: `base seed data uses version 1` test remains skipped pending a stable seeding strategy in Playwright.
 
 #### 12.2 Final migration tasks
 - [ ] **Remove legacy surface**: Once all above complete, remove `public/legacy-pages/*`, `app.js`, `services/navigation/*`, and legacy nav/iframe logic.
