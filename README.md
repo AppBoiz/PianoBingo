@@ -1,6 +1,10 @@
 # PianoBingo
 Piano bingo native app
 
+## Documentation
+
+For comprehensive project context, architecture, migration status, and coding agent guidance, see [docs/agent/CODING_AGENT_CONTEXT.md](docs/agent/CODING_AGENT_CONTEXT.md).
+
 ## Navigation
 
 This is a single page application, which uses iframes to dynamically render the content. To register the app content container, the `services/navigation/host.js` script is linked to the html file it is contained in. Content pages link the script `services/navigation/navigation.js` and can use the function loadPage() in combination with the makshift `PAGES` enum, which should be extended when a page is added.
