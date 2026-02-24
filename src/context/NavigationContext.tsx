@@ -1,13 +1,21 @@
 import React, { createContext, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PAGE as LEGACY_PAGE } from '../services/navigation/legacyNavigation'
 
 type NavigationContextValue = {
   PAGE: Record<string, string>
   loadPage: (page: string) => void
 }
 
-const PAGE = LEGACY_PAGE
+const PAGE: Record<string, string> = {
+  GAME: '/pdf-reader',
+  WELCOME: '/',
+  PACK_SELECT: '/pack-select',
+  GAME_HISTORY: '/game-history',
+  PACK_MANAGEMENT: '/pack-management',
+  PACK_EDIT: '/pack-edit',
+  SONG_MANAGEMENT: '/song-management',
+  SONG_VIEW: '/song-view'
+}
 
 const NavigationContext = createContext<NavigationContextValue | undefined>(undefined)
 
