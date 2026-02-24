@@ -1,6 +1,6 @@
 # PianoBingo — Coding Agent Context
 
-Last updated: 2026-02-24
+Last updated: 2026-02-24 (migration audit completed)
 
 ## 0) Meta: Keeping this context file current
 
@@ -230,16 +230,33 @@ Each migration PR should include:
 - **Testing coverage improvements (2026-02-24)**: Extended offline PDF test to validate render lifecycle (worker + first page render) in `tests/offline-pdf.spec.ts`. Added mobile viewport E2E coverage in `tests/mobile-viewport.spec.ts`.
 - **Playwright suite status (2026-02-24)**: 12 passed, 1 skipped (skipped: `base seed data uses version 1` test in `tests/storage-compatibility.spec.ts`).
 
+### Audit findings (2026-02-24)
+
+**Verification complete for all completed items:**
+- ✅ **Build status**: Clean production build with no errors (`npm run build` succeeds)
+- ✅ **Test status**: 13 total tests; 12 passing, 1 skipped as documented (storage-compatibility needs seeding strategy)
+- ✅ **Code cleanliness**: No pending TODO/FIXME/HACK/BUG comments found in src/ or pages/ directories
+- ✅ **Implementation verification** for key completed items:
+  - `loadGameState()` called in `src/main.tsx#20` ✅
+  - `startNewGame()` called in WelcomePage.tsx#8 and SongView.tsx#17 ✅
+  - PdfReader shows song title with pack index + hamburger menu with game controls ✅
+  - GameHistory displays 75-box bingo grid with proper highlighting ✅
+  - SongView navigation resets game state correctly ✅
+
 ### Incomplete work
 
 #### 12.1 Testing coverage
 - [ ] **Add parity smoke tests**: Automated comparison of React vs legacy page behavior for regression detection.
-   - Note: `base seed data uses version 1` test remains skipped pending a stable seeding strategy in Playwright.
+   - Note: `base seed data uses version 1` test (tests/storage-compatibility.spec.ts:79) remains skipped pending a stable seeding strategy in Playwright.
+   - This is a known limitation; migration checklist can proceed without this test once other items are complete.
 
-#### 12.2 Final migration tasks
-- [ ] **Remove legacy surface**: Once all above complete, remove `public/legacy-pages/*`, `app.js`, `services/navigation/*`, and legacy nav/iframe logic.
-- [ ] **Remove manual SW files**: Delete `/service-worker.js` and `src/sw-template.js` after legacy surface is retired and SW behavior is fully validated.
-- [ ] **Clean unused CSS**: Remove legacy CSS imports from `src/main.tsx` and consolidate into Tailwind where practical.
+#### 12.2 Final migration tasks (cleanup phase)
+- [ ] **Remove legacy surface**: Once all above complete, remove `public/legacy-pages/*` (8 page directories), `app.js`, `services/navigation/*`, and legacy nav/iframe logic.
+   - Status: All legacy files still present; not yet at cleanup phase.
+- [ ] **Remove manual SW files**: Delete `/service-worker.js` (root) and `src/sw-template.js` after legacy surface is retired and SW behavior is fully validated.
+   - Status: Both files still present with deprecation notices.
+- [ ] **Clean unused CSS**: Remove legacy CSS imports from `src/main.tsx` (lines 10-17) and consolidate into Tailwind where practical.
+   - Status: All 8 legacy CSS files still being imported; `src/styles/legacy/` directory contains all page CSS files.
 
 
 ## 13) Confirmed project decisions
