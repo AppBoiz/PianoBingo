@@ -37,7 +37,12 @@ const BASE_PACK_DATA: Pack[] = [
   },
 ];
 
+// PDF base64 data will be loaded and made available globally
+// These map variable names to actual base64 content
+let pdfMap: Record<string, string> = {};
+
 // Define BASE_SONG_DATA with all 150 songs
+// The pdfUrl will be resolved at runtime to actual base64 content
 const BASE_SONG_DATA: Song[] = [
   { songId: 1, title: 'Colours in her Hair', pdfUrl: 't2t9h8uF', version: 1 },
   { songId: 2, title: 'Angels', pdfUrl: 'vGmcIpQy', version: 1 },
@@ -195,20 +200,104 @@ const BASE_SONG_DATA: Song[] = [
 export { BASE_PACK_DATA, BASE_SONG_DATA };
 
 /**
+ * Load base64 PDFs from resource files
+ * This resolves variable names in pdfUrl to actual base64 content
+ */
+async function loadPdfData() {
+  try {
+    // Load all PDF data files
+    const [allPdfs, packJack, packTom] = await Promise.all([
+      fetch('/resources/base64/all_pdfs.js').then(r => r.text()),
+      fetch('/resources/base64/pack_jack.js').then(r => r.text()),
+      fetch('/resources/base64/pack_tom.js').then(r => r.text()),
+    ]);
+
+    // Extract all base64 PDFs from the files using regex
+    // Pattern: const VARIABLE_NAME = 'BASE64_CONTENT...';
+    // Regex matches base64 + whitespace to handle newlines in middle of strings
+    const pdfRegex = /const\s+(\w+)\s*=\s*['"]([A-Za-z0-9+/=\s]+)['"]/g;
+    
+    for (const content of [allPdfs, packJack, packTom]) {
+      let match;
+      while ((match = pdfRegex.exec(content)) !== null) {
+        const [, variableName, base64Data] = match;
+        // Remove all whitespace from base64 data before storing
+        const cleanedBase64 = base64Data.replace(/\s/g, '');
+        pdfMap[variableName] = cleanedBase64;
+      }
+    }
+
+    console.log(`✓ Loaded ${Object.keys(pdfMap).length} PDF resources`);
+    return pdfMap;
+  } catch (error) {
+    console.warn('Failed to load PDF resources:', error);
+    return {};
+  }
+}
+
+/**
+ * Resolve PDF URL to actual base64 content
+ * If pdfUrl is a variable name, looks it up in the pdfMap
+ */
+export function resolvePdfUrl(pdfUrl: string): string | null {
+  if (!pdfUrl) return null;
+  
+  // If it's already valid base64 (starts with PDF signature), return as-is
+  if (pdfUrl.startsWith('JVBERi0')) {
+    return pdfUrl;
+  }
+  
+  // Otherwise, try to resolve from pdfMap
+  if (pdfMap[pdfUrl]) {
+    console.debug(`✓ Resolved PDF: ${pdfUrl} (${pdfMap[pdfUrl].length} bytes)`);
+    return pdfMap[pdfUrl];
+  }
+  
+  // If it's on window object (fallback for dynamic resolution)
+  if (typeof window !== 'undefined' && (window as any)[pdfUrl]) {
+    const resolved = (window as any)[pdfUrl];
+    console.debug(`✓ Resolved PDF from window: ${pdfUrl}`);
+    return resolved;
+  }
+  
+  // Log available PDFs for debugging on first failure
+  if (Object.keys(pdfMap).length > 0) {
+    console.warn(`✗ PDF not found: "${pdfUrl}". Available PDFs: ${Object.keys(pdfMap).slice(0, 5).join(', ')}... (total: ${Object.keys(pdfMap).length})`);
+  } else {
+    console.warn(`✗ PDF not found: "${pdfUrl}". No PDFs loaded yet.`);
+  }
+  return null;
+}
+
+/**
  * Initialize preloaded data on the window object
  * This must be called SYNCHRONOUSLY before the React app initializes IndexedDB
  */
-export function initializePreloadedData() {
-  // Set the data on the window object for IndexedDB to access
-  (window as any).BASE_PACK_DATA = BASE_PACK_DATA;
-  (window as any).BASE_SONG_DATA = BASE_SONG_DATA;
-  console.log('✓ Preloaded data initialized:', {
-    packs: BASE_PACK_DATA.length,
-    songs: BASE_SONG_DATA.length
-  });
+export async function initializePreloadedData() {
+  try {
+    // Load PDF data first
+    await loadPdfData();
+    
+    // Set the data on the window object for IndexedDB to access
+    (window as any).BASE_PACK_DATA = BASE_PACK_DATA;
+    (window as any).BASE_SONG_DATA = BASE_SONG_DATA;
+    
+    // Store PDF resolution function on window for use by PDFViewer
+    (window as any).resolvePdfUrl = resolvePdfUrl;
+    
+    console.log('✓ Preloaded data initialized:', {
+      packs: BASE_PACK_DATA.length,
+      songs: BASE_SONG_DATA.length,
+      pdfs: Object.keys(pdfMap).length
+    });
+  } catch (error) {
+    console.error('Failed to initialize preloaded data:', error);
+  }
 }
 
 // Execute initialization immediately on module load
 if (typeof window !== 'undefined') {
-  initializePreloadedData();
+  initializePreloadedData().catch(err => 
+    console.error('Async initialization failed:', err)
+  );
 }

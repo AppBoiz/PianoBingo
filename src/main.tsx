@@ -1,6 +1,5 @@
 // Initialize preloaded data FIRST - must happen before IndexedDB initialization
 import { initializePreloadedData } from './init/preloadData'
-initializePreloadedData()
 
 import React from 'react'
 import { createRoot } from 'react-dom/client'
@@ -20,17 +19,24 @@ import './styles/legacy/pdf-reader.css'
 import './styles/legacy/game-history.css'
 import './styles/legacy/song-view.css'
 
-// Trigger localStorage migration early if needed
-loadGameState()
+// Initialize and then render
+async function bootstrap() {
+  // Wait for preloaded data to load
+  await initializePreloadedData()
+  
+  // Trigger localStorage migration early if needed
+  loadGameState()
 
-createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
-)
+  createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </React.StrictMode>
+  )
+}
 
+bootstrap().catch(err => console.error('Bootstrap failed:', err))
 // Register Workbox-generated service worker in production
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {

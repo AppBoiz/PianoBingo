@@ -17,11 +17,29 @@ export default function PDFViewer({ base64 }: Props){
   }, [])
 
   useEffect(() => {
-    // If a base64 prop is provided prefer it, otherwise attempt to load a legacy fallback
+    // If a base64 prop is provided, resolve it (might be a variable name or actual base64)
     if (base64) {
-      setPdfBase64(base64)
-      return
+      // Try to resolve the PDF URL if it's a variable name
+      const resolvePdfUrl = (window as any).resolvePdfUrl;
+      if (resolvePdfUrl && typeof resolvePdfUrl === 'function') {
+        const resolved = resolvePdfUrl(base64);
+        if (resolved) {
+          setPdfBase64(resolved);
+          return;
+        }
+      }
+      
+      // If it looks like base64 content (starts with PDF signature), use directly
+      if (base64.startsWith('JVBERi0')) {
+        setPdfBase64(base64);
+        return;
+      }
+      
+      // Otherwise, log a warning
+      console.warn('Could not resolve PDF URL:', base64);
+      return;
     }
+    
     let cancelled = false
     const load = async () => {
       try {
