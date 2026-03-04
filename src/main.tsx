@@ -1,3 +1,7 @@
+// Initialize preloaded data FIRST - must happen before IndexedDB initialization
+import { initializePreloadedData } from './init/preloadData'
+initializePreloadedData()
+
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
