@@ -30,9 +30,12 @@ button {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
     height: calc(100vh - 140px);
     width: 100%;
     position: relative;
+    overflow: auto;
+    background-color: #f5f5f5;
 }
 
 #pdf-viewer .left {
@@ -56,6 +59,10 @@ button {
 canvas {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     border-radius: 12px;
+    max-width: 95%;
+    max-height: 95%;
+    display: block;
+    margin: auto;
 }
 
 nav {

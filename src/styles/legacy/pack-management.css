@@ -30,7 +30,7 @@ body, html {
 }
 
 .playlist-row {
-    max-width: 500px;          /* content width */
+    max-width: 800px;          /* content width */
     margin: 0 auto;            /* center content inside container */
     padding: 0.75rem 1rem;
     background-color: white;
@@ -200,4 +200,51 @@ h2 {
 .playlist-name-input:focus {
   border-bottom: 1px solid #888;
   background: #f9f9f9;
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 768px) {
+  .playlist-container {
+    width: 95%;
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .playlist-row {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0.5rem auto;
+  }
+  
+  .playlist-name-input {
+    flex: 1 1 100%;
+    min-width: 150px;
+  }
+  
+  .playlist-actions {
+    flex: 1 1 100%;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-around;
+  }
+  
+  .edit-btn, .delete-btn {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .playlist-row {
+    padding: 0.75rem;
+  }
+  
+  .playlist-actions {
+    gap: 0.25rem;
+  }
+  
+  .edit-btn, .delete-btn {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
 }

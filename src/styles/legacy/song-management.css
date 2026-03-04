@@ -132,7 +132,7 @@ h2 {
   gap: 0.8rem;
   margin: 1rem auto;
   width: 90%;           /* take most of the screen width */
-  max-width: 600px;     /* but don’t get too wide on desktop */
+  max-width: 800px;     /* but don’t get too wide on desktop */
   padding: 0 0.5rem;
 }
 
@@ -328,4 +328,50 @@ h2 {
     background-color: #f8a5c2; /* lighter pink */
     cursor: not-allowed;
     opacity: 0.6;
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 768px) {
+  .playlist-container {
+    width: 95%;
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .playlist-row {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  
+  .playlist-name-input {
+    flex: 1 1 100%;
+    min-width: 150px;
+  }
+  
+  .playlist-actions {
+    flex: 1 1 100%;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-around;
+  }
+  
+  .pdf-btn, .remove-pdf-btn, .pdf-upload-label, .delete-btn {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .playlist-row {
+    padding: 0.75rem;
+  }
+  
+  .playlist-actions {
+    gap: 0.25rem;
+  }
+  
+  .pdf-btn, .remove-pdf-btn, .pdf-upload-label, .delete-btn {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
 }
