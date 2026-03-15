@@ -20,7 +20,7 @@ export default function SongManagement(){
   }
 
   function handleViewSong(songId: number){
-    loadPage(`${PAGE.SONG_VIEW}?songId=${songId}`)
+    loadPage(`${PAGE.SONG_VIEW}/${songId}`)
   }
 
   async function handleDeleteSong(songId: number){

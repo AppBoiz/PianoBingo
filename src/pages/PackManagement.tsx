@@ -1,8 +1,8 @@
-import { createNewPack, deletePack, renamePack, selectPack } from '../storage/indexedDb'
+import { createNewPack, deletePack, renamePack } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import { usePacks } from '../hooks/usePacks'
 import Header from '../components/Header'
-import { PAGE_NAME } from '../constants/navigation'
+import { PAGE, PAGE_NAME } from '../constants/navigation'
 
 export default function PackManagement(){
   const { packs, refresh: refreshPacks } = usePacks()
@@ -19,8 +19,7 @@ export default function PackManagement(){
   }
 
   function handleEditPack(packId: number){
-    selectPack(packId)
-    loadPage(PAGE_NAME.PACK_EDIT)
+    loadPage(`${PAGE.PACK_EDIT}/${packId}`)
   }
 
   async function handleRenamePack(packId: number, newName: string){

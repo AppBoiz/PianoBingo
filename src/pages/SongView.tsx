@@ -1,5 +1,5 @@
 import React from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import PDFViewer from '../components/PDFViewer'
 import { useLoadedSong } from '../hooks/usePdfSong'
 import { loadSong, startNewGame } from '../storage/indexedDb'
@@ -8,20 +8,19 @@ import { PAGE_NAME } from '../constants/navigation'
 
 export default function SongView(){
   const { loadPage } = useNavigation()
-  const [searchParams] = useSearchParams()
+  const { songId: songIdParam } = useParams<{ songId: string }>()
   const { base64, songTitle, isLoading } = useLoadedSong(async () => {
-    const idParam = searchParams.get('songId')
-    if (!idParam) {
+    if (!songIdParam) {
       return null
     }
 
-    const songId = parseInt(idParam, 10)
+    const songId = parseInt(songIdParam, 10)
     if (isNaN(songId)) {
       return null
     }
 
     return loadSong(songId)
-  }, [searchParams])
+  }, [songIdParam])
 
   function handleBack(){
     startNewGame()

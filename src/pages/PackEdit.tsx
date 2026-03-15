@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getSelectedSongPackId, loadPack, savePack, startNewGame } from '../storage/indexedDb'
+import { loadPack, savePack } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import { useSongs } from '../hooks/useSongs'
 import { useSortable } from '../hooks/useSortable'
@@ -8,25 +8,44 @@ import type { Pack } from '../types/models'
 import { compareSongsByPackMembershipThenPackOrder } from '../utils/sort'
 import { PACK_SIZE } from '../constants/game'
 import { PAGE_NAME } from '../constants/navigation'
+import { useParams } from 'react-router-dom'
 
-function useLoadSelectedPack() {
+function useLoadPackFromPathParam(packIdParam: string | undefined) {
   const [pack, setPack] = useState<Pack | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     let cancelled = false
-    const packId = getSelectedSongPackId()
-    if (!packId) return
-    loadPack(packId).then(loaded => {
-      if (loaded && !cancelled) setPack({ ...loaded, songs: loaded.songs ?? [] })
-    })
-    return () => { cancelled = true }
-  }, [])
+    const packId = packIdParam ? Number.parseInt(packIdParam, 10) : NaN
 
-  return [pack, setPack] as const
+    if (!Number.isFinite(packId)) {
+      setPack(null)
+      setIsLoading(false)
+      return () => { cancelled = true }
+    }
+
+    setIsLoading(true)
+    loadPack(packId).then(loaded => {
+      if (!cancelled) {
+        setPack(loaded ? { ...loaded, songs: loaded.songs ?? [] } : null)
+        setIsLoading(false)
+      }
+    }).catch(() => {
+      if (!cancelled) {
+        setPack(null)
+        setIsLoading(false)
+      }
+    })
+
+    return () => { cancelled = true }
+  }, [packIdParam])
+
+  return { pack, setPack, isLoading }
 }
 
 export default function PackEdit() {
-  const [pack, setPack] = useLoadSelectedPack()
+  const { packId } = useParams<{ packId: string }>()
+  const { pack, setPack, isLoading } = useLoadPackFromPathParam(packId)
   const { songs } = useSongs()
   const { loadPage } = useNavigation()
 
@@ -37,7 +56,8 @@ export default function PackEdit() {
     { rowSelector: '.playlist-row', idAttribute: 'data-song-id' }
   )
 
-  if (!pack) return <div>Loading...</div>
+  if (isLoading) return <div>Loading...</div>
+  if (!pack) return <div>Pack not found</div>
 
   const songsSortedByPackOrder = songs.sort(compareSongsByPackMembershipThenPackOrder(pack.songs))
 
@@ -65,7 +85,7 @@ export default function PackEdit() {
     <div id="app">
       <Header
         title="Edit Pack"
-        backAction={() => { startNewGame(); loadPage(PAGE_NAME.PACK_MANAGEMENT) }}
+        backAction={() => loadPage(PAGE_NAME.PACK_MANAGEMENT)}
         rightContent={<div id="song-counter">{selectedCount}/{PACK_SIZE}</div>}
       />
 

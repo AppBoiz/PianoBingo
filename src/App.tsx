@@ -19,9 +19,9 @@ export default function App(){
         <Route path={PAGE.PACK_SELECT} element={<PackSelect/>} />
         <Route path={PAGE.GAME} element={<PdfReader/>} />
         <Route path={PAGE.PACK_MANAGEMENT} element={<PackManagement/>} />
-        <Route path={PAGE.PACK_EDIT} element={<PackEdit/>} />
+        <Route path={`${PAGE.PACK_EDIT}/:packId`} element={<PackEdit/>} />
         <Route path={PAGE.SONG_MANAGEMENT} element={<SongManagement/>} />
-        <Route path={PAGE.SONG_VIEW} element={<SongView/>} />
+        <Route path={`${PAGE.SONG_VIEW}/:songId`} element={<SongView/>} />
         <Route path={PAGE.GAME_HISTORY} element={<GameHistory/>} />
       </Routes>
     </NavigationProvider>
