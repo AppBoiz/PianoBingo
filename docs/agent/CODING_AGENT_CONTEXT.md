@@ -106,6 +106,7 @@ Rules:
 ### 4.3 PDF reader implementation
 
 - React PDF rendering uses `pdfjs-dist` via dynamic import in `src/components/PDFViewer.tsx`.
+- `src/hooks/usePdfSong.ts` centralizes the common song-loading flow used by both `PdfReader` and `SongView`: load a `Song`, derive `pdfUrl`/title state, expose loading state, and provide a `reload()` helper.
 - Worker is loaded from bundled assets (`pdf.worker` chunk) via `GlobalWorkerOptions.workerSrc` for offline-capable modern path.
 - PDF rendering exposes lightweight test hooks: `window.__PDF_RENDERED__` and `window.__PDF_RENDER_ERROR__` for Playwright render validation.
 - **Legacy PDF limitation**: Legacy pages (`public/legacy-pages/pdf-reader/` and `song-view/`) use CDN-hosted PDF.js worker from cdnjs.cloudflare.com. This breaks offline functionality for legacy pages. Since the legacy surface will be removed soon, this limitation is documented rather than fixed. React pages have full offline support via bundled worker.

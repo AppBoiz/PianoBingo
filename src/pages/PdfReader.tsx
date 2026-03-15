@@ -1,49 +1,48 @@
 import React, { useEffect, useState } from 'react'
 import PDFViewer from '../components/PDFViewer'
+import { usePdfSong } from '../hooks/usePdfSong'
 import { getCurrentSong, getSelectedSongPackId, loadPack, nextSong as storageNextSong, prevSong as storagePrevSong } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 
 export default function PdfReader(){
-  const [base64, setBase64] = useState<string | null>(null)
-  const [songTitle, setSongTitle] = useState<string>('')
   const [songIndex, setSongIndex] = useState<number>(0)
   const { loadPage } = useNavigation()
+  const { song, base64, songTitle, reload } = usePdfSong(async () => getCurrentSong(), [])
 
   useEffect(() => {
-    loadSongData()
-  }, [])
-
-  async function loadSongData() {
-    const song = await getCurrentSong()
-    if (!song || !song.pdfUrl) {
-      setBase64(null)
-      setSongTitle('')
-      setSongIndex(0)
-      return
-    }
-    
-    setBase64(song.pdfUrl)
-    setSongTitle(song.title || 'Untitled')
-    
-    // Get pack index for this song
-    const selectedPackId = getSelectedSongPackId()
-    if (selectedPackId) {
-      const packData = await loadPack(selectedPackId)
-      if (packData) {
-        const index = packData.songs.findIndex(id => id === song.songId)
-        setSongIndex(index !== -1 ? index + 1 : 0)
+    const loadSongIndex = async () => {
+      if (!song || !song.pdfUrl) {
+        setSongIndex(0)
+        return
       }
+
+      const selectedPackId = getSelectedSongPackId()
+      if (!selectedPackId) {
+        setSongIndex(0)
+        return
+      }
+
+      const packData = await loadPack(selectedPackId)
+      if (!packData) {
+        setSongIndex(0)
+        return
+      }
+
+      const index = packData.songs.findIndex(id => id === song.songId)
+      setSongIndex(index !== -1 ? index + 1 : 0)
     }
-  }
+
+    void loadSongIndex()
+  }, [song])
 
   async function nextSong(){
     await storageNextSong?.()
-    await loadSongData()
+    await reload()
   }
 
   async function prevSong(){
     await storagePrevSong?.()
-    await loadSongData()
+    await reload()
   }
 
   return (
