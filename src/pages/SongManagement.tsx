@@ -1,10 +1,8 @@
-import React from 'react'
-import { saveSong, deleteSong, loadSong, startNewGame } from '../storage/indexedDb'
+import { clearSongPdf, createNewSong, deleteSong, renameSong, setSongPdf, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import { useSongs } from '../hooks/useSongs'
 import { fileToBase64 } from '../utils/fileUtils'
 import Header from '../components/Header'
-import type { Song } from '../types/models'
 import { PAGE, PAGE_NAME } from '../constants/navigation'
 
 export default function SongManagement(){
@@ -12,21 +10,12 @@ export default function SongManagement(){
   const { loadPage } = useNavigation()
 
   async function handleRenameSong(songId: number, newName: string){
-    const song = await loadSong(songId)
-    if (!song) return
-    song.title = newName
-    await saveSong(song)
+    await renameSong(songId, newName)
     await refreshSongs()
   }
 
   async function handleCreateNewSong(){
-    const maxSongId = songs.length > 0 ? Math.max(...songs.map(s => s.songId)) : 0
-    const newSong: Song = {
-      songId: maxSongId + 1,
-      title: 'New Song',
-      pdfUrl: null
-    }
-    await saveSong(newSong)
+    await createNewSong()
     await refreshSongs()
   }
 
@@ -40,11 +29,8 @@ export default function SongManagement(){
   }
 
   async function handleUpload(file: File, songId: number){
-    const base64 = await fileToBase64(file)
-    const song = await loadSong(songId)
-    if (!song) return
-    song.pdfUrl = base64.split(',')[1]
-    await saveSong(song)
+    const pdfDataUrl = await fileToBase64(file)
+    await setSongPdf(songId, pdfDataUrl)
     await refreshSongs()
   }
 
@@ -63,7 +49,7 @@ export default function SongManagement(){
                   {hasPdf ? (
                     <>
                       <button className="pdf-btn" onClick={() => handleViewSong(song.songId)}>📄 View</button>
-                      <button className="remove-pdf-btn" onClick={async () => { const s = await loadSong(song.songId); if (!s) return; s.pdfUrl = null; await saveSong(s); await refreshSongs() }}>❌ PDF</button>
+                      <button className="remove-pdf-btn" onClick={async () => { await clearSongPdf(song.songId); await refreshSongs() }}>❌ PDF</button>
                     </>
                   ) : (
                     <>

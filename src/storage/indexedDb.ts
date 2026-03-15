@@ -194,6 +194,42 @@ export async function renamePack(packId: number, newName: string): Promise<void>
   await savePack(pack)
 }
 
+export async function createNewSong(): Promise<Song> {
+  const songs = await loadAllSongs()
+  const maxSongId = songs.length ? Math.max(...songs.map(s => s.songId)) : 0
+  const newSong: Song = {
+    songId: maxSongId + 1,
+    title: 'New Song',
+    pdfUrl: null,
+  }
+  await saveSong(newSong)
+  return newSong
+}
+
+export async function renameSong(songId: number, newName: string): Promise<void> {
+  const song = await loadSong(songId)
+  if (!song) return
+  song.title = newName.trim() || 'Untitled Song'
+  await saveSong(song)
+}
+
+export async function setSongPdf(songId: number, pdfData: string | null): Promise<void> {
+  const song = await loadSong(songId)
+  if (!song) return
+
+  // Accept either raw base64 or data URL and persist payload only.
+  const normalizedPdf = typeof pdfData === 'string' && pdfData.includes(',')
+    ? pdfData.split(',')[1]
+    : pdfData
+
+  song.pdfUrl = normalizedPdf
+  await saveSong(song)
+}
+
+export async function clearSongPdf(songId: number): Promise<void> {
+  await setSongPdf(songId, null)
+}
+
 export async function saveSong(song: Song): Promise<void> {
   const db = await openDB();
   const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode);
