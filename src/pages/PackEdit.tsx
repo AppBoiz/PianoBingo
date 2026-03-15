@@ -1,89 +1,97 @@
-import React, { useEffect, useRef, useState } from 'react'
-import Sortable from 'sortablejs'
+import React, { useEffect, useState } from 'react'
 import { getSelectedSongPackId, loadPack, savePack, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import { useSongs } from '../hooks/useSongs'
+import { useSortable } from '../hooks/useSortable'
 import Header from '../components/Header'
 import type { Pack } from '../types/models'
+import { compareSongsByPackMembershipThenPackOrder } from '../utils/sort'
 
-export default function PackEdit(){
-  const [packData, setPackData] = useState<Pack | null>(null)
-  const { songs } = useSongs()
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const sortableRef = useRef<Sortable | null>(null)
-  const { loadPage } = useNavigation()
+const PACK_SIZE = 75
+
+function useLoadSelectedPack() {
+  const [pack, setPack] = useState<Pack | null>(null)
 
   useEffect(() => {
     let cancelled = false
-    const loadPackData = async () => {
-      const selectedPackId = getSelectedSongPackId()
-      if (!selectedPackId) return
-      const p = await loadPack(selectedPackId)
-      if (!p || cancelled) return
-      if (!p.songs) p.songs = []
-      setPackData(p)
-    }
-    loadPackData()
+    const packId = getSelectedSongPackId()
+    if (!packId) return
+    loadPack(packId).then(loaded => {
+      if (loaded && !cancelled) setPack({ ...loaded, songs: loaded.songs ?? [] })
+    })
     return () => { cancelled = true }
   }, [])
 
-  useEffect(() => {
-    if (!containerRef.current) return
-    if (sortableRef.current) return
-    sortableRef.current = Sortable.create(containerRef.current, {
-      animation: 150,
-      handle: '.drag-handle',
-      onEnd: () => {
-        // compute new order of songs that are in pack
-        const newOrder = Array.from(containerRef.current!.querySelectorAll('.playlist-row'))
-          .map(el => parseInt(el.getAttribute('data-song-id') || '0', 10))
-          .filter(id => packData?.songs?.includes(id))
-        setPackData(prev => prev ? { ...prev, songs: newOrder } : prev)
-      }
+  return [pack, setPack] as const
+}
+
+export default function PackEdit() {
+  const [pack, setPack] = useLoadSelectedPack()
+  const { songs } = useSongs()
+  const { loadPage } = useNavigation()
+
+  const containerRef = useSortable(
+    orderedIds => {
+      setPack(prev => prev ? { ...prev, songs: orderedIds.filter(id => prev.songs.includes(id)) } : prev)
+    },
+    { rowSelector: '.playlist-row', idAttribute: 'data-song-id' }
+  )
+
+  if (!pack) return <div>Loading...</div>
+
+  const songsSortedByPackOrder = songs.sort(compareSongsByPackMembershipThenPackOrder(pack.songs))
+
+  function toggleSong(songId: number) {
+    setPack(prev => {
+      if (!prev) return prev
+      const isInPack = prev.songs.includes(songId)
+      const updatedSongs = isInPack
+        ? prev.songs.filter(id => id !== songId)
+        : [...prev.songs, songId]
+      return { ...prev, songs: updatedSongs }
     })
-  }, [containerRef.current, packData])
-
-  if (!packData) return <div>Loading...</div>
-
-  const total = 75
-  const selectedCount = (packData.songs || []).length
-  const okDisabled = selectedCount !== total
-
-  const sortedSongs = [...songs].sort((a,b) => {
-    const indexA = packData.songs.findIndex(id => id === a.songId)
-    const indexB = packData.songs.findIndex(id => id === b.songId)
-    if (indexA !== -1 && indexB !== -1) return indexA - indexB
-    if (indexA !== -1) return -1
-    if (indexB !== -1) return 1
-    return a.songId - b.songId
-  })
-
-  function toggleSong(songId: number){
-    if (!packData) return
-    const has = packData.songs.includes(songId)
-    const updatedSongs = has ? packData.songs.filter(id => id !== songId) : [...packData.songs, songId]
-    setPackData({ ...packData, songs: updatedSongs })
   }
+
+  async function handleSave() {
+    if (!pack) return
+    await savePack(pack)
+    loadPage('PACK_MANAGEMENT')
+  }
+
+  const selectedCount = pack.songs.length
+  const isPackComplete = selectedCount === PACK_SIZE
 
   return (
     <div id="app">
-      <Header 
-        title="Edit Pack" 
+      <Header
+        title="Edit Pack"
         backAction={() => { startNewGame(); loadPage('PACK_MANAGEMENT') }}
-        rightContent={<div id="song-counter">{selectedCount}/{total}</div>}
+        rightContent={<div id="song-counter">{selectedCount}/{PACK_SIZE}</div>}
       />
 
       <div className="main-content">
-        <div ref={containerRef} className="playlist-container" style={{flexGrow:1}}>
-          {sortedSongs.map(song => {
-            const packPosition = packData.songs.findIndex(id => id === song.songId) + 1
-            const isChecked = packPosition !== 0
+        <div ref={containerRef} className="playlist-container" style={{ flexGrow: 1 }}>
+          {songsSortedByPackOrder.map(song => {
+            const packPosition = pack.songs.indexOf(song.songId) + 1
+            const isInPack = packPosition !== 0
             return (
-              <div key={song.songId} className={`playlist-row ${isChecked ? '' : 'unchecked'}`} data-song-id={song.songId}
-                onClick={(e) => { if ((e.target as HTMLElement).classList.contains('playlist-checkbox')) return; toggleSong(song.songId) }}>
-                <span className="drag-handle">{isChecked ? packPosition : '\u00A0'}</span>
+              <div
+                key={song.songId}
+                className={`playlist-row ${isInPack ? '' : 'unchecked'}`}
+                data-song-id={song.songId}
+                onClick={(e) => {
+                  if ((e.target as HTMLElement).classList.contains('playlist-checkbox')) return
+                  toggleSong(song.songId)
+                }}
+              >
+                <span className="drag-handle">{isInPack ? packPosition : '\u00A0'}</span>
                 <span className="playlist-name">{song.title}</span>
-                <input className="playlist-checkbox" type="checkbox" checked={isChecked} onChange={(e) => { toggleSong(song.songId) }} />
+                <input
+                  className="playlist-checkbox"
+                  type="checkbox"
+                  checked={isInPack}
+                  onChange={() => toggleSong(song.songId)}
+                />
               </div>
             )
           })}
@@ -91,7 +99,9 @@ export default function PackEdit(){
       </div>
 
       <div className="footer">
-        <button className="primary-btn" disabled={okDisabled} onClick={async () => { if (!okDisabled) { await savePack(packData); loadPage('PACK_MANAGEMENT') } }}>Ok</button>
+        <button className="primary-btn" disabled={!isPackComplete} onClick={handleSave}>
+          Ok
+        </button>
       </div>
     </div>
   )
