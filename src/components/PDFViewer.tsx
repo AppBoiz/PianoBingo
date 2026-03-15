@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
+import { LEGACY_PDF_FALLBACK_PATH } from '../constants/pdf'
 
 // Keep the PDF runtime out of the main bundle until a document is actually opened.
-
-const LEGACY_PDF_FALLBACK_PATH = '/resources/base64/pack_tom.js'
 
 type PdfDocument = PDFDocumentProxy
 

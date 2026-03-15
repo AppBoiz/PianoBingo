@@ -1,19 +1,7 @@
 import React, { createContext, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-const PAGE = {
-  GAME: '/pdf-reader',
-  WELCOME: '/',
-  PACK_SELECT: '/pack-select',
-  GAME_HISTORY: '/game-history',
-  PACK_MANAGEMENT: '/pack-management',
-  PACK_EDIT: '/pack-edit',
-  SONG_MANAGEMENT: '/song-management',
-  SONG_VIEW: '/song-view'
-} as const
-
-type PageKey = keyof typeof PAGE
-type PagePath = typeof PAGE[PageKey]
+import { PAGE } from '../constants/navigation'
+import type { PageKey, PagePath } from '../constants/navigation'
 
 type NavigationContextValue = {
   PAGE: typeof PAGE

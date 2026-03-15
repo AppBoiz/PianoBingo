@@ -1,9 +1,10 @@
 import React from 'react'
-import { INDEXED_BD_CONFIG, savePack, deletePack, loadPack, selectPack } from '../storage/indexedDb'
+import { savePack, deletePack, loadPack, selectPack } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import { usePacks } from '../hooks/usePacks'
 import Header from '../components/Header'
 import type { Pack } from '../types/models'
+import { PACK_ID_PARTITION_SIZE } from '../constants/storage'
 
 export default function PackManagement(){
   const { packs, refresh: refreshPacks } = usePacks()
@@ -12,7 +13,7 @@ export default function PackManagement(){
   async function handleCreateNewPack(){
     const maxPackId = packs.length ? Math.max(...packs.map(p => p.packId)) : 0
     const newPack: Pack = {
-      packId: Math.max(maxPackId + 1, INDEXED_BD_CONFIG.PARTITION_SIZE),
+      packId: Math.max(maxPackId + 1, PACK_ID_PARTITION_SIZE),
       packName: 'New Pack',
       songCount: 0,
       songs: []

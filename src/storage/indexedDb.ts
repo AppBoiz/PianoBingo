@@ -3,22 +3,10 @@
 // when legacy BASE_PACK_DATA / BASE_SONG_DATA are present to avoid
 // overwriting user data during migration.
 
-import type { CurrentSongMetadata, GameState, IndexedDbConfig, Pack, Song } from '../types/models'
+import type { CurrentSongMetadata, GameState, Pack, Song } from '../types/models'
+import { DB_TRANSACTION_TYPES, INDEXED_BD_CONFIG } from '../constants/storage'
 
-export const INDEXED_BD_CONFIG: IndexedDbConfig = {
-  DB_NAME: 'PianoBingoDB',
-  DB_VERSION: 1,
-  PARTITION_SIZE: 1000000,
-  SCHEMAS: {
-    PACKS: 'packs',
-    SONGS: 'songs'
-  }
-} as const;
-
-export const DB_TRANSACTION_TYPES = {
-  READ_WRITE: 'readwrite',
-  READ: 'readonly'
-} as const;
+export { DB_TRANSACTION_TYPES, INDEXED_BD_CONFIG } from '../constants/storage'
 
 let firstTimeOpeningDB = true;
 
