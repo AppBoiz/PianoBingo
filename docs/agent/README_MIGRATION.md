@@ -1,6 +1,6 @@
 # Migration README
 
-React + TypeScript migration of PianoBingo from legacy static web app is **substantially complete**. All core workflows have React implementations with full parity to legacy behavior.
+React + TypeScript migration is complete for the active app surface. The project now uses a finalized page-centric source structure.
 
 ## Quick start (from project root)
 
@@ -12,7 +12,51 @@ npm run build         # Production build with Workbox SW generation
 npm run preview       # Preview production build locally
 ```
 
-## Migration status (as of 2026-02-24)
+## Migration status (as of 2026-03-15)
+
+### Final architecture
+
+```text
+src/
+	App.tsx
+	main.tsx
+	pages/
+		game/
+			Game/
+			GameHistory/
+			PackSelect/
+			hooks/
+		packs/
+			PackEdit/
+			PackManagement/
+			hooks/
+		songs/
+			SongManagement/
+			SongView/
+			hooks/
+		welcome/
+			WelcomePage/
+	shared/
+		components/
+		constants/
+		context/
+		services/
+		storage/
+		types/
+		utils/
+	init/
+	styles/
+```
+
+Page entry files:
+- `src/pages/game/Game/Game.tsx`
+- `src/pages/game/GameHistory/GameHistory.tsx`
+- `src/pages/game/PackSelect/PackSelect.tsx`
+- `src/pages/packs/PackEdit/PackEdit.tsx`
+- `src/pages/packs/PackManagement/PackManagement.tsx`
+- `src/pages/songs/SongManagement/SongManagement.tsx`
+- `src/pages/songs/SongView/SongView.tsx`
+- `src/pages/welcome/WelcomePage/WelcomePage.tsx`
 
 ### ✅ Phase 1: Legacy Cleanup Completed
 - All legacy surface removed (`public/legacy-pages/`, `app.js`, `services/navigation/`)

@@ -1,6 +1,6 @@
 # PianoBingo — Coding Agent Context
 
-Last updated: 2026-02-24 (migration audit completed)
+Last updated: 2026-03-15 (final page-centric structure)
 
 ## 0) Meta: Keeping this context file current
 
@@ -34,19 +34,29 @@ Core entities:
 - Game state/history: selected pack, current song, already-shown songs.
 
 
-## 2) Current app architecture (React + legacy coexistence)
+## 2) Current app architecture (finalized)
 
-There are two application surfaces in the repository:
+The active app surface is React + TypeScript with a page-centric structure.
 
-1. **React/TypeScript app (active migration target)**
-   - Entry: `src/main.tsx`, app routes in `src/App.tsx`, pages in `src/pages/*`.
-   - Shared nav abstraction keeps legacy page names/routes compatible (`src/services/navigation/legacyNavigation.ts`, `src/context/NavigationContext.tsx`).
+- Entry: `src/main.tsx`
+- Routes: `src/App.tsx`
+- Navigation context: `src/shared/context/NavigationContext.tsx`
+- Route constants: `src/shared/constants/navigation.ts`
 
-2. **Legacy static app (kept for parity/backward compatibility)**
-   - Legacy shell and pages live under `public/legacy-index.html` + `public/legacy-pages/*`.
-   - Older iframe/postMessage navigation model remains in `services/navigation/*` and `app.js`.
+Source organization:
+- `src/pages/{feature}/{PageName}/...` for page-owned code
+- `src/pages/{feature}/hooks/*` for feature-scoped hooks
+- `src/shared/*` for cross-feature reusable code
 
-Migration goal is parity-first: preserve behavior, styling, mobile UX, and local/offline characteristics while moving page logic to React.
+Current page entry files:
+- `src/pages/game/Game/Game.tsx`
+- `src/pages/game/GameHistory/GameHistory.tsx`
+- `src/pages/game/PackSelect/PackSelect.tsx`
+- `src/pages/packs/PackEdit/PackEdit.tsx`
+- `src/pages/packs/PackManagement/PackManagement.tsx`
+- `src/pages/songs/SongManagement/SongManagement.tsx`
+- `src/pages/songs/SongView/SongView.tsx`
+- `src/pages/welcome/WelcomePage/WelcomePage.tsx`
 
 
 ## 3) Feature parity snapshot (important migration status)
@@ -105,8 +115,8 @@ Rules:
 
 ### 4.3 PDF reader implementation
 
-- React PDF rendering uses `pdfjs-dist` via dynamic import in `src/components/PDFViewer.tsx`.
-- `src/hooks/usePdfSong.ts` centralizes the common song-loading flow used by both `PdfReader` and `SongView`: load a `Song`, derive `pdfUrl`/title state, expose loading state, and provide a `reload()` helper.
+- React PDF rendering uses `pdfjs-dist` via dynamic import in `src/shared/components/pdf/PDFViewer.tsx`.
+- `src/pages/game/hooks/usePdfSong.ts` centralizes the common song-loading flow used by both `Game` and `SongView`: load a `Song`, derive `pdfUrl`/title state, expose loading state, and provide a `reload()` helper.
 - Worker is loaded from bundled assets (`pdf.worker` chunk) via `GlobalWorkerOptions.workerSrc` for offline-capable modern path.
 - PDF rendering exposes lightweight test hooks: `window.__PDF_RENDERED__` and `window.__PDF_RENDER_ERROR__` for Playwright render validation.
 - **Legacy PDF limitation**: Legacy pages (`public/legacy-pages/pdf-reader/` and `song-view/`) use CDN-hosted PDF.js worker from cdnjs.cloudflare.com. This breaks offline functionality for legacy pages. Since the legacy surface will be removed soon, this limitation is documented rather than fixed. React pages have full offline support via bundled worker.
@@ -240,7 +250,7 @@ Each migration PR should include:
 - **WelcomePage initialization**: Resolved TODO - now calls `startNewGame()` before navigating to Pack Select to ensure proper game state setup.
 - **Early migration trigger**: Added `loadGameState()` call in `src/main.tsx` to run migrations on every app load.
 - **GameHistory page (2026-02-24)**: Implemented 75-box bingo grid matching legacy behavior. Shows numbered boxes 1-75 with highlighting for shown songs. Added missing CSS for both React (`src/styles/legacy/game-history.css`) and legacy (`public/legacy-pages/game-history/game-history.css`) surfaces. Back button correctly navigates to PDF reader (game page). Mobile-responsive grid with adaptive box sizing.
-- **PdfReader UX enhancements (2026-02-24)**: Added contextual UI matching legacy. Nav bar now displays song title with pack index (e.g., "3 - Moonlight Sonata"). Implemented hamburger menu (checkbox-based dropdown) with Next/Previous Song, Game History, and End Game options. Added footer with "Next Song" button. Removed redundant page navigation buttons from PDFViewer component (kept left/right click areas for page turning). Updated in `src/pages/PdfReader.tsx` and `src/components/PDFViewer.tsx`.
+- **Game UX enhancements (2026-02-24)**: Added contextual UI matching legacy. Nav bar displays song title with pack index, includes game menu actions (Next/Previous Song, Game History, End Game), and footer has "Next Song" button. PDF viewer keeps left/right click areas for page turning. Current files are under `src/pages/game/Game/*` and `src/shared/components/pdf/PDFViewer.tsx`.
 - **SongView navigation alignment (2026-02-24)**: Fixed navigation semantics to match legacy preview behavior. Back button now calls `startNewGame()` and navigates to Song Management (not Welcome). Removed Next/Prev song buttons (SongView is for single-song preview from management UI, not game progression). Created missing CSS file for legacy page. Updated in `src/pages/SongView.tsx`, `src/styles/legacy/song-view.css`, and `public/legacy-pages/song-view/song-view.css`.
 - **SongView data-passing decoupled from game cache (2026-03-15)**: `SongManagement` previously used `setSongId()` to write the chosen song into the game's localStorage cache as a workaround (legacy holdover from before React). Replaced with proper React Router navigation: `SongManagement` now navigates to `/song-view?songId=<id>` and `SongView` reads `useSearchParams()` then loads the song directly from IndexedDB via `loadSong()`. The `setSongId()` function was removed from `indexedDb.ts`. Game state is no longer polluted by song preview actions.
 - **Service worker cleanup (2026-02-24)**: Added deprecation notices to manual SW files (`/service-worker.js`, `src/sw-template.js`) clarifying they are no longer used in production. Enabled `cleanupOutdatedCaches: true` in Workbox generation to automatically purge old cache names like `pianobingo-cache-v1`. Updated documentation in context file explaining the SW architecture. Documented legacy PDF CDN worker limitation (affects offline for legacy pages only, will be resolved when legacy surface is removed).
@@ -266,7 +276,7 @@ Each migration PR should include:
 - ✅ Removed `public/legacy-pages/` directory (8 page directories with HTML/CSS/JS)
 - ✅ Removed `app.js` (legacy launcher)
 - ✅ Removed `services/navigation/` (iframe/postMessage navigation code)
-- ✅ Migrated PAGE route mapping from `legacyNavigation.ts` directly to `src/context/NavigationContext.tsx`
+- ✅ Migrated PAGE route mapping into React navigation context at `src/shared/context/NavigationContext.tsx`
 - ✅ Deleted `/service-worker.js` (root, no longer needed - Workbox generates `dist/service-worker.js`)
 - ✅ Deleted `src/sw-template.js` (unused template from abandoned approach)
 - ✅ Build verified: Clean production build with no regressions

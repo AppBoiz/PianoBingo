@@ -1,44 +1,71 @@
 # PianoBingo
-Piano bingo native app
+
+PianoBingo is a React + TypeScript web app for running song-draw games from configurable song packs, with local song/pack management and offline-capable PDF viewing.
+
+## Project Structure (Final)
+
+The source structure is page-centric and feature-grouped:
+
+```text
+src/
+	App.tsx
+	main.tsx
+	pages/
+		game/
+			Game/
+			GameHistory/
+			PackSelect/
+			hooks/
+		packs/
+			PackEdit/
+			PackManagement/
+			hooks/
+		songs/
+			SongManagement/
+			SongView/
+			hooks/
+		welcome/
+			WelcomePage/
+	shared/
+		components/
+		constants/
+		context/
+		services/
+		storage/
+		types/
+		utils/
+	init/
+	styles/
+	vite-env.d.ts
+```
+
+Notes:
+- Page files are kept with explicit names inside each page folder (for example `Game.tsx`, `PackEdit.tsx`, `SongView.tsx`).
+- Reusable cross-feature code lives under `src/shared/*`.
+- Route constants are in `src/shared/constants/navigation.ts`.
 
 ## Documentation
 
-For comprehensive project context, architecture, migration status, and coding agent guidance, see [docs/agent/CODING_AGENT_CONTEXT.md](docs/agent/CODING_AGENT_CONTEXT.md).
+Detailed agent context and migration notes:
+- `docs/agent/CODING_AGENT_CONTEXT.md`
+- `docs/agent/README_MIGRATION.md`
 
-## Navigation
+## Development
 
-This is a single page application, which uses iframes to dynamically render the content. To register the app content container, the `services/navigation/host.js` script is linked to the html file it is contained in. Content pages link the script `services/navigation/navigation.js` and can use the function loadPage() in combination with the makshift `PAGES` enum, which should be extended when a page is added.
+```bash
+npm install
+npm run dev
+```
 
-Internally, it uses events to communicate between origins, telling the parent when to switch to a different page.
-
-## PDF Compilation
-
-To compile pdfs into a bundled .js file, there is a python util. This is a workaround for localhost to avoid cors issues.
-
-## Running local http server
-
-```npx http-server -c-1 -p 3000 -o```
-
-This command stops the browser from caching the web pages, so code can be edited and tested in real-time.
-
-## Testing Service Worker & Offline PDFs (local)
-
-1. Build the app:
+## Build and Preview
 
 ```bash
 npm run build
+npm run preview
 ```
 
-2. Serve the `dist/` directory over HTTPS or HTTP on localhost (service workers require secure contexts except on localhost). Example using `serve`:
+## E2E Tests
 
 ```bash
-npx serve dist -p 3000
+npm run test:e2e
 ```
-
-3. Open the app at `http://localhost:3000` and check DevTools > Application > Service Workers to confirm `service-worker.js` is registered.
-
-4. After install, confirm Cache Storage contains `assets/*` entries (the Workbox-generated SW precaches the hashed pdf worker and pdf chunks).
-
-5. Test offline: in DevTools, enable "Offline" in the Network tab and reload — PDF viewing should still work because the worker and chunks are cached.
-
-If you want the SW to be regenerated with new precache contents, re-run `npm run build`.
