@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react'
 import Sortable from 'sortablejs'
+import { getOrderedIdsFromContainer } from '../../../shared/services/runtime/domService'
 
 type UseSortableOptions = {
   /** CSS selector used to identify each sortable row within the container. */
@@ -44,8 +45,7 @@ export function useSortable(onReorder: (orderedIds: number[]) => void, options: 
       animation,
       handle,
       onEnd: () => {
-        const orderedIds = Array.from(node.querySelectorAll(rowSelector))
-          .map(el => parseInt(el.getAttribute(idAttribute) || '0', 10))
+        const orderedIds = getOrderedIdsFromContainer(node, rowSelector, idAttribute)
         onReorderRef.current(orderedIds)
       }
     })

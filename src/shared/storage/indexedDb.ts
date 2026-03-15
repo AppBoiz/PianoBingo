@@ -5,25 +5,17 @@
 
 import type { CurrentSongMetadata, GameState, Pack, Song } from '../types/models'
 import { DB_TRANSACTION_TYPES, INDEXED_BD_CONFIG, PACK_ID_PARTITION_SIZE } from '../constants/storage'
+import { openIndexedDb, requestToPromise, waitForTransaction } from '../services/storage/indexedDbClient'
+import {
+  loadJsonFromLocalStorage,
+  removeLocalStorageItem,
+  saveJsonToLocalStorage,
+} from '../services/storage/localStorageService'
+import { getBasePackData, getBaseSongData } from '../services/runtime/windowGlobals'
 
 export { DB_TRANSACTION_TYPES, INDEXED_BD_CONFIG } from '../constants/storage'
 
 let firstTimeOpeningDB = true;
-
-function waitForTransaction(tx: IDBTransaction): Promise<void> {
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve()
-    tx.onerror = () => reject(tx.error ?? new Error('IndexedDB transaction failed'))
-    tx.onabort = () => reject(tx.error ?? new Error('IndexedDB transaction aborted'))
-  })
-}
-
-function requestToPromise<T>(request: IDBRequest<T>): Promise<T> {
-  return new Promise((resolve, reject) => {
-    request.onsuccess = () => resolve(request.result)
-    request.onerror = () => reject(request.error)
-  })
-}
 
 function normalizePack(pack: Pack): Pack {
   return {
@@ -56,69 +48,64 @@ function getDefaultGameState(): GameState {
 
 export function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(INDEXED_BD_CONFIG.DB_NAME, INDEXED_BD_CONFIG.DB_VERSION);
-
-    request.onupgradeneeded = () => {
-      const db = request.result;
+    openIndexedDb(INDEXED_BD_CONFIG, db => {
       if (!db.objectStoreNames.contains(INDEXED_BD_CONFIG.SCHEMAS.PACKS)) {
-        db.createObjectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS, { keyPath: 'packId' });
+        db.createObjectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS, { keyPath: 'packId' })
       }
       if (!db.objectStoreNames.contains(INDEXED_BD_CONFIG.SCHEMAS.SONGS)) {
-        db.createObjectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS, { keyPath: 'songId' });
+        db.createObjectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS, { keyPath: 'songId' })
       }
-    };
-
-    request.onsuccess = async () => {
-      const db = request.result;
+    }).then(async db => {
 
       if (firstTimeOpeningDB) {
-        firstTimeOpeningDB = false;
+        firstTimeOpeningDB = false
 
         // Try to seed with legacy globals if available (migration safe)
         try {
-          const packs = await loadAllPacks();
+          const packs = await loadAllPacks()
+          const basePackData = getBasePackData()
 
-          if (window.BASE_PACK_DATA) {
-            for (const BASE_PACK of window.BASE_PACK_DATA) {
-              const existing = packs.find(p => p.packId === BASE_PACK.packId);
+          if (basePackData.length) {
+            for (const BASE_PACK of basePackData) {
+              const existing = packs.find(p => p.packId === BASE_PACK.packId)
               if (!existing || (existing.version ?? 0) < (BASE_PACK.version ?? 0)) {
                 // Seed directly without incrementing version
-                const db2 = await openDB();
-                const tx = db2.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode);
-                const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS);
-                store.put(normalizePack(BASE_PACK));  // Insert base pack with original version
-                await waitForTransaction(tx);
-                db2.close();
+                const db2 = await openDB()
+                const tx = db2.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode)
+                const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS)
+                store.put(normalizePack(BASE_PACK))
+                await waitForTransaction(tx)
+                db2.close()
               }
             }
           }
 
-          const songs = await loadAllSongs();
-          if (window.BASE_SONG_DATA) {
-            for (const BASE_SONG of window.BASE_SONG_DATA) {
-              const existing = songs.find(s => s.songId === BASE_SONG.songId);
+          const songs = await loadAllSongs()
+          const baseSongData = getBaseSongData()
+
+          if (baseSongData.length) {
+            for (const BASE_SONG of baseSongData) {
+              const existing = songs.find(s => s.songId === BASE_SONG.songId)
               if (!existing || (existing.version ?? 0) < (BASE_SONG.version ?? 0)) {
                 // Seed directly without incrementing version
-                const db2 = await openDB();
-                const tx = db2.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode);
-                const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS);
-                store.put(BASE_SONG);  // Insert base song with original version
-                await waitForTransaction(tx);
-                db2.close();
+                const db2 = await openDB()
+                const tx = db2.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode)
+                const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS)
+                store.put(BASE_SONG)
+                await waitForTransaction(tx)
+                db2.close()
               }
             }
           }
         } catch (err) {
           // If seeding fails, don't block opening DB
-          console.warn('Seeding skipped or failed:', err);
+          console.warn('Seeding skipped or failed:', err)
         }
       }
 
-      resolve(db);
-    };
-
-    request.onerror = () => reject(request.error);
-  });
+      resolve(db)
+    }).catch(reject)
+  })
 }
 
 export async function savePack(pack: Pack): Promise<void> {
@@ -283,18 +270,18 @@ export async function deleteSong(songId: number): Promise<void> {
 
 // Simple localStorage-backed game state (mirrors original)
 const defaultGameState: GameState = getDefaultGameState()
+const GAME_STATE_STORAGE_KEY = 'gameState'
 
 export function saveGameState(gameState: GameState): void {
-  const gameStateString = JSON.stringify(gameState)
-  localStorage.setItem('gameState', gameStateString)
+  saveJsonToLocalStorage(GAME_STATE_STORAGE_KEY, gameState)
 }
 
 export function loadGameState(): GameState | null {
-  const gameStateString = localStorage.getItem('gameState');
-  if (gameStateString) {
-    const gameState = JSON.parse(gameStateString) as Partial<GameState> & {
+  const gameState = loadJsonFromLocalStorage<Partial<GameState> & {
       currentSong?: CurrentSongMetadata & { id?: number }
-    }
+    }>(GAME_STATE_STORAGE_KEY)
+
+  if (gameState) {
     // Migrate legacy data: rename currentSong.id to currentSong.songId
     if (gameState.currentSong && gameState.currentSong.id !== undefined && gameState.currentSong.songId === undefined) {
       gameState.currentSong.songId = gameState.currentSong.id
@@ -320,7 +307,7 @@ export function loadGameState(): GameState | null {
 }
 
 export function clearGameState() {
-  localStorage.removeItem('gameState');
+  removeLocalStorageItem(GAME_STATE_STORAGE_KEY)
 }
 
 export function startNewGame() {

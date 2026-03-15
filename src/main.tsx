@@ -6,6 +6,8 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { loadGameState } from './shared/storage/indexedDb'
+import { getRequiredElementById } from './shared/services/runtime/domService'
+import { registerProductionServiceWorker } from './shared/services/runtime/serviceWorkerService'
 
 import './styles/tailwind.css'
 import '/styles.css'
@@ -27,7 +29,7 @@ async function bootstrap() {
   // Trigger localStorage migration early if needed
   loadGameState()
 
-  createRoot(document.getElementById('root')!).render(
+  createRoot(getRequiredElementById<HTMLDivElement>('root')).render(
     <React.StrictMode>
       <BrowserRouter>
         <App />
@@ -37,11 +39,4 @@ async function bootstrap() {
 }
 
 bootstrap().catch(err => console.error('Bootstrap failed:', err))
-// Register Workbox-generated service worker in production
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(reg => console.log('SW registered:', reg.scope))
-      .catch(err => console.warn('SW registration failed:', err))
-  })
-}
+registerProductionServiceWorker()

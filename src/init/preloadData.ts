@@ -6,6 +6,8 @@
 
 import type { Pack, Song } from '../shared/types/models'
 import { PACK_SIZE } from '../shared/constants/game'
+import { fetchTextResources } from '../shared/services/network/resourceLoader'
+import { setBaseData, setPdfResolver } from '../shared/services/runtime/windowGlobals'
 
 // Define BASE_PACK_DATA - all songs are split into two packs
 const BASE_PACK_DATA: Pack[] = [
@@ -28,6 +30,7 @@ const BASE_PACK_DATA: Pack[] = [
 // PDF base64 data will be loaded and made available globally
 // These map variable names to actual base64 content
 let pdfMap: Record<string, string> = {};
+let preloadPromise: Promise<void> | null = null
 
 // Define BASE_SONG_DATA with all 150 songs
 // The pdfUrl will be resolved at runtime to actual base64 content
@@ -194,11 +197,11 @@ export { BASE_PACK_DATA, BASE_SONG_DATA };
 async function loadPdfData() {
   try {
     // Load all PDF data files
-    const [allPdfs, packJack, packTom] = await Promise.all([
-      fetch('/resources/base64/all_pdfs.js').then(r => r.text()),
-      fetch('/resources/base64/pack_jack.js').then(r => r.text()),
-      fetch('/resources/base64/pack_tom.js').then(r => r.text()),
-    ]);
+    const [allPdfs, packJack, packTom] = await fetchTextResources([
+      '/resources/base64/all_pdfs.js',
+      '/resources/base64/pack_jack.js',
+      '/resources/base64/pack_tom.js',
+    ])
 
     // Extract all base64 PDFs from the files using regex
     // Pattern: const VARIABLE_NAME = 'BASE64_CONTENT...';
@@ -263,30 +266,28 @@ export function resolvePdfUrl(pdfUrl: string): string | null {
  * This must be called SYNCHRONOUSLY before the React app initializes IndexedDB
  */
 export async function initializePreloadedData() {
-  try {
-    // Load PDF data first
-    await loadPdfData();
-    
-    // Set the data on the window object for IndexedDB to access
-    window.BASE_PACK_DATA = BASE_PACK_DATA;
-    window.BASE_SONG_DATA = BASE_SONG_DATA;
-    
-    // Store PDF resolution function on window for use by PDFViewer
-    window.resolvePdfUrl = resolvePdfUrl;
-    
-    console.log('✓ Preloaded data initialized:', {
-      packs: BASE_PACK_DATA.length,
-      songs: BASE_SONG_DATA.length,
-      pdfs: Object.keys(pdfMap).length
-    });
-  } catch (error) {
-    console.error('Failed to initialize preloaded data:', error);
-  }
-}
+  if (!preloadPromise) {
+    preloadPromise = (async () => {
+      try {
+        // Load PDF data first
+        await loadPdfData()
 
-// Execute initialization immediately on module load
-if (typeof window !== 'undefined') {
-  initializePreloadedData().catch(err => 
-    console.error('Async initialization failed:', err)
-  );
+        // Set the data on the window object for IndexedDB to access
+        setBaseData(BASE_PACK_DATA, BASE_SONG_DATA)
+
+        // Store PDF resolution function on window for use by PDFViewer
+        setPdfResolver(resolvePdfUrl)
+
+        console.log('✓ Preloaded data initialized:', {
+          packs: BASE_PACK_DATA.length,
+          songs: BASE_SONG_DATA.length,
+          pdfs: Object.keys(pdfMap).length
+        })
+      } catch (error) {
+        console.error('Failed to initialize preloaded data:', error)
+      }
+    })()
+  }
+
+  await preloadPromise
 }

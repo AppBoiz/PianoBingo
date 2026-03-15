@@ -1,4 +1,5 @@
 import { PAGE, PAGE_NAME } from '../../constants/navigation'
+import { postMessageToParent } from '../runtime/frameMessaging'
 
 export { PAGE }
 export { PAGE_NAME as PAGE_NAME_CONSTANT }
@@ -7,7 +8,7 @@ export { PAGE_NAME as PAGE_NAME_CONSTANT }
 export function loadPageLegacy(page: string){
   try {
     const message = { type: 'goToPage', page }
-    window.parent.postMessage(message, '*')
+    postMessageToParent(message)
   } catch (e) {
     // no-op
   }

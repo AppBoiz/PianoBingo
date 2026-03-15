@@ -1,6 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react'
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
-import { LEGACY_PDF_FALLBACK_PATH } from '../../constants/pdf'
+import {
+  loadLegacyFallbackPdfBase64,
+  resolvePdfBase64,
+} from '../../services/pdf/pdfSourceService'
+import {
+  loadPdfDocumentFromBase64,
+  renderPdfPageIntoContainer,
+} from '../../services/pdf/pdfDocumentService'
+import {
+  markPdfError,
+  markPdfLoaded,
+  markPdfRendered,
+  resetPdfDiagnostics,
+} from '../../services/runtime/windowGlobals'
 
 // Keep the PDF runtime out of the main bundle until a document is actually opened.
 
@@ -12,57 +25,6 @@ type Props = {
   base64: string | null | undefined
 }
 
-function markPdfLoadedForDiagnostics() {
-  if (typeof window === 'undefined') return
-  window.__PDF_LOADED__ = true
-  window.__PDF_RENDER_ERROR__ = null
-}
-
-function markPdfRenderedForDiagnostics() {
-  if (typeof window === 'undefined') return
-  window.__PDF_RENDERED__ = true
-}
-
-function markPdfErrorForDiagnostics(error: unknown) {
-  if (typeof window === 'undefined') return
-  window.__PDF_RENDER_ERROR__ = String(error)
-}
-
-function resolveProvidedPdfBase64(base64: string) {
-  const resolvePdfUrl = window.resolvePdfUrl
-  const resolved = typeof resolvePdfUrl === 'function' ? resolvePdfUrl(base64) : base64
-  const cleaned = (resolved || '').replace(/\s/g, '')
-
-  if (cleaned.startsWith('JVBERi0')) {
-    return cleaned
-  }
-
-  console.warn('Could not resolve PDF URL to valid base64:', base64)
-  return null
-}
-
-async function loadLegacyFallbackPdfBase64() {
-  const response = await fetch(LEGACY_PDF_FALLBACK_PATH)
-  if (!response.ok) {
-    return null
-  }
-
-  const fileContents = await response.text()
-  const firstPdfMatch = fileContents.match(/(['"])(JVBERi0[A-Za-z0-9+/=]+)\1/)
-  return firstPdfMatch?.[2] ?? null
-}
-
-function decodePdfBase64ToBytes(pdfBase64: string) {
-  const binary = atob(pdfBase64)
-  const bytes = new Uint8Array(binary.length)
-
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index)
-  }
-
-  return bytes
-}
-
 function useResolvedPdfBase64(base64: string | null | undefined) {
   const [pdfBase64, setPdfBase64] = useState<string | null>(null)
 
@@ -71,7 +33,7 @@ function useResolvedPdfBase64(base64: string | null | undefined) {
 
     const resolvePdfSource = async () => {
       if (base64) {
-        setPdfBase64(resolveProvidedPdfBase64(base64))
+        setPdfBase64(resolvePdfBase64(base64))
         return
       }
 
@@ -109,18 +71,11 @@ function useLoadedPdfDocument(pdfBase64: string | null) {
         setPdfDocument(null)
         setTotalPages(0)
         setCurrentPage(1)
+        resetPdfDiagnostics()
         return
       }
 
-      const pdfBytes = decodePdfBase64ToBytes(pdfBase64)
-      const pdfjs = await import('pdfjs-dist')
-      const { getDocument, GlobalWorkerOptions } = pdfjs
-      const workerUrl = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url)
-
-      GlobalWorkerOptions.workerSrc = workerUrl.toString()
-
-      const loadingTask = getDocument({ data: pdfBytes })
-      const loadedPdfDocument = await loadingTask.promise
+      const loadedPdfDocument = await loadPdfDocumentFromBase64(pdfBase64)
 
       if (cancelled) {
         return
@@ -129,7 +84,7 @@ function useLoadedPdfDocument(pdfBase64: string | null) {
       setPdfDocument(loadedPdfDocument)
       setTotalPages(loadedPdfDocument.numPages)
       setCurrentPage(1)
-      markPdfLoadedForDiagnostics()
+      markPdfLoaded()
     }
 
     setPdfDocument(null)
@@ -137,7 +92,7 @@ function useLoadedPdfDocument(pdfBase64: string | null) {
 
     loadPdfDocument().catch(error => {
       if (!cancelled) {
-        markPdfErrorForDiagnostics(error)
+        markPdfError(error)
         console.error('Failed to load PDF document:', error)
       }
     })
@@ -172,32 +127,16 @@ function useRenderedPdfPage(containerRef: React.RefObject<HTMLDivElement | null>
       }
 
       // Match the legacy viewer's width-first behavior so sizing stays visually consistent.
-      const unscaledViewport = page.getViewport({ scale: 1 })
-      const scale = container.clientWidth / unscaledViewport.width
-      const viewport = page.getViewport({ scale })
-      const canvas = document.createElement('canvas')
-      const context = canvas.getContext('2d')
-
-      if (!context) {
-        throw new Error('Canvas 2D context is not available')
-      }
-
-      canvas.height = Math.floor(viewport.height)
-      canvas.width = Math.floor(viewport.width)
-
-      container.querySelectorAll('canvas').forEach(existingCanvas => existingCanvas.remove())
-      container.appendChild(canvas)
-
-      await page.render({ canvas, canvasContext: context, viewport }).promise
+      await renderPdfPageIntoContainer(container, page)
 
       if (!cancelled) {
-        markPdfRenderedForDiagnostics()
+        markPdfRendered()
       }
     }
 
     renderPageIntoContainer().catch(error => {
       if (!cancelled) {
-        markPdfErrorForDiagnostics(error)
+        markPdfError(error)
         console.error(error)
       }
     })
