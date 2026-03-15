@@ -3,6 +3,7 @@ import { useNavigation } from '../context/NavigationContext'
 import { useGameHistory } from '../hooks/useGameHistory'
 import Header from '../components/Header'
 import { PACK_SIZE } from '../constants/game'
+import { PAGE_NAME } from '../constants/navigation'
 
 export default function GameHistory(){
   const { pack, hasSongIdBeenShown: isHighlighted } = useGameHistory()
@@ -10,7 +11,7 @@ export default function GameHistory(){
 
   return (
     <div className="game-history-root">
-      <Header title="Game History" backAction={() => loadPage('GAME')} withContainers={false} />
+      <Header title="Game History" backAction={() => loadPage(PAGE_NAME.GAME)} withContainers={false} />
       {!pack ? (
         <div style={{ textAlign: 'center', marginTop: '40px', color: '#6b7280' }}>
           No active game. Start a game to see history.

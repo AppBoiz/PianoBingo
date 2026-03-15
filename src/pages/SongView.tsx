@@ -4,6 +4,7 @@ import PDFViewer from '../components/PDFViewer'
 import { usePdfSong } from '../hooks/usePdfSong'
 import { loadSong, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
+import { PAGE_NAME } from '../constants/navigation'
 
 export default function SongView(){
   const { loadPage } = useNavigation()
@@ -24,7 +25,7 @@ export default function SongView(){
 
   function handleBack(){
     startNewGame()
-    loadPage('SONG_MANAGEMENT')
+    loadPage(PAGE_NAME.SONG_MANAGEMENT)
   }
 
   if (isLoading) return <div className="pdf-reader-empty">Loading song...</div>

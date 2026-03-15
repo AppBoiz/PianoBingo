@@ -3,6 +3,7 @@ import PDFViewer from '../components/PDFViewer'
 import { usePdfSong } from '../hooks/usePdfSong'
 import { getCurrentSong, getSelectedSongPackId, loadPack, nextSong as storageNextSong, prevSong as storagePrevSong } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
+import { PAGE_NAME } from '../constants/navigation'
 
 export default function PdfReader(){
   const [songIndex, setSongIndex] = useState<number>(0)
@@ -64,8 +65,8 @@ export default function PdfReader(){
               <div className="menu">
                 <a href="#" onClick={(e) => { e.preventDefault(); nextSong(); }}>Next Song</a>
                 <a href="#" onClick={(e) => { e.preventDefault(); prevSong(); }}>Previous Song</a>
-                <a href="#" onClick={(e) => { e.preventDefault(); loadPage('GAME_HISTORY'); }}>Game History</a>
-                <a href="#" className="red" onClick={(e) => { e.preventDefault(); loadPage('WELCOME'); }}>End Game</a>
+                <a href="#" onClick={(e) => { e.preventDefault(); loadPage(PAGE_NAME.GAME_HISTORY); }}>Game History</a>
+                <a href="#" className="red" onClick={(e) => { e.preventDefault(); loadPage(PAGE_NAME.WELCOME); }}>End Game</a>
               </div>
             </div>
           </div>

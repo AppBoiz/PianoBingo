@@ -9,19 +9,20 @@ import SongManagement from './pages/SongManagement'
 import { NavigationProvider } from './context/NavigationContext'
 import SongView from './pages/SongView'
 import GameHistory from './pages/GameHistory'
+import { PAGE } from './constants/navigation'
 
 export default function App(){
   return (
     <NavigationProvider>
       <Routes>
-        <Route path="/" element={<WelcomePage/>} />
-        <Route path="/pack-select" element={<PackSelect/>} />
-        <Route path="/pdf-reader" element={<PdfReader/>} />
-        <Route path="/pack-management" element={<PackManagement/>} />
-        <Route path="/pack-edit" element={<PackEdit/>} />
-        <Route path="/song-management" element={<SongManagement/>} />
-        <Route path="/song-view" element={<SongView/>} />
-        <Route path="/game-history" element={<GameHistory/>} />
+        <Route path={PAGE.WELCOME} element={<WelcomePage/>} />
+        <Route path={PAGE.PACK_SELECT} element={<PackSelect/>} />
+        <Route path={PAGE.GAME} element={<PdfReader/>} />
+        <Route path={PAGE.PACK_MANAGEMENT} element={<PackManagement/>} />
+        <Route path={PAGE.PACK_EDIT} element={<PackEdit/>} />
+        <Route path={PAGE.SONG_MANAGEMENT} element={<SongManagement/>} />
+        <Route path={PAGE.SONG_VIEW} element={<SongView/>} />
+        <Route path={PAGE.GAME_HISTORY} element={<GameHistory/>} />
       </Routes>
     </NavigationProvider>
   )

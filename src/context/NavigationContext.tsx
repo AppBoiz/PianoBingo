@@ -1,11 +1,12 @@
 import React, { createContext, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PAGE } from '../constants/navigation'
-import type { PageKey, PagePath } from '../constants/navigation'
+import { PAGE, PAGE_NAME } from '../constants/navigation'
+import type { PageKey, PageName, PagePath } from '../constants/navigation'
 
 type NavigationContextValue = {
   PAGE: typeof PAGE
-  loadPage: (page: PageKey | PagePath | string) => void
+  PAGE_NAME_CONSTANT: typeof PAGE_NAME
+  loadPage: (page: PageName | PagePath | string) => void
 }
 
 function isPageKey(page: string): page is PageKey {
@@ -17,7 +18,7 @@ const NavigationContext = createContext<NavigationContextValue | undefined>(unde
 export function NavigationProvider({ children }: { children: React.ReactNode }){
   const navigate = useNavigate()
 
-  const loadPage = (page: PageKey | PagePath | string) => {
+  const loadPage = (page: PageName | PagePath | string) => {
     // Accept either a PAGE key (e.g. 'PACK_SELECT') or a route path ('/pack-select')
     if (!page) return
     if (page.startsWith('/')) return navigate(page)
@@ -28,7 +29,7 @@ export function NavigationProvider({ children }: { children: React.ReactNode }){
   }
 
   return (
-    <NavigationContext.Provider value={{ PAGE, loadPage }}>
+    <NavigationContext.Provider value={{ PAGE, PAGE_NAME_CONSTANT: PAGE_NAME, loadPage }}>
       {children}
     </NavigationContext.Provider>
   )

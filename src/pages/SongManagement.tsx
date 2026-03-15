@@ -5,6 +5,7 @@ import { useSongs } from '../hooks/useSongs'
 import { fileToBase64 } from '../utils/fileUtils'
 import Header from '../components/Header'
 import type { Song } from '../types/models'
+import { PAGE, PAGE_NAME } from '../constants/navigation'
 
 export default function SongManagement(){
   const { songs, refresh: refreshSongs } = useSongs()
@@ -30,7 +31,7 @@ export default function SongManagement(){
   }
 
   function handleViewSong(songId: number){
-    loadPage(`/song-view?songId=${songId}`)
+    loadPage(`${PAGE.SONG_VIEW}?songId=${songId}`)
   }
 
   async function handleDeleteSong(songId: number){
@@ -49,7 +50,7 @@ export default function SongManagement(){
 
   return (
     <div id="app">
-      <Header title="Manage Songs" backAction={() => { startNewGame(); loadPage('WELCOME') }} />
+      <Header title="Manage Songs" backAction={() => { startNewGame(); loadPage(PAGE_NAME.WELCOME) }} />
 
       <div className="main-content">
         <div className="playlist-container">

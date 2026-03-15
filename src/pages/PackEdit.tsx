@@ -7,6 +7,7 @@ import Header from '../components/Header'
 import type { Pack } from '../types/models'
 import { compareSongsByPackMembershipThenPackOrder } from '../utils/sort'
 import { PACK_SIZE } from '../constants/game'
+import { PAGE_NAME } from '../constants/navigation'
 
 function useLoadSelectedPack() {
   const [pack, setPack] = useState<Pack | null>(null)
@@ -54,7 +55,7 @@ export default function PackEdit() {
   async function handleSave() {
     if (!pack) return
     await savePack(pack)
-    loadPage('PACK_MANAGEMENT')
+    loadPage(PAGE_NAME.PACK_MANAGEMENT)
   }
 
   const selectedCount = pack.songs.length
@@ -64,7 +65,7 @@ export default function PackEdit() {
     <div id="app">
       <Header
         title="Edit Pack"
-        backAction={() => { startNewGame(); loadPage('PACK_MANAGEMENT') }}
+        backAction={() => { startNewGame(); loadPage(PAGE_NAME.PACK_MANAGEMENT) }}
         rightContent={<div id="song-counter">{selectedCount}/{PACK_SIZE}</div>}
       />
 

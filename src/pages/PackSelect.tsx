@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { selectPack, generateSong, clearGameState } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import { usePacks } from '../hooks/usePacks'
+import { PAGE_NAME } from '../constants/navigation'
 
 export default function PackSelect(){
   const { packs } = usePacks()
@@ -19,12 +20,12 @@ export default function PackSelect(){
     if (!selected) return
     await selectPack(selected)
     await generateSong()
-    loadPage('GAME')
+    loadPage(PAGE_NAME.GAME)
   }
 
   function handleBack(){
     clearGameState()
-    loadPage('WELCOME')
+    loadPage(PAGE_NAME.WELCOME)
   }
 
   return (

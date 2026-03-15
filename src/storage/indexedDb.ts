@@ -173,6 +173,27 @@ export async function deletePack(packId: number): Promise<void> {
   }
 }
 
+export async function createNewPack(): Promise<Pack> {
+  const packs = await loadAllPacks()
+  const maxPackId = packs.length ? Math.max(...packs.map(p => p.packId)) : 0
+  const { PACK_ID_PARTITION_SIZE } = await import('../constants/storage')
+  const newPack: Pack = {
+    packId: Math.max(maxPackId + 1, PACK_ID_PARTITION_SIZE),
+    packName: 'New Pack',
+    songCount: 0,
+    songs: [],
+  }
+  await savePack(newPack)
+  return newPack
+}
+
+export async function renamePack(packId: number, newName: string): Promise<void> {
+  const pack = await loadPack(packId)
+  if (!pack) return
+  pack.packName = newName.trim() || 'Untitled Pack'
+  await savePack(pack)
+}
+
 export async function saveSong(song: Song): Promise<void> {
   const db = await openDB();
   const tx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode);

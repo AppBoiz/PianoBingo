@@ -1,24 +1,15 @@
-import React from 'react'
-import { savePack, deletePack, loadPack, selectPack } from '../storage/indexedDb'
+import { createNewPack, deletePack, renamePack, selectPack } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import { usePacks } from '../hooks/usePacks'
 import Header from '../components/Header'
-import type { Pack } from '../types/models'
-import { PACK_ID_PARTITION_SIZE } from '../constants/storage'
+import { PAGE_NAME } from '../constants/navigation'
 
 export default function PackManagement(){
   const { packs, refresh: refreshPacks } = usePacks()
   const { loadPage } = useNavigation()
 
   async function handleCreateNewPack(){
-    const maxPackId = packs.length ? Math.max(...packs.map(p => p.packId)) : 0
-    const newPack: Pack = {
-      packId: Math.max(maxPackId + 1, PACK_ID_PARTITION_SIZE),
-      packName: 'New Pack',
-      songCount: 0,
-      songs: []
-    }
-    await savePack(newPack)
+    await createNewPack()
     await refreshPacks()
   }
 
@@ -29,20 +20,17 @@ export default function PackManagement(){
 
   function handleEditPack(packId: number){
     selectPack(packId)
-    loadPage('PACK_EDIT')
+    loadPage(PAGE_NAME.PACK_EDIT)
   }
 
   async function handleRenamePack(packId: number, newName: string){
-    const pack = await loadPack(packId)
-    if (!pack) return
-    pack.packName = newName.trim() || 'Untitled Pack'
-    await savePack(pack)
+    await renamePack(packId, newName)
     await refreshPacks()
   }
 
   return (
     <div id="app">
-      <Header title="Manage Playlists" backAction={() => loadPage('WELCOME')} />
+      <Header title="Manage Playlists" backAction={() => loadPage(PAGE_NAME.WELCOME)} />
 
       <div className="main-content">
         <div id="playlist-container" className="playlist-container">
