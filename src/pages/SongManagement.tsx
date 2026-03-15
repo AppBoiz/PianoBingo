@@ -3,6 +3,10 @@ import { useNavigation } from '../context/NavigationContext'
 import { useSongs } from '../hooks/useSongs'
 import { fileToBase64 } from '../utils/fileUtils'
 import Header from '../components/Header'
+import IconButton from '../components/atoms/IconButton'
+import PlaylistRow from '../components/molecules/PlaylistRow'
+import PageLayout from '../components/organisms/PageLayout'
+import PlaylistContainer from '../components/organisms/PlaylistContainer'
 import { PAGE, PAGE_NAME } from '../constants/navigation'
 
 export default function SongManagement(){
@@ -34,40 +38,48 @@ export default function SongManagement(){
     await refreshSongs()
   }
 
-  return (
-    <div id="app">
-      <Header title="Manage Songs" backAction={() => { startNewGame(); loadPage(PAGE_NAME.WELCOME) }} />
+  async function handleClearSongPdf(songId: number) {
+    await clearSongPdf(songId)
+    await refreshSongs()
+  }
 
-      <div className="main-content">
-        <div className="playlist-container">
-          {songs.map(song => {
-            const hasPdf = !!song.pdfUrl
-            return (
-              <div className="playlist-row" key={song.songId}>
-                <input className="playlist-name-input" defaultValue={song.title} onBlur={(e) => handleRenameSong(song.songId, e.currentTarget.value)} />
-                <div className="playlist-actions">
+  return (
+    <PageLayout
+      header={<Header title="Manage Songs" backAction={() => { startNewGame(); loadPage(PAGE_NAME.WELCOME) }} />}
+      footer={(
+        <div className="footer">
+          <button className="primary-btn" onClick={handleCreateNewSong}>New Song</button>
+        </div>
+      )}
+    >
+      <PlaylistContainer>
+        {songs.map(song => {
+          const hasPdf = !!song.pdfUrl
+          return (
+            <PlaylistRow
+              key={song.songId}
+              value={song.title}
+              onRename={(newName) => handleRenameSong(song.songId, newName)}
+              actions={(
+                <>
                   {hasPdf ? (
                     <>
-                      <button className="pdf-btn" onClick={() => handleViewSong(song.songId)}>📄 View</button>
-                      <button className="remove-pdf-btn" onClick={async () => { await clearSongPdf(song.songId); await refreshSongs() }}>❌ PDF</button>
+                      <IconButton className="pdf-btn" onClick={() => handleViewSong(song.songId)} icon="📄" label="View" />
+                      <IconButton className="remove-pdf-btn" onClick={() => void handleClearSongPdf(song.songId)} icon="❌" label="PDF" />
                     </>
                   ) : (
                     <>
                       <label className="pdf-upload-label" htmlFor={`upload-${song.songId}`}>📤 Upload PDF</label>
-                      <input id={`upload-${song.songId}`} type="file" accept="application/pdf" className="pdf-upload" onChange={(e) => { const f = e.currentTarget.files?.[0]; if (f) handleUpload(f, song.songId) }} />
+                      <input id={`upload-${song.songId}`} type="file" accept="application/pdf" className="pdf-upload" onChange={(e) => { const f = e.currentTarget.files?.[0]; if (f) void handleUpload(f, song.songId) }} />
                     </>
                   )}
-                  <button className="delete-btn" onClick={() => handleDeleteSong(song.songId)}>🗑️</button>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      <div className="footer">
-        <button className="primary-btn" onClick={handleCreateNewSong}>New Song</button>
-      </div>
-    </div>
+                  <IconButton className="delete-btn" onClick={() => void handleDeleteSong(song.songId)} icon="🗑️" />
+                </>
+              )}
+            />
+          )
+        })}
+      </PlaylistContainer>
+    </PageLayout>
   )
 }

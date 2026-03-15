@@ -4,6 +4,9 @@ import { useNavigation } from '../context/NavigationContext'
 import { useSongs } from '../hooks/useSongs'
 import { useSortable } from '../hooks/useSortable'
 import Header from '../components/Header'
+import SelectableSongRow from '../components/molecules/SelectableSongRow'
+import PageLayout from '../components/organisms/PageLayout'
+import PlaylistContainer from '../components/organisms/PlaylistContainer'
 import type { Pack } from '../types/models'
 import { compareSongsByPackMembershipThenPackOrder } from '../utils/sort'
 import { PACK_SIZE } from '../constants/game'
@@ -82,47 +85,38 @@ export default function PackEdit() {
   const isPackComplete = selectedCount === PACK_SIZE
 
   return (
-    <div id="app">
-      <Header
-        title="Edit Pack"
-        backAction={() => loadPage(PAGE_NAME.PACK_MANAGEMENT)}
-        rightContent={<div id="song-counter">{selectedCount}/{PACK_SIZE}</div>}
-      />
-
-      <div className="main-content">
-        <div ref={containerRef} className="playlist-container" style={{ flexGrow: 1 }}>
-          {songsSortedByPackOrder.map(song => {
-            const packPosition = pack.songs.indexOf(song.songId) + 1
-            const isInPack = packPosition !== 0
-            return (
-              <div
-                key={song.songId}
-                className={`playlist-row ${isInPack ? '' : 'unchecked'}`}
-                data-song-id={song.songId}
-                onClick={(e) => {
-                  if ((e.target as HTMLElement).classList.contains('playlist-checkbox')) return
-                  toggleSong(song.songId)
-                }}
-              >
-                <span className="drag-handle">{isInPack ? packPosition : '\u00A0'}</span>
-                <span className="playlist-name">{song.title}</span>
-                <input
-                  className="playlist-checkbox"
-                  type="checkbox"
-                  checked={isInPack}
-                  onChange={() => toggleSong(song.songId)}
-                />
-              </div>
-            )
-          })}
+    <PageLayout
+      header={(
+        <Header
+          title="Edit Pack"
+          backAction={() => loadPage(PAGE_NAME.PACK_MANAGEMENT)}
+          rightContent={<div id="song-counter">{selectedCount}/{PACK_SIZE}</div>}
+        />
+      )}
+      footer={(
+        <div className="footer">
+          <button className="primary-btn" disabled={!isPackComplete} onClick={handleSave}>
+            Ok
+          </button>
         </div>
-      </div>
-
-      <div className="footer">
-        <button className="primary-btn" disabled={!isPackComplete} onClick={handleSave}>
-          Ok
-        </button>
-      </div>
-    </div>
+      )}
+    >
+      <PlaylistContainer containerRef={containerRef} style={{ flexGrow: 1 }}>
+        {songsSortedByPackOrder.map(song => {
+          const packPosition = pack.songs.indexOf(song.songId) + 1
+          const isInPack = packPosition !== 0
+          return (
+            <SelectableSongRow
+              key={song.songId}
+              songId={song.songId}
+              title={song.title}
+              position={isInPack ? packPosition : null}
+              isSelected={isInPack}
+              onToggle={() => toggleSong(song.songId)}
+            />
+          )
+        })}
+      </PlaylistContainer>
+    </PageLayout>
   )
 }

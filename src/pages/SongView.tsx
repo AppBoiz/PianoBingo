@@ -1,6 +1,7 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import PDFViewer from '../components/PDFViewer'
+import IconButton from '../components/atoms/IconButton'
 import { useLoadedSong } from '../hooks/usePdfSong'
 import { loadSong, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
@@ -34,7 +35,7 @@ export default function SongView(){
   return (
     <div className="pdf-page">
       <nav>
-        <button onClick={handleBack}>Back</button>
+        <IconButton onClick={handleBack} icon="Back" />
         <h1 id="title">
           {songTitle}
         </h1>

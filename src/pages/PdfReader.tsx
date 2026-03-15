@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PDFViewer from '../components/PDFViewer'
+import PdfHamburgerMenu from '../components/molecules/PdfHamburgerMenu'
 import { useLoadedSong } from '../hooks/usePdfSong'
 import { getCurrentSong, getSelectedSongPackId, loadPack, nextSong as loadNextSongFromStorage, prevSong as loadPrevSongFromStorage } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
@@ -53,22 +54,14 @@ export default function PdfReader(){
           {songIndex > 0 ? `${songIndex} - ${songTitle}` : songTitle}
         </h1>
         <div style={{width: '121px'}}>
-          <div className="checkboxNav">
-            <div className="checkBoxBox">
-              <input type="checkbox" id="menu-toggle" />
-              <label className="hamburger" htmlFor="menu-toggle">
-                <span className="bar"></span>
-                <span className="bar"></span>
-                <span className="bar"></span>
-              </label>
-              <div className="menu">
-                <a href="#" onClick={(e) => { e.preventDefault(); nextSong(); }}>Next Song</a>
-                <a href="#" onClick={(e) => { e.preventDefault(); prevSong(); }}>Previous Song</a>
-                <a href="#" onClick={(e) => { e.preventDefault(); loadPage(PAGE_NAME.GAME_HISTORY); }}>Game History</a>
-                <a href="#" className="red" onClick={(e) => { e.preventDefault(); loadPage(PAGE_NAME.WELCOME); }}>End Game</a>
-              </div>
-            </div>
-          </div>
+          <PdfHamburgerMenu
+            actions={[
+              { id: 'next-song', label: 'Next Song', onClick: nextSong },
+              { id: 'prev-song', label: 'Previous Song', onClick: prevSong },
+              { id: 'game-history', label: 'Game History', onClick: () => loadPage(PAGE_NAME.GAME_HISTORY) },
+              { id: 'end-game', label: 'End Game', className: 'red', onClick: () => loadPage(PAGE_NAME.WELCOME) },
+            ]}
+          />
         </div>
       </nav>
       

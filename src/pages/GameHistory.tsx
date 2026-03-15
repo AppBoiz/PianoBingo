@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigation } from '../context/NavigationContext'
 import { useGameHistory } from '../hooks/useGameHistory'
 import Header from '../components/Header'
-import { PACK_SIZE } from '../constants/game'
+import GameHistoryGrid from '../components/organisms/GameHistoryGrid'
 import { PAGE_NAME } from '../constants/navigation'
 
 export default function GameHistory(){
@@ -17,19 +17,7 @@ export default function GameHistory(){
           No active game. Start a game to see history.
         </div>
       ) : (
-        <div className="box-container">
-          {Array.from({ length: PACK_SIZE }, (_, i) => {
-            const songId = pack.songs[i]
-            return (
-              <div
-                key={i + 1}
-                className={`box ${isHighlighted(songId) ? 'highlighted' : ''}`}
-              >
-                {i + 1}
-              </div>
-            )
-          })}
-        </div>
+        <GameHistoryGrid songIds={pack.songs} isHighlighted={isHighlighted} />
       )}
     </div>
   )

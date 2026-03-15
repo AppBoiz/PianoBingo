@@ -1,6 +1,8 @@
 import { useNavigation } from '../context/NavigationContext'
 import { startNewGame } from '../storage/indexedDb'
 import { PAGE_NAME } from '../constants/navigation'
+import WelcomeActionGroup from '../components/molecules/WelcomeActionGroup'
+import PageLayout from '../components/organisms/PageLayout'
 
 export default function WelcomePage(){
   const { loadPage } = useNavigation()
@@ -11,14 +13,16 @@ export default function WelcomePage(){
   }
 
   return (
-    <div id="welcome-page-container">
-      <div className="logo-container">
-        <img src="/resources/images/logo.png" alt="PianoBingo Logo" id="logo" style={{width:306}} />
-      </div>
-      <button onClick={newGameButtonHandler}>New Game</button>
-      <button onClick={() => loadPage(PAGE_NAME.SONG_MANAGEMENT)}>Manage Songs</button>
-      <button onClick={() => loadPage(PAGE_NAME.PACK_MANAGEMENT)}>Manage Playlists</button>
-      <img className="piano-banner" src="/resources/images/piano.png" />
-    </div>
+    <PageLayout rootId="welcome-page-container" skipMainWrapper>
+      <WelcomeActionGroup
+        logo={<img src="/resources/images/logo.png" alt="PianoBingo Logo" id="logo" style={{ width: 306 }} />}
+        actions={[
+          { id: 'new-game', label: 'New Game', onClick: newGameButtonHandler },
+          { id: 'manage-songs', label: 'Manage Songs', onClick: () => loadPage(PAGE_NAME.SONG_MANAGEMENT) },
+          { id: 'manage-playlists', label: 'Manage Playlists', onClick: () => loadPage(PAGE_NAME.PACK_MANAGEMENT) },
+        ]}
+        banner={<img className="piano-banner" src="/resources/images/piano.png" />}
+      />
+    </PageLayout>
   )
 }

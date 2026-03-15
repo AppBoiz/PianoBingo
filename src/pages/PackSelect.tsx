@@ -3,6 +3,7 @@ import { selectPack, generateSong, clearGameState } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import { usePacks } from '../hooks/usePacks'
 import { PAGE_NAME } from '../constants/navigation'
+import PackRadioGroup from '../components/molecules/PackRadioGroup'
 
 export default function PackSelect(){
   const { packs } = usePacks()
@@ -36,16 +37,7 @@ export default function PackSelect(){
       <h1>Create New Game</h1>
       <h2>Select Song Pack</h2>
       <div className="flex-col mb-40">
-        <div className="radios-container">
-          {packs.map(pack => (
-            <label className="radio-label" key={pack.packId}>
-              <input type="radio" name="radio" value={pack.packId}
-                checked={selected === pack.packId}
-                onChange={() => setSelected(pack.packId)} />
-              {pack.packName}
-            </label>
-          ))}
-        </div>
+        <PackRadioGroup packs={packs} selectedPackId={selected} onSelectPack={setSelected} />
       </div>
       <button className="select-button" onClick={handleStartGame}>Start Game</button>
       <img className="piano-banner" src="/resources/images/piano.png" />

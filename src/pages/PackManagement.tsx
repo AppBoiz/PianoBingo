@@ -2,6 +2,10 @@ import { createNewPack, deletePack, renamePack } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import { usePacks } from '../hooks/usePacks'
 import Header from '../components/Header'
+import IconButton from '../components/atoms/IconButton'
+import PlaylistRow from '../components/molecules/PlaylistRow'
+import PageLayout from '../components/organisms/PageLayout'
+import PlaylistContainer from '../components/organisms/PlaylistContainer'
 import { PAGE, PAGE_NAME } from '../constants/navigation'
 
 export default function PackManagement(){
@@ -28,26 +32,27 @@ export default function PackManagement(){
   }
 
   return (
-    <div id="app">
-      <Header title="Manage Playlists" backAction={() => loadPage(PAGE_NAME.WELCOME)} />
-
-      <div className="main-content">
-        <div id="playlist-container" className="playlist-container">
-          {packs.map(pack => (
-            <div className="playlist-row" key={pack.packId}>
-              <input className="playlist-name-input" defaultValue={pack.packName || ''}
-                onBlur={(e) => handleRenamePack(pack.packId, e.currentTarget.value)} />
-              <div className="playlist-actions">
-                <button className="edit-btn" onClick={() => handleEditPack(pack.packId)}>✏️</button>
-                <button className="delete-btn" onClick={() => handleDeletePack(pack.packId)}>🗑️</button>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div style={{width:'100%', display:'flex', justifyContent:'center', alignItems:'center', padding: '1rem 0'}}>
-          <button className="create-button" onClick={handleCreateNewPack}>Create New</button>
-        </div>
+    <PageLayout
+      header={<Header title="Manage Playlists" backAction={() => loadPage(PAGE_NAME.WELCOME)} />}
+    >
+      <PlaylistContainer containerId="playlist-container">
+        {packs.map(pack => (
+          <PlaylistRow
+            key={pack.packId}
+            value={pack.packName || ''}
+            onRename={(newName) => handleRenamePack(pack.packId, newName)}
+            actions={(
+              <>
+                <IconButton className="edit-btn" onClick={() => handleEditPack(pack.packId)} icon="✏️" />
+                <IconButton className="delete-btn" onClick={() => handleDeletePack(pack.packId)} icon="🗑️" />
+              </>
+            )}
+          />
+        ))}
+      </PlaylistContainer>
+      <div style={{width:'100%', display:'flex', justifyContent:'center', alignItems:'center', padding: '1rem 0'}}>
+        <button className="create-button" onClick={handleCreateNewPack}>Create New</button>
       </div>
-    </div>
+    </PageLayout>
   )
 }
