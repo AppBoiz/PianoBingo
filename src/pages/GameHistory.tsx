@@ -3,6 +3,7 @@ import { useNavigation } from '../context/NavigationContext'
 import { useGameHistory } from '../hooks/useGameHistory'
 import Header from '../components/Header'
 import GameHistoryGrid from '../components/organisms/GameHistoryGrid'
+import PageLayout from '../components/organisms/PageLayout'
 import { PAGE_NAME } from '../constants/navigation'
 
 export default function GameHistory(){
@@ -10,8 +11,11 @@ export default function GameHistory(){
   const { loadPage } = useNavigation()
 
   return (
-    <div className="game-history-root">
-      <Header title="Game History" backAction={() => loadPage(PAGE_NAME.GAME)} withContainers={false} />
+    <PageLayout
+      rootClassName="game-history-root"
+      header={<Header title="Game History" backAction={() => loadPage(PAGE_NAME.GAME)} withContainers={false} />}
+      skipMainWrapper
+    >
       {!pack ? (
         <div style={{ textAlign: 'center', marginTop: '40px', color: '#6b7280' }}>
           No active game. Start a game to see history.
@@ -19,6 +23,6 @@ export default function GameHistory(){
       ) : (
         <GameHistoryGrid songIds={pack.songs} isHighlighted={isHighlighted} />
       )}
-    </div>
+    </PageLayout>
   )
 }

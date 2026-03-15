@@ -7,6 +7,7 @@ import Header from '../components/Header'
 import SelectableSongRow from '../components/molecules/SelectableSongRow'
 import PageLayout from '../components/organisms/PageLayout'
 import PlaylistContainer from '../components/organisms/PlaylistContainer'
+import PrimaryActionFooter from '../components/organisms/PrimaryActionFooter'
 import type { Pack } from '../types/models'
 import { compareSongsByPackMembershipThenPackOrder } from '../utils/sort'
 import { PACK_SIZE } from '../constants/game'
@@ -93,13 +94,7 @@ export default function PackEdit() {
           rightContent={<div id="song-counter">{selectedCount}/{PACK_SIZE}</div>}
         />
       )}
-      footer={(
-        <div className="footer">
-          <button className="primary-btn" disabled={!isPackComplete} onClick={handleSave}>
-            Ok
-          </button>
-        </div>
-      )}
+      footer={<PrimaryActionFooter label="Ok" disabled={!isPackComplete} onClick={handleSave} />}
     >
       <PlaylistContainer containerRef={containerRef} style={{ flexGrow: 1 }}>
         {songsSortedByPackOrder.map(song => {

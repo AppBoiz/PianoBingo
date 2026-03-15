@@ -1,7 +1,8 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import PDFViewer from '../components/PDFViewer'
-import IconButton from '../components/atoms/IconButton'
+import PageLayout from '../components/organisms/PageLayout'
+import SongViewHeader from '../components/organisms/SongViewHeader'
 import { useLoadedSong } from '../hooks/usePdfSong'
 import { loadSong, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
@@ -33,15 +34,14 @@ export default function SongView(){
   if (!base64) return <div className="pdf-reader-empty">No song selected</div>
 
   return (
-    <div className="pdf-page">
-      <nav>
-        <IconButton onClick={handleBack} icon="Back" />
-        <h1 id="title">
-          {songTitle}
-        </h1>
-      </nav>
-
+    <PageLayout
+      rootClassName="pdf-page"
+      header={(
+        <SongViewHeader title={songTitle} onBack={handleBack} />
+      )}
+      skipMainWrapper
+    >
       <PDFViewer base64={base64} />
-    </div>
+    </PageLayout>
   )
 }

@@ -4,6 +4,8 @@ import { useNavigation } from '../context/NavigationContext'
 import { usePacks } from '../hooks/usePacks'
 import { PAGE_NAME } from '../constants/navigation'
 import PackRadioGroup from '../components/molecules/PackRadioGroup'
+import PageLayout from '../components/organisms/PageLayout'
+import PackSelectHeader from '../components/organisms/PackSelectHeader'
 
 export default function PackSelect(){
   const { packs } = usePacks()
@@ -30,10 +32,11 @@ export default function PackSelect(){
   }
 
   return (
-    <div id="app" className="p-4">
-      <div className="back-container">
-        <button onClick={handleBack}>Back</button>
-      </div>
+    <PageLayout
+      rootClassName="p-4"
+      header={<PackSelectHeader onBack={handleBack} />}
+      skipMainWrapper
+    >
       <h1>Create New Game</h1>
       <h2>Select Song Pack</h2>
       <div className="flex-col mb-40">
@@ -41,6 +44,6 @@ export default function PackSelect(){
       </div>
       <button className="select-button" onClick={handleStartGame}>Start Game</button>
       <img className="piano-banner" src="/resources/images/piano.png" />
-    </div>
+    </PageLayout>
   )
 }

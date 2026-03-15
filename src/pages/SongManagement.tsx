@@ -7,6 +7,7 @@ import IconButton from '../components/atoms/IconButton'
 import PlaylistRow from '../components/molecules/PlaylistRow'
 import PageLayout from '../components/organisms/PageLayout'
 import PlaylistContainer from '../components/organisms/PlaylistContainer'
+import PrimaryActionFooter from '../components/organisms/PrimaryActionFooter'
 import { PAGE, PAGE_NAME } from '../constants/navigation'
 
 export default function SongManagement(){
@@ -46,11 +47,7 @@ export default function SongManagement(){
   return (
     <PageLayout
       header={<Header title="Manage Songs" backAction={() => { startNewGame(); loadPage(PAGE_NAME.WELCOME) }} />}
-      footer={(
-        <div className="footer">
-          <button className="primary-btn" onClick={handleCreateNewSong}>New Song</button>
-        </div>
-      )}
+      footer={<PrimaryActionFooter label="New Song" onClick={handleCreateNewSong} />}
     >
       <PlaylistContainer>
         {songs.map(song => {
