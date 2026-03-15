@@ -4,8 +4,8 @@
  * so that the indexed DB initialization can seed default packs and songs
  */
 
-import type { Pack, Song } from '../types/models'
-import { PACK_SIZE } from '../constants/game'
+import type { Pack, Song } from '../shared/types/models'
+import { PACK_SIZE } from '../shared/constants/game'
 
 // Define BASE_PACK_DATA - all songs are split into two packs
 const BASE_PACK_DATA: Pack[] = [
