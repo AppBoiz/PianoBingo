@@ -20,6 +20,7 @@
     "@tailwindcss/postcss": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@types/sortablejs": "^1.15.9",
     "@vitejs/plugin-react": "latest",
     "autoprefixer": "latest",
     "pixelmatch": "^7.1.0",

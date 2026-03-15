@@ -5,6 +5,7 @@ import type { Pack } from '../types/models'
 type UseGameHistoryResult = {
   pack: Pack | null
   shownSongIds: number[]
+  hasSongIdBeenShown: (songId: number) => boolean
 }
 
 export function useGameHistory(): UseGameHistoryResult {
@@ -26,5 +27,7 @@ export function useGameHistory(): UseGameHistoryResult {
     return () => { cancelled = true }
   }, [])
 
-  return { pack, shownSongIds }
+  const hasSongIdBeenShown = (songId: number) => shownSongIds.includes(songId)
+
+  return { pack, shownSongIds, hasSongIdBeenShown }
 }
