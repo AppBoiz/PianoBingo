@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import PDFViewer from '../components/PDFViewer'
-import { usePdfSong } from '../hooks/usePdfSong'
-import { getCurrentSong, getSelectedSongPackId, loadPack, nextSong as storageNextSong, prevSong as storagePrevSong } from '../storage/indexedDb'
+import { useLoadedSong } from '../hooks/usePdfSong'
+import { getCurrentSong, getSelectedSongPackId, loadPack, nextSong as loadNextSongFromStorage, prevSong as loadPrevSongFromStorage } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import { PAGE_NAME } from '../constants/navigation'
 
-export default function PdfReader(){
+function useCurrentSongPositionInSelectedPack(song: { songId: number; pdfUrl: string | null } | null | undefined) {
   const [songIndex, setSongIndex] = useState<number>(0)
-  const { loadPage } = useNavigation()
-  const { song, base64, songTitle, reload } = usePdfSong(async () => getCurrentSong(), [])
 
   useEffect(() => {
     const loadSongIndex = async () => {
@@ -36,15 +34,16 @@ export default function PdfReader(){
     void loadSongIndex()
   }, [song])
 
-  async function nextSong(){
-    await storageNextSong?.()
-    await reload()
-  }
+  return songIndex
+}
 
-  async function prevSong(){
-    await storagePrevSong?.()
-    await reload()
-  }
+export default function PdfReader(){
+  const { loadPage } = useNavigation()
+  const { song, base64, songTitle, nextSong, prevSong } = useLoadedSong(getCurrentSong, [], {
+    loadNextSong: loadNextSongFromStorage,
+    loadPrevSong: loadPrevSongFromStorage,
+  })
+  const songIndex = useCurrentSongPositionInSelectedPack(song)
 
   return (
     <div className="pdf-page">

@@ -3,18 +3,39 @@ import type { DependencyList } from 'react'
 
 import type { Song } from '../types/models'
 
-type UsePdfSongResult = {
+type UseLoadedSongResult = {
   song: Song | null
   base64: string | null
   songTitle: string
   isLoading: boolean
   reload: () => Promise<Song | null>
+  nextSong: () => Promise<Song | null>
+  prevSong: () => Promise<Song | null>
 }
 
-export function usePdfSong(loader: () => Promise<Song | null>, deps: DependencyList): UsePdfSongResult {
+type SongNavigationLoaders = {
+  loadNextSong?: () => Promise<Song | null>
+  loadPrevSong?: () => Promise<Song | null>
+}
+
+/**
+ * Loads and tracks song state from async storage loaders (for example IndexedDB).
+ *
+ * It executes the provided async `loader`, derives `base64` and `songTitle`
+ * from the returned song, and exposes a loading flag while requests are in
+ * flight. The hook re-runs when `deps` change and also provides `reload()` for
+ * manual refreshes (for example after next/previous song actions).
+ *
+ * @param loader Async function that resolves to the current song or `null`.
+ * @param deps Dependency list controlling when the initial effect re-loads.
+ * @returns Current song data, derived display values, loading state, and reload function.
+ */
+export function useLoadedSong(
+  loader: () => Promise<Song | null>,
+  deps: DependencyList,
+  navigationLoaders?: SongNavigationLoaders,
+): UseLoadedSongResult {
   const [song, setSong] = useState<Song | null>(null)
-  const [base64, setBase64] = useState<string | null>(null)
-  const [songTitle, setSongTitle] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   // Per-effect cancelled flag is the correct pattern: unlike a persistent ref, it
@@ -28,8 +49,6 @@ export function usePdfSong(loader: () => Promise<Song | null>, deps: DependencyL
       .then(nextSong => {
         if (!cancelled) {
           setSong(nextSong)
-          setBase64(nextSong?.pdfUrl ?? null)
-          setSongTitle(nextSong ? nextSong.title || 'Untitled' : '')
           setIsLoading(false)
         }
       })
@@ -52,13 +71,44 @@ export function usePdfSong(loader: () => Promise<Song | null>, deps: DependencyL
     try {
       const nextSong = await loader()
       setSong(nextSong)
-      setBase64(nextSong?.pdfUrl ?? null)
-      setSongTitle(nextSong ? nextSong.title || 'Untitled' : '')
       return nextSong
     } finally {
       setIsLoading(false)
     }
   }
+
+  async function nextSong() {
+    if (!navigationLoaders?.loadNextSong) {
+      return reload()
+    }
+
+    setIsLoading(true)
+    try {
+      const nextSongValue = await navigationLoaders.loadNextSong()
+      setSong(nextSongValue)
+      return nextSongValue
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  async function prevSong() {
+    if (!navigationLoaders?.loadPrevSong) {
+      return reload()
+    }
+
+    setIsLoading(true)
+    try {
+      const prevSongValue = await navigationLoaders.loadPrevSong()
+      setSong(prevSongValue)
+      return prevSongValue
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const base64 = song?.pdfUrl ?? null
+  const songTitle = song ? song.title || 'Untitled' : ''
 
   return {
     song,
@@ -66,5 +116,10 @@ export function usePdfSong(loader: () => Promise<Song | null>, deps: DependencyL
     songTitle,
     isLoading,
     reload,
+    nextSong,
+    prevSong,
   }
 }
+
+// Backward-compatible alias while call sites are migrated.
+export const usePdfSong = useLoadedSong

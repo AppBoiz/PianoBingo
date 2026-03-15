@@ -355,15 +355,41 @@ export async function generateSong(): Promise<Song | null> {
 
 // Convenience helpers to match legacy API used by some pages
 export async function nextSong() {
+  const gameState = loadGameState() || defaultGameState
+  const shown = gameState.shownSongIds || []
+  const currentSongId = gameState.currentSong?.songId
+
+  if (currentSongId !== null && currentSongId !== undefined) {
+    const currentIndex = shown.findIndex(id => id === currentSongId)
+    if (currentIndex !== -1 && currentIndex < shown.length - 1) {
+      const nextFromHistoryId = shown[currentIndex + 1]
+      const nextFromHistory = await loadSong(nextFromHistoryId)
+      if (!nextFromHistory) {
+        return null
+      }
+
+      const tmpState: GameState = { ...(gameState || defaultGameState) }
+      tmpState.currentSong = toCurrentSongMetadata(nextFromHistory)
+      saveGameState(tmpState)
+      return nextFromHistory
+    }
+  }
+
   return generateSong()
 }
 
 export async function prevSong() {
   const gameState = loadGameState() || defaultGameState
   const shown = gameState.shownSongIds || []
-  if (shown.length <= 1) return null
-  // previous song id is the one before the last shown
-  const prevId = shown[shown.length - 2]
+  const currentSongId = gameState.currentSong?.songId
+  if (currentSongId === null || currentSongId === undefined) {
+    return null
+  }
+
+  const currentIndex = shown.findIndex(id => id === currentSongId)
+  if (currentIndex <= 0) return null
+
+  const prevId = shown[currentIndex - 1]
   const prevSong = await loadSong(prevId)
   if (!prevSong) {
     return null
@@ -371,8 +397,6 @@ export async function prevSong() {
 
   const tmpState: GameState = { ...(gameState || defaultGameState) }
   tmpState.currentSong = toCurrentSongMetadata(prevSong)
-  // remove the last shown entry (going back)
-  tmpState.shownSongIds = shown.slice(0, shown.length - 1)
   saveGameState(tmpState)
   return prevSong
 }

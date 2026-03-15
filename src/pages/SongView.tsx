@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSearchParams } from 'react-router-dom'
 import PDFViewer from '../components/PDFViewer'
-import { usePdfSong } from '../hooks/usePdfSong'
+import { useLoadedSong } from '../hooks/usePdfSong'
 import { loadSong, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import { PAGE_NAME } from '../constants/navigation'
@@ -9,7 +9,7 @@ import { PAGE_NAME } from '../constants/navigation'
 export default function SongView(){
   const { loadPage } = useNavigation()
   const [searchParams] = useSearchParams()
-  const { base64, songTitle, isLoading } = usePdfSong(async () => {
+  const { base64, songTitle, isLoading } = useLoadedSong(async () => {
     const idParam = searchParams.get('songId')
     if (!idParam) {
       return null
