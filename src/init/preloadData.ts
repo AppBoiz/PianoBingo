@@ -4,20 +4,7 @@
  * so that the indexed DB initialization can seed default packs and songs
  */
 
-interface Song {
-  songId: number;
-  title: string;
-  pdfUrl: string;
-  version: number;
-}
-
-interface Pack {
-  packId: number;
-  packName: string;
-  songCount: number;
-  version: number;
-  songs: number[];
-}
+import type { Pack, Song } from '../types/models'
 
 // Define BASE_PACK_DATA - all songs are split into two packs
 const BASE_PACK_DATA: Pack[] = [
@@ -254,8 +241,9 @@ export function resolvePdfUrl(pdfUrl: string): string | null {
   }
   
   // If it's on window object (fallback for dynamic resolution)
-  if (typeof window !== 'undefined' && (window as any)[pdfUrl]) {
-    const resolved = (window as any)[pdfUrl];
+  const dynamicWindow = window as unknown as Record<string, unknown>
+  if (typeof window !== 'undefined' && typeof dynamicWindow[pdfUrl] === 'string') {
+    const resolved = dynamicWindow[pdfUrl] as string
     console.debug(`✓ Resolved PDF from window: ${pdfUrl}`);
     return resolved;
   }
@@ -279,11 +267,11 @@ export async function initializePreloadedData() {
     await loadPdfData();
     
     // Set the data on the window object for IndexedDB to access
-    (window as any).BASE_PACK_DATA = BASE_PACK_DATA;
-    (window as any).BASE_SONG_DATA = BASE_SONG_DATA;
+    window.BASE_PACK_DATA = BASE_PACK_DATA;
+    window.BASE_SONG_DATA = BASE_SONG_DATA;
     
     // Store PDF resolution function on window for use by PDFViewer
-    (window as any).resolvePdfUrl = resolvePdfUrl;
+    window.resolvePdfUrl = resolvePdfUrl;
     
     console.log('✓ Preloaded data initialized:', {
       packs: BASE_PACK_DATA.length,

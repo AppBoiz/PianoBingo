@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { loadAllPacks, savePack, deletePack, loadPack, selectPack } from '../storage/indexedDb'
+import { INDEXED_BD_CONFIG, loadAllPacks, savePack, deletePack, loadPack, selectPack } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import Header from '../components/Header'
+import type { Pack } from '../types/models'
 
 export default function PackManagement(){
-  const [packs, setPacks] = useState<any[]>([])
+  const [packs, setPacks] = useState<Pack[]>([])
   const { loadPage } = useNavigation()
 
   useEffect(() => { fetchPacks() }, [])
@@ -16,10 +17,11 @@ export default function PackManagement(){
 
   async function handleCreateNewPack(){
     const packData = await loadAllPacks()
-    const maxPackId = packData.length ? Math.max(...packData.map((p:any) => p.packId)) : 0
-    const newPack = {
-      packId: Math.max(maxPackId + 1, (window as any).INDEXED_BD_CONFIG?.PARTITION_SIZE || 1000000),
+    const maxPackId = packData.length ? Math.max(...packData.map(pack => pack.packId)) : 0
+    const newPack: Pack = {
+      packId: Math.max(maxPackId + 1, INDEXED_BD_CONFIG.PARTITION_SIZE),
       packName: 'New Pack',
+      songCount: 0,
       songs: []
     }
     await savePack(newPack)

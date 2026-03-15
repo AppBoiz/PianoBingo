@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { loadAllPacks, selectPack, generateSong, clearGameState } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
+import type { Pack } from '../types/models'
 
 export default function PackSelect(){
-  const [packs, setPacks] = useState<any[]>([])
+  const [packs, setPacks] = useState<Pack[]>([])
   const [selected, setSelected] = useState<number>(1)
-  const navigate = useNavigate()
-  const { PAGE, loadPage } = useNavigation()
+  const { loadPage } = useNavigation()
 
   useEffect(() => {
     let mounted = true
@@ -39,7 +38,7 @@ export default function PackSelect(){
       <h2>Select Song Pack</h2>
       <div className="flex-col mb-40">
         <div className="radios-container">
-          {packs.map((pack, idx) => (
+          {packs.map(pack => (
             <label className="radio-label" key={pack.packId}>
               <input type="radio" name="radio" value={pack.packId}
                 checked={selected === pack.packId}

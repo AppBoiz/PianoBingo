@@ -2,12 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { loadGameState, loadPack } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import Header from '../components/Header'
-
-interface Pack {
-  packId: number
-  packName: string
-  songs: number[]
-}
+import type { Pack } from '../types/models'
 
 export default function GameHistory(){
   const [pack, setPack] = useState<Pack | null>(null)

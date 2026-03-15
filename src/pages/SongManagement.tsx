@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { loadAllSongs, saveSong, deleteSong, loadSong, setSongId, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import Header from '../components/Header'
+import type { Song } from '../types/models'
 
 export default function SongManagement(){
-  const [songs, setSongs] = useState<any[]>([])
+  const [songs, setSongs] = useState<Song[]>([])
   const { loadPage } = useNavigation()
 
   useEffect(() => { fetchSongs() }, [])
@@ -24,8 +25,8 @@ export default function SongManagement(){
 
   async function handleCreateNewSong(){
     const songData = await loadAllSongs()
-    const maxSongId = songData.length > 0 ? Math.max(...songData.map((s:any)=>s.songId)) : 0
-    const newSong = {
+    const maxSongId = songData.length > 0 ? Math.max(...songData.map(song => song.songId)) : 0
+    const newSong: Song = {
       songId: maxSongId + 1,
       title: 'New Song',
       pdfUrl: null

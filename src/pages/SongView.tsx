@@ -3,9 +3,10 @@ import PDFViewer from '../components/PDFViewer'
 import { getCurrentSong, startNewGame } from '../storage/indexedDb'
 import { useEffect, useState } from 'react'
 import { useNavigation } from '../context/NavigationContext'
+import type { CurrentSongMetadata } from '../types/models'
 
 export default function SongView(){
-  const [song, setSong] = useState<any>(null)
+  const [song, setSong] = useState<CurrentSongMetadata | null>(null)
   const { loadPage } = useNavigation()
 
   useEffect(() => {
