@@ -3,24 +3,49 @@ import { useSearchParams } from 'react-router-dom'
 import PDFViewer from '../components/PDFViewer'
 import { loadSong, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
-import type { Song } from '../types/models'
 
 export default function SongView(){
-  const [song, setSong] = useState<Song | null>(null)
+  const [base64, setBase64] = useState<string | null>(null)
+  const [songTitle, setSongTitle] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const { loadPage } = useNavigation()
   const [searchParams] = useSearchParams()
 
   useEffect(() => {
     let mounted = true
-    const idParam = searchParams.get('songId')
-    if (!idParam) return
 
-    const songId = parseInt(idParam, 10)
-    if (isNaN(songId)) return
+    const loadSongData = async () => {
+      setIsLoading(true)
+      setBase64(null)
+      setSongTitle('')
 
-    loadSong(songId).then(s => {
-      if (mounted) setSong(s ?? null)
-    })
+      const idParam = searchParams.get('songId')
+      if (!idParam) {
+        if (mounted) {
+          setIsLoading(false)
+        }
+        return
+      }
+
+      const songId = parseInt(idParam, 10)
+      if (isNaN(songId)) {
+        if (mounted) {
+          setIsLoading(false)
+        }
+        return
+      }
+
+      const song = await loadSong(songId)
+      if (!mounted) {
+        return
+      }
+
+      setBase64(song?.pdfUrl ?? null)
+      setSongTitle(song?.title || 'Untitled')
+      setIsLoading(false)
+    }
+
+    loadSongData()
 
     return () => {
       mounted = false
@@ -32,22 +57,20 @@ export default function SongView(){
     loadPage('SONG_MANAGEMENT')
   }
 
-  console.log(song)
+  if (isLoading) return <div className="pdf-reader-empty">Loading song...</div>
 
-  if (!song) return <div className="pdf-reader-empty">No song selected</div>
+  if (!base64) return <div className="pdf-reader-empty">No song selected</div>
 
   return (
     <div className="pdf-page">
       <nav>
         <button onClick={handleBack}>Back</button>
         <h1 id="title">
-          {song.title || 'Untitled'}
+          {songTitle}
         </h1>
       </nav>
-      
-      <div id="pdf-viewer">
-        <PDFViewer base64={song.pdfUrl} />
-      </div>
+
+      <PDFViewer base64={base64} />
     </div>
   )
 }
