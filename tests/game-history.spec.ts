@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
+import { PACK_SIZE } from '../src/constants/game'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -52,7 +53,7 @@ test.describe('GameHistory Page', () => {
     await seedPackAndSong(page)
   })
 
-  test('displays 75-box bingo grid with highlighted boxes', async ({ page }) => {
+  test(`displays ${PACK_SIZE}-box bingo grid with highlighted boxes`, async ({ page }) => {
     // Navigate to welcome page and start a game
     await page.waitForLoadState('networkidle')
     
@@ -73,20 +74,20 @@ test.describe('GameHistory Page', () => {
     await page.waitForLoadState('networkidle')
     await expect(page.getByRole('heading', { name: 'Game History' }).first()).toBeVisible()
     
-    // Verify 75 boxes are rendered
+    // Verify pack-size boxes are rendered
     const boxes = page.locator('.box')
-    await expect(boxes).toHaveCount(75)
+    await expect(boxes).toHaveCount(PACK_SIZE)
     
     // Verify at least one box is highlighted (the first drawn song)
     const highlightedBoxes = page.locator('.box.highlighted')
     const count = await highlightedBoxes.count()
     expect(count).toBeGreaterThan(0)
     
-    // Verify boxes are numbered 1-75
+    // Verify boxes are numbered 1..PACK_SIZE
     const firstBox = boxes.first()
     await expect(firstBox).toHaveText('1')
     const lastBox = boxes.last()
-    await expect(lastBox).toHaveText('75')
+    await expect(lastBox).toHaveText(String(PACK_SIZE))
   })
 
   test('shows message when no active game', async ({ page }) => {

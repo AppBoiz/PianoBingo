@@ -5,22 +5,23 @@
  */
 
 import type { Pack, Song } from '../types/models'
+import { PACK_SIZE } from '../constants/game'
 
 // Define BASE_PACK_DATA - all songs are split into two packs
 const BASE_PACK_DATA: Pack[] = [
   {
     packId: 1,
     packName: 'Tom',
-    songCount: 75,
+    songCount: PACK_SIZE,
     version: 1,
-    songs: Array.from({ length: 75 }, (_, i) => i + 1),
+    songs: Array.from({ length: PACK_SIZE }, (_, i) => i + 1),
   },
   {
     packId: 2,
     packName: 'Jack',
-    songCount: 75,
+    songCount: PACK_SIZE,
     version: 1,
-    songs: Array.from({ length: 75 }, (_, i) => i + 76),
+    songs: Array.from({ length: PACK_SIZE }, (_, i) => i + PACK_SIZE + 1),
   },
 ];
 

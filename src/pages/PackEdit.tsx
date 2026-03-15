@@ -6,8 +6,7 @@ import { useSortable } from '../hooks/useSortable'
 import Header from '../components/Header'
 import type { Pack } from '../types/models'
 import { compareSongsByPackMembershipThenPackOrder } from '../utils/sort'
-
-const PACK_SIZE = 75
+import { PACK_SIZE } from '../constants/game'
 
 function useLoadSelectedPack() {
   const [pack, setPack] = useState<Pack | null>(null)

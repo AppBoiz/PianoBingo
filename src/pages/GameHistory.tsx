@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigation } from '../context/NavigationContext'
 import { useGameHistory } from '../hooks/useGameHistory'
 import Header from '../components/Header'
+import { PACK_SIZE } from '../constants/game'
 
 export default function GameHistory(){
   const { pack, hasSongIdBeenShown: isHighlighted } = useGameHistory()
@@ -16,7 +17,7 @@ export default function GameHistory(){
         </div>
       ) : (
         <div className="box-container">
-          {Array.from({ length: 75 }, (_, i) => {
+          {Array.from({ length: PACK_SIZE }, (_, i) => {
             const songId = pack.songs[i]
             return (
               <div

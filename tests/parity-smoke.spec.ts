@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
+import { PACK_SIZE } from '../src/constants/game'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -122,7 +123,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       // Verify game history shows grid
       await expect(page.getByRole('heading', { name: 'Game History' })).toBeVisible()
       const boxes = page.locator('.box')
-      await expect(boxes).toHaveCount(75)
+      await expect(boxes).toHaveCount(PACK_SIZE)
       
       // At least 2 boxes should be highlighted (first and second songs drawn)
       const highlighted = page.locator('.box.highlighted')
