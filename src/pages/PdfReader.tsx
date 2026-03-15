@@ -14,9 +14,11 @@ export default function PdfReader(){
   }, [])
 
   async function loadSongData() {
-    const song = getCurrentSong()
+    const song = await getCurrentSong()
     if (!song || !song.pdfUrl) {
       setBase64(null)
+      setSongTitle('')
+      setSongIndex(0)
       return
     }
     

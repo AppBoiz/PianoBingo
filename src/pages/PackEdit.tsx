@@ -77,12 +77,12 @@ export default function PackEdit(){
       <div className="main-content">
         <div ref={containerRef} className="playlist-container" style={{flexGrow:1}}>
           {sortedSongs.map(song => {
-            const songIdInPack = packData.songs.findIndex(id => id === song.songId) + 1
-            const isChecked = songIdInPack !== 0
+            const packPosition = packData.songs.findIndex(id => id === song.songId) + 1
+            const isChecked = packPosition !== 0
             return (
               <div key={song.songId} className={`playlist-row ${isChecked ? '' : 'unchecked'}`} data-song-id={song.songId}
                 onClick={(e) => { if ((e.target as HTMLElement).classList.contains('playlist-checkbox')) return; toggleSong(song.songId) }}>
-                <span className="drag-handle">{isChecked ? songIdInPack : '\u00A0'}</span>
+                <span className="drag-handle">{isChecked ? packPosition : '\u00A0'}</span>
                 <span className="playlist-name">{song.title}</span>
                 <input className="playlist-checkbox" type="checkbox" checked={isChecked} onChange={(e) => { toggleSong(song.songId) }} />
               </div>

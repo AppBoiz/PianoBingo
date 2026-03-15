@@ -54,7 +54,7 @@ Migration goal is parity-first: preserve behavior, styling, mobile UX, and local
 - `WelcomePage`, `PackSelect`, `PackManagement`, `PackEdit`, `SongManagement`: high parity with legacy flows.
 - `PdfReader`: **✅ Full parity achieved** - contextual UI, song title with pack index, hamburger menu, and footer button match legacy.
 - `GameHistory`: **✅ Full parity achieved** - 75-box grid with highlighting and proper navigation.
-- `SongView`: **✅ Full parity achieved** - preview mode navigation (back to Song Management with game reset), song ID in title, no game controls.
+- `SongView`: **✅ Full parity achieved** - preview mode navigation (back to Song Management with game reset), title-only header (no ID shown outside game context), no game controls.
 
 
 ## 4) Technical implementation details
@@ -87,6 +87,21 @@ Current runtime caching strategy (Workbox-generated):
 - Compatibility-sensitive changes must preserve:
   - DB name/object store names/keys and migration behavior.
   - localStorage key names and expected field shapes.
+
+### 4.2a Song ID concepts — IMPORTANT
+
+There are two distinct numeric identifiers for songs. Always keep them separate:
+
+| Concept | Field | Type | Usage |
+|---|---|---|---|
+| **Technical DB key** | `Song.songId` / `Pack.songs[]` entries | `number` | IndexedDB object store key; used in all `loadSong()` / `saveSong()` / `deleteSong()` calls and in `GameState.shownSongIds`. **Never display to the user.** |
+| **Pack position** | 1-based index of song in `Pack.songs[]` | `number` (computed) | Meaningful only within a specific pack context. Shown in `PdfReader` game title and `PackEdit` drag-handle. **Do not show outside a game/pack context.** |
+
+Rules:
+- `PdfReader` (game context): show pack position in the title (`packData.songs.findIndex(id => id === song.songId) + 1`).
+- `SongView` / `SongManagement` (management context, no active pack): show only the song title — no numeric ID of any kind.
+- `GameHistory`: displays numbers 1–75 which are pack positions; uses `songId` only for internal `shownSongIds` comparison.
+- `PackEdit`: uses `packPosition` (local variable, 1-based) for the drag-handle label; uses `songId` only for `data-song-id` attributes and DB calls.
 
 ### 4.3 PDF reader implementation
 
@@ -225,7 +240,8 @@ Each migration PR should include:
 - **Early migration trigger**: Added `loadGameState()` call in `src/main.tsx` to run migrations on every app load.
 - **GameHistory page (2026-02-24)**: Implemented 75-box bingo grid matching legacy behavior. Shows numbered boxes 1-75 with highlighting for shown songs. Added missing CSS for both React (`src/styles/legacy/game-history.css`) and legacy (`public/legacy-pages/game-history/game-history.css`) surfaces. Back button correctly navigates to PDF reader (game page). Mobile-responsive grid with adaptive box sizing.
 - **PdfReader UX enhancements (2026-02-24)**: Added contextual UI matching legacy. Nav bar now displays song title with pack index (e.g., "3 - Moonlight Sonata"). Implemented hamburger menu (checkbox-based dropdown) with Next/Previous Song, Game History, and End Game options. Added footer with "Next Song" button. Removed redundant page navigation buttons from PDFViewer component (kept left/right click areas for page turning). Updated in `src/pages/PdfReader.tsx` and `src/components/PDFViewer.tsx`.
-- **SongView navigation alignment (2026-02-24)**: Fixed navigation semantics to match legacy preview behavior. Back button now calls `startNewGame()` and navigates to Song Management (not Welcome). Removed Next/Prev song buttons (SongView is for single-song preview from management UI, not game progression). Added song ID to title display (e.g., "3 - Moonlight Sonata"). Created missing CSS file for legacy page. Updated in `src/pages/SongView.tsx`, `src/styles/legacy/song-view.css`, and `public/legacy-pages/song-view/song-view.css`.
+- **SongView navigation alignment (2026-02-24)**: Fixed navigation semantics to match legacy preview behavior. Back button now calls `startNewGame()` and navigates to Song Management (not Welcome). Removed Next/Prev song buttons (SongView is for single-song preview from management UI, not game progression). Created missing CSS file for legacy page. Updated in `src/pages/SongView.tsx`, `src/styles/legacy/song-view.css`, and `public/legacy-pages/song-view/song-view.css`.
+- **SongView data-passing decoupled from game cache (2026-03-15)**: `SongManagement` previously used `setSongId()` to write the chosen song into the game's localStorage cache as a workaround (legacy holdover from before React). Replaced with proper React Router navigation: `SongManagement` now navigates to `/song-view?songId=<id>` and `SongView` reads `useSearchParams()` then loads the song directly from IndexedDB via `loadSong()`. The `setSongId()` function was removed from `indexedDb.ts`. Game state is no longer polluted by song preview actions.
 - **Service worker cleanup (2026-02-24)**: Added deprecation notices to manual SW files (`/service-worker.js`, `src/sw-template.js`) clarifying they are no longer used in production. Enabled `cleanupOutdatedCaches: true` in Workbox generation to automatically purge old cache names like `pianobingo-cache-v1`. Updated documentation in context file explaining the SW architecture. Documented legacy PDF CDN worker limitation (affects offline for legacy pages only, will be resolved when legacy surface is removed).
 - **Testing coverage improvements (2026-02-24)**: Extended offline PDF test to validate render lifecycle (worker + first page render) in `tests/offline-pdf.spec.ts`. Added mobile viewport E2E coverage in `tests/mobile-viewport.spec.ts`.
 - **Playwright suite status (2026-02-24)**: 12 passed, 1 skipped (skipped: `base seed data uses version 1` test in `tests/storage-compatibility.spec.ts`).

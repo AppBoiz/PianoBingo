@@ -49,14 +49,12 @@ function toCurrentSongMetadata(song: Song | null): CurrentSongMetadata {
     return {
       songId: null,
       title: '',
-      pdfUrl: null,
     }
   }
 
   return {
     songId: song.songId,
     title: song.title,
-    pdfUrl: song.pdfUrl,
   }
 }
 
@@ -292,9 +290,18 @@ export function selectPack(packId: number) {
   saveGameState(tmpState)
 }
 
-export function getCurrentSong(): CurrentSongMetadata | null {
+export function getCurrentSongMetadata(): CurrentSongMetadata | null {
   const gameState = loadGameState()
   return gameState ? gameState.currentSong : null
+}
+
+export async function getCurrentSong(): Promise<Song | null> {
+  const currentSongMetadata = getCurrentSongMetadata()
+  if (!currentSongMetadata?.songId) {
+    return null
+  }
+
+  return loadSong(currentSongMetadata.songId)
 }
 
 export function getShownSongIds() {
@@ -307,7 +314,7 @@ export function getSelectedSongPackId() {
   return gameState ? gameState.selectedSongPackId : null
 }
 
-export async function generateSong(): Promise<CurrentSongMetadata | null> {
+export async function generateSong(): Promise<Song | null> {
   const shownSongIds = getShownSongIds()
   const selectedPackId = getSelectedSongPackId()
   const packData = await loadAllPacks()
@@ -334,24 +341,12 @@ export async function generateSong(): Promise<CurrentSongMetadata | null> {
   tmpState.shownSongIds = tmpState.shownSongIds || []
   tmpState.shownSongIds.push(selectedSong.songId)
   saveGameState(tmpState)
-  return tmpState.currentSong
-}
-
-export async function setSongId(songId: number) {
-  const selectedSong = await loadSong(songId)
-  if (!selectedSong) {
-    return
-  }
-
-  const tmpState: GameState = { ...(loadGameState() || defaultGameState) }
-  tmpState.currentSong = toCurrentSongMetadata(selectedSong)
-  saveGameState(tmpState)
+  return selectedSong
 }
 
 // Convenience helpers to match legacy API used by some pages
 export async function nextSong() {
-  await generateSong();
-  return getCurrentSong();
+  return generateSong()
 }
 
 export async function prevSong() {
@@ -370,5 +365,5 @@ export async function prevSong() {
   // remove the last shown entry (going back)
   tmpState.shownSongIds = shown.slice(0, shown.length - 1)
   saveGameState(tmpState)
-  return tmpState.currentSong
+  return prevSong
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { loadAllSongs, saveSong, deleteSong, loadSong, setSongId, startNewGame } from '../storage/indexedDb'
+import { loadAllSongs, saveSong, deleteSong, loadSong, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
 import Header from '../components/Header'
 import type { Song } from '../types/models'
@@ -35,9 +35,8 @@ export default function SongManagement(){
     await fetchSongs()
   }
 
-  async function handleViewSong(songId:number){
-    await setSongId(songId)
-    loadPage('SONG_VIEW')
+  function handleViewSong(songId: number){
+    loadPage(`/song-view?songId=${songId}`)
   }
 
   async function handleDeleteSong(songId:number){

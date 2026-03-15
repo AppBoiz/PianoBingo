@@ -16,7 +16,6 @@ export interface Pack {
 export interface CurrentSongMetadata {
   songId: number | null
   title: string
-  pdfUrl: string | null
 }
 
 export interface GameState {
