@@ -1,32 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Sortable from 'sortablejs'
-import { getSelectedSongPackId, loadPack, loadAllSongs, savePack, startNewGame } from '../storage/indexedDb'
+import { getSelectedSongPackId, loadPack, savePack, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
+import { useSongs } from '../hooks/useSongs'
 import Header from '../components/Header'
-import type { Pack, Song } from '../types/models'
+import type { Pack } from '../types/models'
 
 export default function PackEdit(){
   const [packData, setPackData] = useState<Pack | null>(null)
-  const [songs, setSongs] = useState<Song[]>([])
+  const { songs } = useSongs()
   const containerRef = useRef<HTMLDivElement | null>(null)
   const sortableRef = useRef<Sortable | null>(null)
   const { loadPage } = useNavigation()
 
   useEffect(() => {
-    let mounted = true
-    const init = async () => {
+    let cancelled = false
+    const loadPackData = async () => {
       const selectedPackId = getSelectedSongPackId()
+      if (!selectedPackId) return
       const p = await loadPack(selectedPackId)
-      const all = await loadAllSongs()
-      if (!p) return
+      if (!p || cancelled) return
       if (!p.songs) p.songs = []
-      if (mounted) {
-        setPackData(p)
-        setSongs(all || [])
-      }
+      setPackData(p)
     }
-    init()
-    return () => { mounted = false }
+    loadPackData()
+    return () => { cancelled = true }
   }, [])
 
   useEffect(() => {
@@ -60,10 +58,11 @@ export default function PackEdit(){
     return a.songId - b.songId
   })
 
-  function toggleSong(songId:number){
+  function toggleSong(songId: number){
+    if (!packData) return
     const has = packData.songs.includes(songId)
-    const next = has ? packData.songs.filter(id => id !== songId) : [...packData.songs, songId]
-    setPackData({ ...packData, songs: next })
+    const updatedSongs = has ? packData.songs.filter(id => id !== songId) : [...packData.songs, songId]
+    setPackData({ ...packData, songs: updatedSongs })
   }
 
   return (

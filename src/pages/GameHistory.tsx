@@ -1,30 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { loadGameState, loadPack } from '../storage/indexedDb'
+import React from 'react'
 import { useNavigation } from '../context/NavigationContext'
+import { useGameHistory } from '../hooks/useGameHistory'
 import Header from '../components/Header'
-import type { Pack } from '../types/models'
 
 export default function GameHistory(){
-  const [pack, setPack] = useState<Pack | null>(null)
-  const [shownSongIds, setShownSongIds] = useState<number[]>([])
+  const { pack, shownSongIds } = useGameHistory()
   const { loadPage } = useNavigation()
-
-  useEffect(() => { 
-    fetchGameData() 
-  }, [])
-
-  async function fetchGameData(){
-    const state = loadGameState()
-    if (!state || !state.selectedSongPackId) {
-      return
-    }
-    
-    const packData = await loadPack(state.selectedSongPackId)
-    if (packData) {
-      setPack(packData)
-      setShownSongIds(state.shownSongIds || [])
-    }
-  }
 
   function renderBoxes(){
     if (!pack) return null

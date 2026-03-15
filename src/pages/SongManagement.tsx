@@ -1,65 +1,50 @@
-import React, { useEffect, useState } from 'react'
-import { loadAllSongs, saveSong, deleteSong, loadSong, startNewGame } from '../storage/indexedDb'
+import React from 'react'
+import { saveSong, deleteSong, loadSong, startNewGame } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
+import { useSongs } from '../hooks/useSongs'
+import { fileToBase64 } from '../utils/fileUtils'
 import Header from '../components/Header'
 import type { Song } from '../types/models'
 
 export default function SongManagement(){
-  const [songs, setSongs] = useState<Song[]>([])
+  const { songs, refresh: refreshSongs } = useSongs()
   const { loadPage } = useNavigation()
 
-  useEffect(() => { fetchSongs() }, [])
-
-  async function fetchSongs(){
-    const data = await loadAllSongs()
-    setSongs(data || [])
-  }
-
-  async function handleRenameSong(songId:number, newName:string){
+  async function handleRenameSong(songId: number, newName: string){
     const song = await loadSong(songId)
     if (!song) return
     song.title = newName
     await saveSong(song)
-    await fetchSongs()
+    await refreshSongs()
   }
 
   async function handleCreateNewSong(){
-    const songData = await loadAllSongs()
-    const maxSongId = songData.length > 0 ? Math.max(...songData.map(song => song.songId)) : 0
+    const maxSongId = songs.length > 0 ? Math.max(...songs.map(s => s.songId)) : 0
     const newSong: Song = {
       songId: maxSongId + 1,
       title: 'New Song',
       pdfUrl: null
     }
     await saveSong(newSong)
-    await fetchSongs()
+    await refreshSongs()
   }
 
   function handleViewSong(songId: number){
     loadPage(`/song-view?songId=${songId}`)
   }
 
-  async function handleDeleteSong(songId:number){
+  async function handleDeleteSong(songId: number){
     await deleteSong(songId)
-    await fetchSongs()
+    await refreshSongs()
   }
 
-  async function handleUpload(file: File, songId:number){
+  async function handleUpload(file: File, songId: number){
     const base64 = await fileToBase64(file)
     const song = await loadSong(songId)
     if (!song) return
     song.pdfUrl = base64.split(',')[1]
     await saveSong(song)
-    await fetchSongs()
-  }
-
-  function fileToBase64(file: File){
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = (err) => reject(err)
-    })
+    await refreshSongs()
   }
 
   return (
@@ -77,7 +62,7 @@ export default function SongManagement(){
                   {hasPdf ? (
                     <>
                       <button className="pdf-btn" onClick={() => handleViewSong(song.songId)}>📄 View</button>
-                      <button className="remove-pdf-btn" onClick={async () => { const s = await loadSong(song.songId); if (!s) return; s.pdfUrl = null; await saveSong(s); await fetchSongs() }}>❌ PDF</button>
+                      <button className="remove-pdf-btn" onClick={async () => { const s = await loadSong(song.songId); if (!s) return; s.pdfUrl = null; await saveSong(s); await refreshSongs() }}>❌ PDF</button>
                     </>
                   ) : (
                     <>

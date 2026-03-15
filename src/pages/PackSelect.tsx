@@ -1,30 +1,28 @@
 import React, { useEffect, useState } from 'react'
-import { loadAllPacks, selectPack, generateSong, clearGameState } from '../storage/indexedDb'
+import { selectPack, generateSong, clearGameState } from '../storage/indexedDb'
 import { useNavigation } from '../context/NavigationContext'
-import type { Pack } from '../types/models'
+import { usePacks } from '../hooks/usePacks'
 
 export default function PackSelect(){
-  const [packs, setPacks] = useState<Pack[]>([])
-  const [selected, setSelected] = useState<number>(1)
+  const { packs } = usePacks()
+  const [selected, setSelected] = useState<number | null>(null)
   const { loadPage } = useNavigation()
 
+  // Auto-select the first pack once the list loads
   useEffect(() => {
-    let mounted = true
-    loadAllPacks().then((data) => {
-      if (!mounted) return
-      setPacks(data || [])
-      if (data && data.length > 0) setSelected(data[0].packId)
-    }).catch(err => console.error(err))
-    return () => { mounted = false }
-  }, [])
+    if (packs.length > 0 && selected === null) {
+      setSelected(packs[0].packId)
+    }
+  }, [packs, selected])
 
-  const pickPack = async () => {
+  async function handleStartGame(){
+    if (!selected) return
     await selectPack(selected)
     await generateSong()
     loadPage('GAME')
   }
 
-  const onBack = () => {
+  function handleBack(){
     clearGameState()
     loadPage('WELCOME')
   }
@@ -32,7 +30,7 @@ export default function PackSelect(){
   return (
     <div id="app" className="p-4">
       <div className="back-container">
-        <button onClick={onBack}>Back</button>
+        <button onClick={handleBack}>Back</button>
       </div>
       <h1>Create New Game</h1>
       <h2>Select Song Pack</h2>
@@ -48,7 +46,7 @@ export default function PackSelect(){
           ))}
         </div>
       </div>
-      <button className="select-button" onClick={pickPack}>Start Game</button>
+      <button className="select-button" onClick={handleStartGame}>Start Game</button>
       <img className="piano-banner" src="/resources/images/piano.png" />
     </div>
   )
