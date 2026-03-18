@@ -1,6 +1,6 @@
 # PianoBingo — Coding Agent Context
 
-Last updated: 2026-03-15 (final page-centric structure)
+Last updated: 2026-03-18 (service layer extraction)
 
 ## 0) Meta: Keeping this context file current
 
@@ -47,6 +47,7 @@ Source organization:
 - `src/pages/{feature}/{PageName}/...` for page-owned code
 - `src/pages/{feature}/hooks/*` for feature-scoped hooks
 - `src/shared/*` for cross-feature reusable code
+- `src/shared/services/*` for browser/runtime API service modules (see §4.5)
 
 Current page entry files:
 - `src/pages/game/Game/Game.tsx`
@@ -86,13 +87,12 @@ Current runtime caching strategy (Workbox-generated):
 - `src/sw-template.js`: Workbox template for `injectManifest()` approach, but build uses `generateSW()` instead. Unused, kept for reference only.
 
 **Service worker registration:**
-- React app: `src/main.tsx` registers `/service-worker.js` in production builds
-- Legacy app: `app.js` also registers `/service-worker.js`
-- Both surfaces share the same SW scope and cache storage
+  - React app: `src/main.tsx` calls `registerProductionServiceWorker()` from `src/shared/services/runtime/serviceWorkerService.ts`, which wraps `navigator.serviceWorker.register('/service-worker.js')` with feature detection and error handling.
+  - Legacy surface has been removed; SW registration is now React-only.
 
 ### 4.2 Local persistence and backward compatibility
 
-- IndexedDB (`src/storage/indexedDb.ts`) stores songs/packs and is designed to preserve legacy schema expectations.
+- IndexedDB (`src/shared/storage/indexedDb.ts`) stores songs/packs and is designed to preserve legacy schema expectations.
 - localStorage game state mirrors legacy helper model (`resources/state-helpers/gameStorage.js`) for continuity.
 - Compatibility-sensitive changes must preserve:
   - DB name/object store names/keys and migration behavior.
@@ -115,13 +115,34 @@ Rules:
 
 ### 4.3 PDF reader implementation
 
-- React PDF rendering uses `pdfjs-dist` via dynamic import in `src/shared/components/pdf/PDFViewer.tsx`.
+- React PDF rendering uses `pdfjs-dist` via dynamic import.
 - `src/pages/game/hooks/usePdfSong.ts` centralizes the common song-loading flow used by both `Game` and `SongView`: load a `Song`, derive `pdfUrl`/title state, expose loading state, and provide a `reload()` helper.
-- Worker is loaded from bundled assets (`pdf.worker` chunk) via `GlobalWorkerOptions.workerSrc` for offline-capable modern path.
-- PDF rendering exposes lightweight test hooks: `window.__PDF_RENDERED__` and `window.__PDF_RENDER_ERROR__` for Playwright render validation.
-- **Legacy PDF limitation**: Legacy pages (`public/legacy-pages/pdf-reader/` and `song-view/`) use CDN-hosted PDF.js worker from cdnjs.cloudflare.com. This breaks offline functionality for legacy pages. Since the legacy surface will be removed soon, this limitation is documented rather than fixed. React pages have full offline support via bundled worker.
+- PDF.js worker is initialized once (module-level singleton) in `src/shared/services/pdf/pdfDocumentService.ts` via `GlobalWorkerOptions.workerSrc`; component code never touches `GlobalWorkerOptions` directly.
+- Base64 source resolution and legacy fallback loading are in `src/shared/services/pdf/pdfSourceService.ts`.
+- Canvas creation and PDF page rendering are in `pdfDocumentService.ts`; `PDFViewer.tsx` delegates all DOM/PDF.js API calls to these services.
+- PDF diagnostic flags (`window.__PDF_LOADED__`, `window.__PDF_RENDERED__`, `window.__PDF_RENDER_ERROR__`) are now written exclusively through `src/shared/services/runtime/windowGlobals.ts`.
 
-### 4.4 Mobile compatibility
+### 4.5 Service layer — browser / runtime API boundaries
+
+All raw browser and runtime API calls are encapsulated in dedicated service modules under `src/shared/services/`. Pages, hooks, and storage modules must go through these services rather than calling browser APIs directly.
+
+| Service file | API encapsulated |
+|---|---|
+| `services/storage/indexedDbClient.ts` | `indexedDB.open()`, `IDBTransaction/IDBRequest` promise wrappers |
+| `services/storage/localStorageService.ts` | `localStorage.getItem/setItem/removeItem` |
+| `services/network/resourceLoader.ts` | `fetch()` (text resource loading) |
+| `services/runtime/windowGlobals.ts` | `window.BASE_PACK_DATA/BASE_SONG_DATA/resolvePdfUrl`, PDF diagnostic flags |
+| `services/runtime/serviceWorkerService.ts` | `navigator.serviceWorker.register()` |
+| `services/runtime/fileReaderService.ts` | `FileReader` (file → data URL) |
+| `services/runtime/frameMessaging.ts` | `window.parent.postMessage()` (legacy iframe navigation) |
+| `services/runtime/domService.ts` | `document.getElementById()`, `querySelectorAll()` DOM reads |
+| `services/pdf/pdfSourceService.ts` | `atob()`, base64 validation, legacy fetch fallback |
+| `services/pdf/pdfDocumentService.ts` | `pdfjs-dist` dynamic import, worker setup, `getDocument()`, canvas render |
+| `services/navigation/legacyNavigation.ts` | Page navigation via `postMessageToParent()` |
+
+**Rule**: If adding code that calls a browser/runtime API (e.g. `localStorage`, `fetch`, `FileReader`, DOM manipulation), put the raw call in the appropriate service module and import from there. Do not call browser APIs from components, hooks, or storage modules directly.
+
+### 4.6 Mobile compatibility
 
 Mobile behavior currently depends heavily on inherited legacy CSS contracts:
 - Full-height shell and constrained content panes.
@@ -129,6 +150,8 @@ Mobile behavior currently depends heavily on inherited legacy CSS contracts:
 - Tight positional layout in headers/nav.
 
 Do not refactor structure or selector names casually during migration; layout parity is fragile and selector-driven.
+
+(Note: Section numbering shifted by 1 after §4.4 when §4.5 service layer was added. References to §4.4 in older notes now correspond to §4.6.)
 
 
 ## 5) Tech stack summary
@@ -302,6 +325,28 @@ Covers all critical workflows with 16+ test cases:
 - ✅ **Offline Functionality** smoke test: App loads offline (service worker functionality)
 
 Ready to run: `npm run test:e2e -- tests/parity-smoke.spec.ts`
+
+### Service layer extraction (2026-03-18) ✅
+
+All raw browser / runtime API calls pulled out of storage, component, and bootstrap code into dedicated service modules:
+- `src/shared/services/storage/indexedDbClient.ts` — IndexedDB open/transaction/request primitives.
+- `src/shared/services/storage/localStorageService.ts` — localStorage get/set/remove with JSON serialization.
+- `src/shared/services/network/resourceLoader.ts` — `fetch()` with error handling for text resources.
+- `src/shared/services/runtime/windowGlobals.ts` — typed read/write for `window.BASE_PACK_DATA`, `window.BASE_SONG_DATA`, `window.resolvePdfUrl`, and PDF diagnostic flags.
+- `src/shared/services/runtime/serviceWorkerService.ts` — `navigator.serviceWorker.register()` with production guard and `window.addEventListener('load')` lifecycle.
+- `src/shared/services/runtime/fileReaderService.ts` — `FileReader.readAsDataURL()` as a promise.
+- `src/shared/services/runtime/frameMessaging.ts` — `window.parent.postMessage()` with same-origin target derivation (replaces insecure wildcard `'*'` origin).
+- `src/shared/services/runtime/domService.ts` — `document.getElementById()` and `querySelectorAll()` readback.
+- `src/shared/services/pdf/pdfSourceService.ts` — base64 validation, resolver dispatch, legacy fallback fetch, `atob()` decode.
+- `src/shared/services/pdf/pdfDocumentService.ts` — PDF.js module singleton (worker initialized once), `getDocument()`, canvas render.
+
+Consumers updated: `src/shared/storage/indexedDb.ts`, `src/init/preloadData.ts`, `src/shared/components/pdf/PDFViewer.tsx`, `src/shared/utils/fileUtils.ts`, `src/shared/services/navigation/legacyNavigation.ts`, `src/pages/packs/hooks/useSortable.ts`, `src/main.tsx`.
+
+Additional fix: `initializePreloadedData()` in `preloadData.ts` is now idempotent (singleton promise guard prevents double init).
+
+Security note: `frameMessaging.ts` now derives target origin from `document.referrer` instead of using `'*'`.
+
+Build verified: `npm run build` clean after extraction.
 
 ### Remaining incomplete work
 

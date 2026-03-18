@@ -12,7 +12,7 @@ npm run build         # Production build with Workbox SW generation
 npm run preview       # Preview production build locally
 ```
 
-## Migration status (as of 2026-03-15)
+## Migration status (as of 2026-03-18)
 
 ### Final architecture
 
@@ -41,6 +41,11 @@ src/
 		constants/
 		context/
 		services/
+			navigation/
+			network/
+			pdf/
+			runtime/
+			storage/
 		storage/
 		types/
 		utils/
@@ -66,7 +71,14 @@ Page entry files:
 - Build size: CSS bundle 14.62 kB (optimized with legacy surface removed)
 - All tests passing: 12 legacy + 1 skipped (no regressions)
 
-### ✅ Phase 2: Parity Smoke Tests Completed
+### ✅ Phase 3: Service Layer Extraction Completed (2026-03-18)
+- All raw browser/runtime API calls moved to dedicated service modules under `src/shared/services/`
+- Services: `storage/indexedDbClient`, `storage/localStorageService`, `network/resourceLoader`, `runtime/windowGlobals`, `runtime/serviceWorkerService`, `runtime/fileReaderService`, `runtime/frameMessaging`, `runtime/domService`, `pdf/pdfSourceService`, `pdf/pdfDocumentService`
+- PDF.js worker is now initialized once (singleton) in `pdfDocumentService.ts`; no component owns that concern anymore
+- `postMessage` origin is now correctly scoped (no more wildcard `'*'`)
+- Build size: 301 kB JS + 404 kB PDF chunk (unchanged from pre-refactor)
+- All tests passing, clean build verified
+
 - Created `tests/parity-smoke.spec.ts` with 16+ comprehensive regression test cases
 - Tests full workflow: Welcome → Pack Select → Game → History
 - Tests song progression, navigation, state persistence, offline functionality
