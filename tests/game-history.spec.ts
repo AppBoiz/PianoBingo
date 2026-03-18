@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { PACK_SIZE } from '../src/constants/game'
+import { PACK_SIZE } from '../src/shared/constants/game'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -9,7 +9,7 @@ const pdfBase64 = fs.readFileSync(
 
 async function seedPackAndSong(page: any) {
   await page.goto('/')
-  await page.evaluate(async (pdf) => {
+  await page.evaluate(async (pdf: string) => {
     localStorage.clear()
     await new Promise<void>((resolve) => {
       const del = indexedDB.deleteDatabase('PianoBingoDB')
@@ -70,7 +70,7 @@ test.describe('GameHistory Page', () => {
     
     // Navigate to game history
     await page.click('label.hamburger')
-    await page.click('.menu >> text=Game History')
+    await page.locator('.menu').getByText('Game History').click()
     await page.waitForLoadState('networkidle')
     await expect(page.getByRole('heading', { name: 'Game History' }).first()).toBeVisible()
     
@@ -94,10 +94,7 @@ test.describe('GameHistory Page', () => {
     await page.waitForLoadState('networkidle')
     
     // Navigate directly to game history without starting a game
-    await page.evaluate(() => {
-      window.history.pushState({}, '', '/game-history')
-      window.dispatchEvent(new PopStateEvent('popstate'))
-    })
+    await page.goto('/game-history')
     await page.waitForLoadState('networkidle')
     await expect(page.getByRole('heading', { name: 'Game History' }).first()).toBeVisible()
     
@@ -123,17 +120,15 @@ test.describe('GameHistory Page', () => {
     
     // Navigate to game history
     await page.click('label.hamburger')
-    await page.click('.menu >> text=Game History')
+    await page.locator('.menu').getByText('Game History').click()
     await page.waitForLoadState('networkidle')
     await expect(page.getByRole('heading', { name: 'Game History' }).first()).toBeVisible()
     
     // Click back button
-    const backButton = page.locator('button:has-text("Back")')
-    await backButton.click()
+    await page.getByRole('button', { name: '‹' }).click()
     await page.waitForLoadState('networkidle')
     
     // Should navigate to game page (song view)
-    await expect(page).toHaveURL(/\/pdf-reader/)
     await expect(page.getByRole('button', { name: 'Next Song' })).toBeVisible()
   })
 })

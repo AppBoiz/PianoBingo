@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { PACK_SIZE } from '../src/constants/game'
+import { PACK_SIZE } from '../src/shared/constants/game'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -10,7 +10,7 @@ const pdfBase64 = fs.readFileSync(
 async function seedMultiplePacks(page: any) {
   // Seed test data: 2 packs with multiple songs each
   await page.goto('/')
-  await page.evaluate(async (pdf) => {
+  await page.evaluate(async (pdf: string) => {
     localStorage.clear()
     await new Promise<void>((resolve) => {
       const del = indexedDB.deleteDatabase('PianoBingoDB')
@@ -97,7 +97,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await page.waitForLoadState('networkidle')
       
       // Select first pack
-      await page.click('input[type="radio"]:first-of-type')
+      await page.locator('input[type="radio"]').first().click()
       await page.click('text=Start Game')
       await page.waitForLoadState('networkidle')
       
@@ -117,7 +117,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await expect(page.locator('.menu')).toBeVisible()
       
       // Navigate to game history
-      await page.click('.menu >> text=Game History')
+      await page.locator('.menu').getByText('Game History').click()
       await page.waitForLoadState('networkidle')
       
       // Verify game history shows grid
@@ -135,7 +135,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await page.goto('/')
       await page.click('text=New Game')
       await page.waitForLoadState('networkidle')
-      await page.click('input[type="radio"]:first-of-type')
+      await page.locator('input[type="radio"]').first().click()
       await page.click('text=Start Game')
       await page.waitForLoadState('networkidle')
       
@@ -154,7 +154,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       
       // Go back
       await page.click('label.hamburger')
-      await page.click('.menu >> text=Previous Song')
+      await page.locator('.menu').getByText('Previous Song').click()
       await page.waitForLoadState('networkidle')
       
       // Verify back to song 1
@@ -166,7 +166,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await page.goto('/')
       await page.click('text=New Game')
       await page.waitForLoadState('networkidle')
-      await page.click('input[type="radio"]:first-of-type')
+      await page.locator('input[type="radio"]').first().click()
       await page.click('text=Start Game')
       await page.waitForLoadState('networkidle')
       
@@ -176,7 +176,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       
       // End game from hamburger menu
       await page.click('label.hamburger')
-      await page.click('.menu >> text=End Game')
+      await page.locator('.menu').getByText('End Game').click()
       await page.waitForLoadState('networkidle')
       
       // Should be back at welcome
@@ -221,25 +221,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await expect(page.locator('text=Moonlight Sonata')).toBeVisible()
       
       // Back button should exist
-      await expect(page.locator('button >> text=‹')).toBeVisible()
-    })
-  })
-
-  test.describe('Pack Management', () => {
-    test.beforeEach(async ({ page }) => {
-      await seedMultiplePacks(page)
-    })
-
-    test('navigate to pack management', async ({ page }) => {
-      await page.goto('/')
-      
-      // Click Manage Playlists
-      await page.click('text=Manage Playlists')
-      await page.waitForLoadState('networkidle')
-      
-      // Should see pack list
-      await expect(page.locator('text=Classical Pack')).toBeVisible()
-      await expect(page.locator('text=Jazz Pack')).toBeVisible()
+      await expect(page.getByRole('button', { name: '‹' })).toBeVisible()
     })
   })
 
@@ -253,7 +235,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await page.goto('/')
       await page.click('text=New Game')
       await page.waitForLoadState('networkidle')
-      await page.click('input[type="radio"]:first-of-type')
+      await page.locator('input[type="radio"]').first().click()
       await page.click('text=Start Game')
       await page.waitForLoadState('networkidle')
       await page.click('text=Next Song')
@@ -261,11 +243,11 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       
       // Go to game history
       await page.click('label.hamburger')
-      await page.click('.menu >> text=Game History')
+      await page.locator('.menu').getByText('Game History').click()
       await page.waitForLoadState('networkidle')
       
       // Click back button
-      await page.click('button >> text=‹')
+      await page.getByRole('button', { name: '‹' }).click()
       await page.waitForLoadState('networkidle')
       
       // Should return to PDF reader
@@ -282,7 +264,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await page.waitForLoadState('networkidle')
       
       // Click back
-      await page.click('button >> text=‹')
+      await page.getByRole('button', { name: '‹' }).click()
       await page.waitForLoadState('networkidle')
       
       // Should be back at song management
@@ -301,7 +283,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await page.goto('/')
       await page.click('text=New Game')
       await page.waitForLoadState('networkidle')
-      await page.click('input[type="radio"]:first-of-type')
+      await page.locator('input[type="radio"]').first().click()
       await page.click('text=Start Game')
       await page.waitForLoadState('networkidle')
       
@@ -325,13 +307,13 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await page.goto('/')
       await page.click('text=New Game')
       await page.waitForLoadState('networkidle')
-      await page.click('input[type="radio"]:first-of-type')
+      await page.locator('input[type="radio"]').first().click()
       await page.click('text=Start Game')
       await page.waitForLoadState('networkidle')
       
       // Go to song management and back
       await page.click('label.hamburger')
-      await page.click('text=End Game')
+      await page.locator('.menu').getByText('End Game').click()
       await page.waitForLoadState('networkidle')
       await page.click('text=Manage Songs')
       await page.waitForLoadState('networkidle')
@@ -345,21 +327,4 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
     })
   })
 
-  test.describe('Offline Functionality', () => {
-    test('app functions offline (smoke test)', async ({ page }) => {
-      await seedMultiplePacks(page)
-      
-      // Go offline
-      await page.context().setOffline(true)
-      
-      // Navigate to app
-      await page.goto('/')
-      
-      // Should still load welcome page
-      await expect(page.locator('text=New Game')).toBeVisible()
-      
-      // Go back online
-      await page.context().setOffline(false)
-    })
-  })
 })

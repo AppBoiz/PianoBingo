@@ -14,6 +14,8 @@ interface GameMenuProps {
 export default function GameMenu({ actions }: GameMenuProps) {
   function handleActionClick(event: MouseEvent<HTMLAnchorElement>, action: GameMenuAction) {
     event.preventDefault()
+    const toggle = document.getElementById('menu-toggle') as HTMLInputElement | null
+    if (toggle) toggle.checked = false
     action.onClick()
   }
 

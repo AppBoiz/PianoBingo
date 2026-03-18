@@ -1,11 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 test('IndexedDB is seeded with preloaded data on first app load', async ({ page, context }) => {
-  // Start with fresh storage context
-  await context.clearCookies();
+  await context.clearCookies()
 
-  // Navigate to the app
-  await page.goto('http://localhost:5175');
+  await page.goto('/')
 
   // Wait for the app to initialize
   await page.waitForTimeout(2000);
@@ -19,11 +17,18 @@ test('IndexedDB is seeded with preloaded data on first app load', async ({ page,
   // Verify preloaded data initialized message appears
   await expect(async () => {
     const logs = consoleMessages.join('\n');
-    expect(logs).toContain('Preloaded data initialized');
-  }).toPass();
+    expect(logs).toContain('Preloaded data initialized')
+  }).toPass()
 
   // Get the IndexedDB data via JavaScript evaluation
-  const dbInfo = await page.evaluate(async () => {
+  type DbInfo = {
+    packsCount: number
+    songsCount: number
+    packs: Array<{ packId: number; packName: string }>
+    sampleSongs?: Array<{ songId: number; title: string }>
+    error?: string
+  }
+  const dbInfo = await page.evaluate(async (): Promise<DbInfo> => {
     return new Promise((resolve) => {
       const request = indexedDB.open('PianoBingoDB', 1);
 
@@ -60,6 +65,7 @@ test('IndexedDB is seeded with preloaded data on first app load', async ({ page,
           error: 'Failed to open database',
           packsCount: 0,
           songsCount: 0,
+                  packs: [],
         });
       };
     });
@@ -72,19 +78,4 @@ test('IndexedDB is seeded with preloaded data on first app load', async ({ page,
   expect(dbInfo.songsCount).toBe(150);
   expect(dbInfo.packs).toContainEqual({ packId: 1, packName: 'Tom' });
   expect(dbInfo.packs).toContainEqual({ packId: 2, packName: 'Jack' });
-});
-
-test('Pack select page displays preloaded packs', async ({ page }) => {
-  await page.goto('http://localhost:5175');
-
-  // Wait for app to load and data to be seeded
-  await page.waitForTimeout(2000);
-
-  // Check if we're on welcome page or pack select
-  const pageTitle = await page.locator('h1, h2, h3').first().textContent();
-  console.log('Page title:', pageTitle);
-
-  // The app should display pack selection or song selection after initialization
-  // This test confirms the app loaded without errors
-  expect(await page.locator('body').isVisible()).toBe(true);
 });

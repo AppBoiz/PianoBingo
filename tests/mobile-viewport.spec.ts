@@ -7,7 +7,7 @@ const pdfBase64 = fs.readFileSync(
 ).toString('base64')
 
 async function seedPackAndSong(page: any) {
-  await page.evaluate(async (pdf) => {
+  await page.evaluate(async (pdf: string) => {
     localStorage.clear()
     await new Promise<void>((resolve) => {
       const del = indexedDB.deleteDatabase('PianoBingoDB')
@@ -83,8 +83,8 @@ test.describe('Mobile viewport flows', () => {
 
     await page.click('label.hamburger')
     await expect(page.locator('.menu')).toBeVisible()
-    await expect(page.locator('.menu >> text=Next Song')).toBeVisible()
-    await expect(page.locator('.menu >> text=Game History')).toBeVisible()
+    await expect(page.locator('.menu').getByText('Next Song')).toBeVisible()
+    await expect(page.locator('.menu').getByText('Game History')).toBeVisible()
   })
 
   test('song management list renders on mobile', async ({ page }) => {
