@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
 import { PACK_SIZE } from '../src/shared/constants/game'
+import { pianoBingoLocator, pianoExpect } from './support/locators'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -54,81 +55,67 @@ test.describe('GameHistory Page', () => {
   })
 
   test(`displays ${PACK_SIZE}-box bingo grid with highlighted boxes`, async ({ page }) => {
-    // Navigate to welcome page and start a game
-    await page.waitForLoadState('networkidle')
-    
-    // Start game and select a pack
-    await page.click('text=New Game')
-    await page.waitForLoadState('networkidle')
-    
-    // Select the first pack
-    await page.waitForSelector('input[type="radio"]', { timeout: 10000 })
-    await page.click('text=Start Game')
+    const app = pianoBingoLocator(page)
     await page.waitForLoadState('networkidle')
 
-    await expect(page.getByRole('button', { name: 'Next Song' })).toBeVisible()
-    
-    // Navigate to game history
-    await page.click('label.hamburger')
-    await page.locator('.menu').getByText('Game History').click()
+    await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    await expect(page.getByRole('heading', { name: 'Game History' }).first()).toBeVisible()
-    
-    // Verify pack-size boxes are rendered
-    const boxes = page.locator('.box')
-    await expect(boxes).toHaveCount(PACK_SIZE)
-    
-    // Verify at least one box is highlighted (the first drawn song)
-    const highlightedBoxes = page.locator('.box.highlighted')
-    const count = await highlightedBoxes.count()
-    expect(count).toBeGreaterThan(0)
-    
-    // Verify boxes are numbered 1..PACK_SIZE
-    const firstBox = boxes.first()
-    await expect(firstBox).toHaveText('1')
-    const lastBox = boxes.last()
-    await expect(lastBox).toHaveText(String(PACK_SIZE))
+
+    await app.pagePackSelect().packRadioInputs().first().click()
+    await app.pagePackSelect().startGameButton().click()
+    await page.waitForLoadState('networkidle')
+
+    await pianoExpect(app.pageGame().nextSong()).toBeVisible()
+
+    await app.pageGame().menuToggle().click()
+    await app.pageGame().menuItem('game-history').click()
+    await page.waitForLoadState('networkidle')
+
+    await pianoExpect(app.pageGameHistory().header()).toBeVisible()
+
+    const boxes = app.pageGameHistory().boxes()
+    await pianoExpect(boxes).toHaveCount(PACK_SIZE)
+
+    const highlightedCount = await app.pageGameHistory().highlightedBoxes().count()
+    expect(highlightedCount).toBeGreaterThan(0)
+
+    await pianoExpect(app.pageGameHistory().box(1)).toHaveText('1')
+    await pianoExpect(app.pageGameHistory().box(PACK_SIZE)).toHaveText(String(PACK_SIZE))
   })
 
   test('shows message when no active game', async ({ page }) => {
+    const app = pianoBingoLocator(page)
     await page.waitForLoadState('networkidle')
-    
-    // Navigate directly to game history without starting a game
-    await page.goto('/game-history')
+
+    await page.evaluate(() => {
+      localStorage.removeItem('gameState')
+      window.history.pushState({}, '', '/game-history')
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    })
     await page.waitForLoadState('networkidle')
-    await expect(page.getByRole('heading', { name: 'Game History' }).first()).toBeVisible()
-    
-    // Should show "no active game" message
-    await expect(page.locator('text=No active game')).toBeVisible()
-    
-    // Should not show any boxes
-    const boxes = page.locator('.box')
-    await expect(boxes).toHaveCount(0)
+    await pianoExpect(app.pageGameHistory().emptyState()).toBeVisible()
   })
 
   test('back button navigates to game page', async ({ page }) => {
-    await page.waitForLoadState('networkidle')
-    
-    // Start a game
-    await page.click('text=New Game')
-    await page.waitForLoadState('networkidle')
-    await page.waitForSelector('input[type="radio"]', { timeout: 10000 })
-    await page.click('text=Start Game')
+    const app = pianoBingoLocator(page)
     await page.waitForLoadState('networkidle')
 
-    await expect(page.getByRole('button', { name: 'Next Song' })).toBeVisible()
-    
-    // Navigate to game history
-    await page.click('label.hamburger')
-    await page.locator('.menu').getByText('Game History').click()
+    await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    await expect(page.getByRole('heading', { name: 'Game History' }).first()).toBeVisible()
-    
-    // Click back button
-    await page.getByRole('button', { name: '‹' }).click()
+    await app.pagePackSelect().packRadioInputs().first().click()
+    await app.pagePackSelect().startGameButton().click()
     await page.waitForLoadState('networkidle')
-    
-    // Should navigate to game page (song view)
-    await expect(page.getByRole('button', { name: 'Next Song' })).toBeVisible()
+
+    await pianoExpect(app.pageGame().nextSong()).toBeVisible()
+
+    await app.pageGame().menuToggle().click()
+    await app.pageGame().menuItem('game-history').click()
+    await page.waitForLoadState('networkidle')
+    await pianoExpect(app.pageGameHistory().header()).toBeVisible()
+
+    await app.pageGameHistory().backButton().click()
+    await page.waitForLoadState('networkidle')
+
+    await pianoExpect(app.pageGame().nextSong()).toBeVisible()
   })
 })

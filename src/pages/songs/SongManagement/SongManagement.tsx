@@ -46,8 +46,9 @@ export default function SongManagement(){
 
   return (
     <PageLayout
+      rootTestId="page-song-management"
       header={<Header title="Manage Songs" backAction={() => { startNewGame(); loadPage(PAGE_NAME.WELCOME) }} />}
-      footer={<PrimaryActionFooter label="New Song" onClick={handleCreateNewSong} />}
+      footer={<PrimaryActionFooter label="New Song" actionId="create-song" onClick={handleCreateNewSong} />}
     >
       <PlaylistContainer>
         {songs.map(song => {
@@ -56,21 +57,22 @@ export default function SongManagement(){
             <PlaylistRow
               key={song.songId}
               value={song.title}
+              rowTestId={`row-${song.songId}`}
               onRename={(newName) => handleRenameSong(song.songId, newName)}
               actions={(
                 <>
                   {hasPdf ? (
                     <>
-                      <IconButton className="pdf-btn" onClick={() => handleViewSong(song.songId)} icon="📄" label="View" />
-                      <IconButton className="remove-pdf-btn" onClick={() => void handleClearSongPdf(song.songId)} icon="❌" label="PDF" />
+                      <IconButton className="pdf-btn" actionId={`view-song-${song.songId}`} onClick={() => handleViewSong(song.songId)} icon="📄" label="View" />
+                      <IconButton className="remove-pdf-btn" actionId={`remove-pdf-${song.songId}`} onClick={() => void handleClearSongPdf(song.songId)} icon="❌" label="PDF" />
                     </>
                   ) : (
                     <>
-                      <label className="pdf-upload-label" htmlFor={`upload-${song.songId}`}>📤 Upload PDF</label>
-                      <input id={`upload-${song.songId}`} type="file" accept="application/pdf" className="pdf-upload" onChange={(e) => { const f = e.currentTarget.files?.[0]; if (f) void handleUpload(f, song.songId) }} />
+                      <label data-testid={`upload-pdf-label-${song.songId}`} className="pdf-upload-label" htmlFor={`upload-${song.songId}`}>📤 Upload PDF</label>
+                      <input data-testid={`pdf-input-${song.songId}`} id={`upload-${song.songId}`} type="file" accept="application/pdf" className="pdf-upload" onChange={(e) => { const f = e.currentTarget.files?.[0]; if (f) void handleUpload(f, song.songId) }} />
                     </>
                   )}
-                  <IconButton className="delete-btn" onClick={() => void handleDeleteSong(song.songId)} icon="🗑️" />
+                  <IconButton className="delete-btn" actionId={`delete-song-${song.songId}`} onClick={() => void handleDeleteSong(song.songId)} icon="🗑️" />
                 </>
               )}
             />

@@ -12,7 +12,7 @@ export default function PlaylistContainer({ children, containerId, className, co
   const classes = className ? `playlist-container ${className}` : 'playlist-container'
 
   return (
-    <div id={containerId} ref={containerRef} className={classes} style={style}>
+    <div id={containerId} data-testid="list" ref={containerRef} className={classes} style={style}>
       {children}
     </div>
   )

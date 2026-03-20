@@ -51,6 +51,7 @@ export default function Game(){
   return (
     <PageLayout
       rootClassName="pdf-page"
+      rootTestId="page-game"
       header={(
         <GameHeader
           songIndex={songIndex}

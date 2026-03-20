@@ -20,20 +20,21 @@ export default function GameMenu({ actions }: GameMenuProps) {
   }
 
   return (
-    <div className="checkboxNav">
+    <div className="checkboxNav" data-testid="menu-wrapper">
       <div className="checkBoxBox">
-        <input type="checkbox" id="menu-toggle" />
-        <label className="hamburger" htmlFor="menu-toggle">
+        <input type="checkbox" id="menu-toggle" data-testid="menu-toggle-checkbox" />
+        <label className="hamburger" htmlFor="menu-toggle" data-testid="menu-toggle">
           <span className="bar"></span>
           <span className="bar"></span>
           <span className="bar"></span>
         </label>
-        <div className="menu">
+        <div className="menu" data-testid="menu">
           {actions.map((action) => (
             <a
               key={action.id}
               href="#"
               className={action.className}
+              data-action={action.id}
               onClick={(event) => handleActionClick(event, action)}
             >
               {action.label}

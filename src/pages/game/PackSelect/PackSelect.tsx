@@ -34,6 +34,7 @@ export default function PackSelect(){
   return (
     <PageLayout
       rootClassName="p-4"
+      rootTestId="page-pack-select"
       header={<PackSelectHeader onBack={handleBack} />}
       skipMainWrapper
     >
@@ -42,7 +43,7 @@ export default function PackSelect(){
       <div className="flex-col mb-40">
         <PackRadioGroup packs={packs} selectedPackId={selected} onSelectPack={setSelected} />
       </div>
-      <button className="select-button" onClick={handleStartGame}>Start Game</button>
+      <button className="select-button" data-action="start-game" onClick={handleStartGame}>Start Game</button>
       <img className="piano-banner" src="/resources/images/piano.png" />
     </PageLayout>
   )

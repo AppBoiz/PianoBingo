@@ -18,7 +18,7 @@ export default function GameHeader({
   onEndGame,
 }: GameHeaderProps) {
   return (
-    <nav>
+    <nav data-testid="header">
       <div style={{ width: '121px' }}></div>
       <h1 id="title">
         {songIndex > 0 ? `${songIndex} - ${songTitle}` : songTitle}

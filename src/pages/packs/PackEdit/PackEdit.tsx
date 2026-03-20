@@ -87,6 +87,7 @@ export default function PackEdit() {
 
   return (
     <PageLayout
+      rootTestId="page-pack-edit"
       header={(
         <Header
           title="Edit Pack"
@@ -94,7 +95,7 @@ export default function PackEdit() {
           rightContent={<div id="song-counter">{selectedCount}/{PACK_SIZE}</div>}
         />
       )}
-      footer={<PrimaryActionFooter label="Ok" disabled={!isPackComplete} onClick={handleSave} />}
+      footer={<PrimaryActionFooter label="Ok" actionId="save-pack" disabled={!isPackComplete} onClick={handleSave} />}
     >
       <PlaylistContainer containerRef={containerRef} style={{ flexGrow: 1 }}>
         {songsSortedByPackOrder.map(song => {

@@ -17,7 +17,7 @@ export default function WelcomeActionGroup({ logo, actions, banner }: WelcomeAct
     <>
       <div className="logo-container">{logo}</div>
       {actions.map((action) => (
-        <button key={action.id} onClick={action.onClick}>{action.label}</button>
+        <button key={action.id} data-action={action.id} onClick={action.onClick}>{action.label}</button>
       ))}
       {banner}
     </>

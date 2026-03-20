@@ -9,6 +9,7 @@ export default function EditableTextInput({ value, onCommit, ...inputProps }: Ed
   return (
     <input
       {...inputProps}
+      data-testid="input"
       defaultValue={value}
       onBlur={(event) => onCommit(event.currentTarget.value)}
     />

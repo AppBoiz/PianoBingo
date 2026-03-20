@@ -158,9 +158,9 @@ export default function PDFViewer({ base64 }: Props){
 
   return (
     <div>
-      <div id="pdf-viewer" ref={containerRef} style={{height: 'calc(100vh - 140px)'}}>
-        <span className="left" onClick={() => setCurrentPage(p => Math.max(1, p-1))} />
-        <span className="right" onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} />
+      <div id="pdf-viewer" data-testid="pdf-viewer" ref={containerRef} style={{height: 'calc(100vh - 140px)'}}>
+        <span data-testid="pdf-prev-page-zone" className="left" onClick={() => setCurrentPage(p => Math.max(1, p-1))} />
+        <span data-testid="pdf-next-page-zone" className="right" onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} />
       </div>
     </div>
   )

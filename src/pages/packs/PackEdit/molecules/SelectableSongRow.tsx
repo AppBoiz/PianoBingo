@@ -27,13 +27,15 @@ export default function SelectableSongRow({
   return (
     <div
       className={`playlist-row ${isSelected ? '' : 'unchecked'}`}
+      data-testid={`row-${songId}`}
       data-song-id={songId}
       onClick={handleRowClick}
     >
-      <span className="drag-handle">{position ?? '\u00A0'}</span>
-      <span className="playlist-name">{title}</span>
+      <span className="drag-handle" data-testid="handle">{position ?? '\u00A0'}</span>
+      <span className="playlist-name" data-testid="name">{title}</span>
       <CheckboxControl
         className="playlist-checkbox"
+        data-testid="checkbox"
         checked={isSelected}
         onChange={onToggle}
       />

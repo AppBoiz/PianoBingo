@@ -5,6 +5,7 @@ interface PageLayoutProps {
   footer?: ReactNode
   children: ReactNode
   rootId?: string
+  rootTestId?: string
   rootClassName?: string
   mainClassName?: string
   skipMainWrapper?: boolean
@@ -15,14 +16,15 @@ export default function PageLayout({
   footer,
   children,
   rootId = 'app',
+  rootTestId,
   rootClassName,
   mainClassName = 'main-content',
   skipMainWrapper = false,
 }: PageLayoutProps) {
   return (
-    <div id={rootId} className={rootClassName}>
+    <div id={rootId} className={rootClassName} data-testid={rootTestId}>
       {header}
-      {skipMainWrapper ? children : <div className={mainClassName}>{children}</div>}
+      {skipMainWrapper ? children : <div className={mainClassName} data-testid="body">{children}</div>}
       {footer}
     </div>
   )

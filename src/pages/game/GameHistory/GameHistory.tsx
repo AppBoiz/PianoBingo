@@ -13,11 +13,12 @@ export default function GameHistory(){
   return (
     <PageLayout
       rootClassName="game-history-root"
+      rootTestId="page-game-history"
       header={<Header title="Game History" backAction={() => loadPage(PAGE_NAME.GAME)} withContainers={false} />}
       skipMainWrapper
     >
       {!pack ? (
-        <div style={{ textAlign: 'center', marginTop: '40px', color: '#6b7280' }}>
+        <div data-testid="empty-state" style={{ textAlign: 'center', marginTop: '40px', color: '#6b7280' }}>
           No active game. Start a game to see history.
         </div>
       ) : (

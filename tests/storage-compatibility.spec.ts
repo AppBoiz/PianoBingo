@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { pianoBingoLocator } from './support/locators'
 
 test.describe('Storage Compatibility Tests', () => {
   
@@ -56,12 +57,12 @@ test.describe('Storage Compatibility Tests', () => {
   })
 
   test('default gameState has null selectedSongPackId', async ({ page }) => {
+    const app = pianoBingoLocator(page)
     await page.goto('/')
     await page.waitForLoadState('domcontentloaded')
     
     // Click "New Game" which calls startNewGame()
-    await page.waitForSelector('button:has-text("New Game")', { timeout: 5000 })
-    await page.click('button:has-text("New Game")')
+    await app.pageWelcome().action('new-game').click()
     await page.waitForTimeout(1000)
 
     // Verify gameState structure

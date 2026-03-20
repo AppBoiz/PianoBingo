@@ -34,6 +34,7 @@ export default function PackManagement(){
 
   return (
     <PageLayout
+      rootTestId="page-pack-management"
       header={<Header title="Manage Playlists" backAction={() => loadPage(PAGE_NAME.WELCOME)} />}
       footer={<PackManagementFooter onCreateNewPack={handleCreateNewPack} />}
     >
@@ -42,11 +43,12 @@ export default function PackManagement(){
           <PlaylistRow
             key={pack.packId}
             value={pack.packName || ''}
+            rowTestId={`row-${pack.packId}`}
             onRename={(newName) => handleRenamePack(pack.packId, newName)}
             actions={(
               <>
-                <IconButton className="edit-btn" onClick={() => handleEditPack(pack.packId)} icon="✏️" />
-                <IconButton className="delete-btn" onClick={() => handleDeletePack(pack.packId)} icon="🗑️" />
+                <IconButton className="edit-btn" actionId={`edit-pack-${pack.packId}`} onClick={() => handleEditPack(pack.packId)} icon="✏️" />
+                <IconButton className="delete-btn" actionId={`delete-pack-${pack.packId}`} onClick={() => handleDeletePack(pack.packId)} icon="🗑️" />
               </>
             )}
           />

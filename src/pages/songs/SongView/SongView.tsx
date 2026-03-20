@@ -36,6 +36,7 @@ export default function SongView(){
   return (
     <PageLayout
       rootClassName="pdf-page"
+      rootTestId="page-song-view"
       header={(
         <SongViewHeader title={songTitle} onBack={handleBack} />
       )}

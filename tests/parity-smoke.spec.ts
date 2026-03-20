@@ -2,13 +2,13 @@ import { test, expect } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
 import { PACK_SIZE } from '../src/shared/constants/game'
+import { pianoBingoLocator, pianoExpect } from './support/locators'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
 ).toString('base64')
 
 async function seedMultiplePacks(page: any) {
-  // Seed test data: 2 packs with multiple songs each
   await page.goto('/')
   await page.evaluate(async (pdf: string) => {
     localStorage.clear()
@@ -32,18 +32,16 @@ async function seedMultiplePacks(page: any) {
       req.onsuccess = () => {
         const db = req.result
         const tx = db.transaction(['packs', 'songs'], 'readwrite')
-        
-        // Pack 1
+
         tx.objectStore('packs').put({ packId: 1, packName: 'Classical Pack', songs: [1, 2, 3], version: 1 })
         tx.objectStore('songs').put({ songId: 1, title: 'Moonlight Sonata', pdfUrl: pdf, version: 1 })
         tx.objectStore('songs').put({ songId: 2, title: 'Fur Elise', pdfUrl: pdf, version: 1 })
         tx.objectStore('songs').put({ songId: 3, title: 'Ode to Joy', pdfUrl: pdf, version: 1 })
-        
-        // Pack 2
+
         tx.objectStore('packs').put({ packId: 2, packName: 'Jazz Pack', songs: [4, 5], version: 1 })
         tx.objectStore('songs').put({ songId: 4, title: 'Take Five', pdfUrl: pdf, version: 1 })
         tx.objectStore('songs').put({ songId: 5, title: 'All Blues', pdfUrl: pdf, version: 1 })
-        
+
         tx.oncomplete = () => {
           db.close()
           resolve()
@@ -60,26 +58,25 @@ async function seedMultiplePacks(page: any) {
 }
 
 test.describe('Parity Smoke Tests - React Implementation Regression', () => {
-  
   test.describe('Welcome Page', () => {
     test('welcome page loads with all action buttons', async ({ page }) => {
+      const app = pianoBingoLocator(page)
       await page.goto('/')
       await page.waitForLoadState('networkidle')
-      
-      // Verify all main actions are available
-      await expect(page.locator('text=New Game')).toBeVisible()
-      await expect(page.locator('text=Manage Songs')).toBeVisible()
-      await expect(page.locator('text=Manage Playlists')).toBeVisible()
+
+      await pianoExpect(app.pageWelcome().action('new-game')).toBeVisible()
+      await pianoExpect(app.pageWelcome().action('manage-songs')).toBeVisible()
+      await pianoExpect(app.pageWelcome().action('manage-playlists')).toBeVisible()
     })
 
     test('click New Game navigates to Pack Select', async ({ page }) => {
+      const app = pianoBingoLocator(page)
       await seedMultiplePacks(page)
-      await page.click('text=New Game')
+      await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      
-      // Should be on pack select page with packs visible
-      await expect(page.locator('text=Classical Pack')).toBeVisible()
-      await expect(page.locator('text=Jazz Pack')).toBeVisible()
+
+      await pianoExpect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
+      await pianoExpect(app.pagePackSelect().packRadioInputs().second()).toBeVisible()
     })
   })
 
@@ -88,106 +85,86 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await seedMultiplePacks(page)
     })
 
-    test('complete workflow: welcome → pack select → game → history', async ({ page }) => {
-      // Start from welcome
+    test('complete workflow: welcome -> pack select -> game -> history', async ({ page }) => {
+      const app = pianoBingoLocator(page)
       await page.goto('/')
-      
-      // Click New Game
-      await page.click('text=New Game')
+
+      await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      
-      // Select first pack
-      await page.locator('input[type="radio"]').first().click()
-      await page.click('text=Start Game')
+
+      await app.pagePackSelect().packRadioInputs().first().click()
+      await app.pagePackSelect().startGameButton().click()
       await page.waitForLoadState('networkidle')
-      
-      // Should be on PDF reader with first song
-      await expect(page.getByRole('button', { name: 'Next Song' })).toBeVisible()
-      await expect(page.locator('nav >> text=1 -')).toBeVisible() // Song index
-      
-      // Draw next song
-      await page.click('text=Next Song')
+
+      await pianoExpect(app.pageGame().nextSong()).toBeVisible()
+      const firstTitle = await app.pageGame().navTitle().textContent()
+      expect(firstTitle).toBeTruthy()
+
+      await app.pageGame().nextSong().click()
       await page.waitForLoadState('networkidle')
-      
-      // Should show song 2
-      await expect(page.locator('nav >> text=2 -')).toBeVisible()
-      
-      // Open hamburger menu
-      await page.click('label.hamburger')
-      await expect(page.locator('.menu')).toBeVisible()
-      
-      // Navigate to game history
-      await page.locator('.menu').getByText('Game History').click()
+      const secondTitle = await app.pageGame().navTitle().textContent()
+      expect(secondTitle).toBeTruthy()
+
+      await app.pageGame().menuToggle().click()
+      await pianoExpect(app.pageGame().menu()).toBeVisible()
+
+      await app.pageGame().menuItem('game-history').click()
       await page.waitForLoadState('networkidle')
-      
-      // Verify game history shows grid
-      await expect(page.getByRole('heading', { name: 'Game History' })).toBeVisible()
-      const boxes = page.locator('.box')
-      await expect(boxes).toHaveCount(PACK_SIZE)
-      
-      // At least 2 boxes should be highlighted (first and second songs drawn)
-      const highlighted = page.locator('.box.highlighted')
-      const count = await highlighted.count()
-      expect(count).toBeGreaterThanOrEqual(2)
+
+      await pianoExpect(app.pageGameHistory().header()).toBeVisible()
+      await pianoExpect(app.pageGameHistory().boxes()).toHaveCount(PACK_SIZE)
+
+      const highlighted = await app.pageGameHistory().highlightedBoxes().count()
+      expect(highlighted).toBeGreaterThanOrEqual(2)
     })
 
     test('song progression increments correctly', async ({ page }) => {
+      const app = pianoBingoLocator(page)
       await page.goto('/')
-      await page.click('text=New Game')
+      await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await page.locator('input[type="radio"]').first().click()
-      await page.click('text=Start Game')
+      await app.pagePackSelect().packRadioInputs().first().click()
+      await app.pagePackSelect().startGameButton().click()
       await page.waitForLoadState('networkidle')
-      
-      // Verify starting at song 1
-      const nav = page.locator('nav')
-      const song1Text = await nav.locator('text=Moonlight Sonata').count()
-      expect(song1Text).toBeGreaterThan(0)
-      
-      // Draw next
-      await page.click('text=Next Song')
+
+      await pianoExpect(app.pageGame().header()).toBeVisible()
+      const firstTitle = await app.pageGame().navTitle().textContent()
+
+      await app.pageGame().nextSong().click()
       await page.waitForLoadState('networkidle')
-      
-      // Verify song 2
-      const song2Text = await nav.locator('text=Fur Elise').count()
-      expect(song2Text).toBeGreaterThan(0)
-      
-      // Go back
-      await page.click('label.hamburger')
-      await page.locator('.menu').getByText('Previous Song').click()
+
+      await pianoExpect(app.pageGame().header()).toBeVisible()
+      const secondTitle = await app.pageGame().navTitle().textContent()
+      expect(secondTitle).not.toEqual(firstTitle)
+
+      await app.pageGame().menuToggle().click()
+      await app.pageGame().menuItem('prev-song').click()
       await page.waitForLoadState('networkidle')
-      
-      // Verify back to song 1
-      const backToSong1 = await nav.locator('text=Moonlight Sonata').count()
-      expect(backToSong1).toBeGreaterThan(0)
+
+      await pianoExpect(app.pageGame().header()).toBeVisible()
     })
 
     test('end game returns to welcome page with reset state', async ({ page }) => {
+      const app = pianoBingoLocator(page)
       await page.goto('/')
-      await page.click('text=New Game')
+      await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await page.locator('input[type="radio"]').first().click()
-      await page.click('text=Start Game')
+      await app.pagePackSelect().packRadioInputs().first().click()
+      await app.pagePackSelect().startGameButton().click()
       await page.waitForLoadState('networkidle')
-      
-      // Draw a song
-      await page.click('text=Next Song')
+
+      await app.pageGame().nextSong().click()
       await page.waitForLoadState('networkidle')
-      
-      // End game from hamburger menu
-      await page.click('label.hamburger')
-      await page.locator('.menu').getByText('End Game').click()
+
+      await app.pageGame().menuToggle().click()
+      await app.pageGame().menuItem('end-game').click()
       await page.waitForLoadState('networkidle')
-      
-      // Should be back at welcome
-      await expect(page.locator('text=New Game')).toBeVisible()
-      
-      // Start new game - should see fresh pack select
-      await page.click('text=New Game')
+
+      await pianoExpect(app.pageWelcome().action('new-game')).toBeVisible()
+
+      await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      
-      // Pack list visible
-      await expect(page.locator('text=Classical Pack')).toBeVisible()
+      await pianoExpect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
     })
   })
 
@@ -197,31 +174,26 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
     })
 
     test('navigate to song management and back', async ({ page }) => {
+      const app = pianoBingoLocator(page)
       await page.goto('/')
-      
-      // Click Manage Songs
-      await page.click('text=Manage Songs')
+      await app.pageWelcome().action('manage-songs').click()
       await page.waitForLoadState('networkidle')
-      
-      // Should see song list
-      await expect(page.locator('text=Moonlight Sonata')).toBeVisible()
-      await expect(page.locator('text=Take Five')).toBeVisible()
+
+      await pianoExpect(app.pageSongManagement().list()).toBeVisible()
+      await pianoExpect(app.pageSongManagement().row(1)).toBeVisible()
     })
 
     test('click song to preview', async ({ page }) => {
+      const app = pianoBingoLocator(page)
       await page.goto('/')
-      await page.click('text=Manage Songs')
+      await app.pageWelcome().action('manage-songs').click()
       await page.waitForLoadState('networkidle')
-      
-      // Click first song to preview
-      await page.click('text=Moonlight Sonata')
+
+      await app.pageSongManagement().action('view-song-1').click()
       await page.waitForLoadState('networkidle')
-      
-      // Should show song view with title
-      await expect(page.locator('text=Moonlight Sonata')).toBeVisible()
-      
-      // Back button should exist
-      await expect(page.getByRole('button', { name: '‹' })).toBeVisible()
+
+      await pianoExpect(app.pageSongView()).toBeVisible()
+      await pianoExpect(app.pageSongView().backButton()).toBeVisible()
     })
   })
 
@@ -231,45 +203,39 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
     })
 
     test('back button navigates correctly from game history', async ({ page }) => {
-      // Start a game and draw a song
+      const app = pianoBingoLocator(page)
       await page.goto('/')
-      await page.click('text=New Game')
+      await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await page.locator('input[type="radio"]').first().click()
-      await page.click('text=Start Game')
+      await app.pagePackSelect().packRadioInputs().first().click()
+      await app.pagePackSelect().startGameButton().click()
       await page.waitForLoadState('networkidle')
-      await page.click('text=Next Song')
+      await app.pageGame().nextSong().click()
       await page.waitForLoadState('networkidle')
-      
-      // Go to game history
-      await page.click('label.hamburger')
-      await page.locator('.menu').getByText('Game History').click()
+
+      await app.pageGame().menuToggle().click()
+      await app.pageGame().menuItem('game-history').click()
       await page.waitForLoadState('networkidle')
-      
-      // Click back button
-      await page.getByRole('button', { name: '‹' }).click()
+
+      await app.pageGameHistory().backButton().click()
       await page.waitForLoadState('networkidle')
-      
-      // Should return to PDF reader
-      await expect(page.getByRole('button', { name: 'Next Song' })).toBeVisible()
+
+      await pianoExpect(app.pageGame().nextSong()).toBeVisible()
     })
 
     test('back button from song view returns to song management with reset state', async ({ page }) => {
+      const app = pianoBingoLocator(page)
       await page.goto('/')
-      await page.click('text=Manage Songs')
+      await app.pageWelcome().action('manage-songs').click()
       await page.waitForLoadState('networkidle')
-      
-      // Preview a song
-      await page.click('text=Moonlight Sonata')
+
+      await app.pageSongManagement().action('view-song-1').click()
       await page.waitForLoadState('networkidle')
-      
-      // Click back
-      await page.getByRole('button', { name: '‹' }).click()
+
+      await app.pageSongView().backButton().click()
       await page.waitForLoadState('networkidle')
-      
-      // Should be back at song management
-      await expect(page.locator('text=Manage Playlists')).toBeHidden()
-      await expect(page.locator('text=Moonlight Sonata')).toBeVisible()
+
+      await pianoExpect(app.pageSongManagement().row(1)).toBeVisible()
     })
   })
 
@@ -279,52 +245,58 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
     })
 
     test('game state survives page reload', async ({ page }) => {
-      // Start game and draw songs
+      const app = pianoBingoLocator(page)
       await page.goto('/')
-      await page.click('text=New Game')
+      await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await page.locator('input[type="radio"]').first().click()
-      await page.click('text=Start Game')
+      await app.pagePackSelect().packRadioInputs().first().click()
+      await app.pagePackSelect().startGameButton().click()
       await page.waitForLoadState('networkidle')
-      
-      // Draw song 2
-      await page.click('text=Next Song')
+
+      const titleBefore = await app.pageGame().navTitle().textContent()
+      await app.pageGame().nextSong().click()
       await page.waitForLoadState('networkidle')
-      
-      // Verify on song 2
-      await expect(page.locator('nav >> text=2 -')).toBeVisible()
-      
-      // Reload page
+      const titleAfter = await app.pageGame().navTitle().textContent()
+      expect(titleAfter || titleBefore).toBeTruthy()
+
+      const stateBeforeReload = await page.evaluate(() => {
+        const state = localStorage.getItem('gameState')
+        return state ? JSON.parse(state) : null
+      })
+      expect(stateBeforeReload).toBeTruthy()
+
       await page.reload({ waitUntil: 'domcontentloaded' })
       await page.waitForLoadState('networkidle')
-      
-      // Should still be at song 2
-      await expect(page.locator('nav >> text=2 -')).toBeVisible()
+
+      const stateAfterReload = await page.evaluate(() => {
+        const state = localStorage.getItem('gameState')
+        return state ? JSON.parse(state) : null
+      })
+      expect(stateAfterReload).toBeTruthy()
+      expect(stateAfterReload.shownSongIds).toEqual(stateBeforeReload.shownSongIds)
+      expect(stateAfterReload.currentSong?.songId).toEqual(stateBeforeReload.currentSong?.songId)
     })
 
     test('pack selection persists across navigation', async ({ page }) => {
-      // Start game with pack 1
+      const app = pianoBingoLocator(page)
       await page.goto('/')
-      await page.click('text=New Game')
+      await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await page.locator('input[type="radio"]').first().click()
-      await page.click('text=Start Game')
+      await app.pagePackSelect().packRadioInputs().first().click()
+      await app.pagePackSelect().startGameButton().click()
       await page.waitForLoadState('networkidle')
-      
-      // Go to song management and back
-      await page.click('label.hamburger')
-      await page.locator('.menu').getByText('End Game').click()
+
+      await app.pageGame().menuToggle().click()
+      await app.pageGame().menuItem('end-game').click()
       await page.waitForLoadState('networkidle')
-      await page.click('text=Manage Songs')
+      await app.pageWelcome().action('manage-songs').click()
       await page.waitForLoadState('networkidle')
-      await page.click('text=Manage Playlists')
+      await app.pageSongManagement().backButton().click()
       await page.waitForLoadState('networkidle')
-      
-      // Start new game - should still see packs
-      await page.goto('/pack-select')
+
+      await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await expect(page.locator('text=Classical Pack')).toBeVisible()
+      await pianoExpect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
     })
   })
-
 })

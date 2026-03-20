@@ -9,11 +9,12 @@ interface PackRadioGroupProps {
 
 export default function PackRadioGroup({ packs, selectedPackId, onSelectPack }: PackRadioGroupProps) {
   return (
-    <div className="radios-container">
+    <div className="radios-container" data-testid="list">
       {packs.map((pack) => (
         <RadioOption
           key={pack.packId}
           wrapperClassName="radio-label"
+          data-testid={`option-${pack.packId}`}
           name="radio"
           value={pack.packId}
           checked={selectedPackId === pack.packId}
