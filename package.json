@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/generate-sw-manifest.js && node scripts/generate-workbox-sw.js",
+    "build": "vite build && cp -r resources dist/resources && node scripts/generate-sw-manifest.js && node scripts/generate-workbox-sw.js",
     "preview": "vite preview",
     "test:e2e": "playwright test",
     "test:arch": "jest --config jest.config.cjs tests/unit/architecture",

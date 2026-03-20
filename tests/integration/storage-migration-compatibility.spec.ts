@@ -79,9 +79,77 @@ test.describe('Storage compatibility and migration', () => {
     expect(gameState.currentSong.songId).toBeNull()
   })
 
-  test.skip('base seed data uses version 1', async () => {
-    // TODO: Fix this test - encountering "Execution context destroyed" timing issues.
-    // The functionality is tested manually and works correctly.
+  test('base seed data uses version 1', async ({ page }) => {
+    // beforeEach cleared the DB and left the page in a post-boot state where
+    // firstTimeOpeningDB === false. Reload to get a fresh module state so that
+    // the next openDB() call triggers seeding again.
+    const consoleLogs: string[] = []
+    page.on('console', msg => consoleLogs.push(msg.text()))
+
+    await page.goto('/')
+
+    // Wait for preloaded data to be ready before triggering IDB seeding
+    await expect(async () => {
+      expect(consoleLogs.join('\n')).toContain('Preloaded data initialized')
+    }).toPass({ timeout: 10000 })
+
+    // Navigate to pack management to trigger openDB() → IDB seeding
+    await page.evaluate(() => {
+      window.history.pushState({}, '', '/pack-management')
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    })
+
+    // Poll until both stores are seeded and all records have version === 1
+    // Uses page.evaluate inside expect().toPass() — the correct pattern for
+    // Promise-based browser checks (see CODING_AGENT_CONTEXT §"Build fix" note).
+    type VersionCheck = { packsAllV1: boolean; songsAllV1: boolean; packsCount: number; songsCount: number }
+    let result: VersionCheck | null = null
+
+    await expect(async () => {
+      try {
+        result = await page.evaluate(() => {
+          return new Promise<VersionCheck | null>((resolve) => {
+            const req = indexedDB.open('PianoBingoDB', 1)
+            req.onsuccess = () => {
+              const db = req.result
+              let packs: any[] = [], songs: any[] = [], remaining = 2
+
+              function finish() {
+                if (--remaining === 0) {
+                  db.close()
+                  if (packs.length !== 2 || songs.length !== 150) { resolve(null); return }
+                  resolve({
+                    packsCount: packs.length,
+                    songsCount: songs.length,
+                    packsAllV1: packs.every((p: any) => p.version === 1),
+                    songsAllV1: songs.every((s: any) => s.version === 1),
+                  })
+                }
+              }
+
+              const pt = db.transaction('packs', 'readonly')
+              const pr = pt.objectStore('packs').getAll()
+              pr.onsuccess = () => { packs = pr.result; finish() }
+              pr.onerror = () => { db.close(); resolve(null) }
+
+              const st = db.transaction('songs', 'readonly')
+              const sr = st.objectStore('songs').getAll()
+              sr.onsuccess = () => { songs = sr.result; finish() }
+              sr.onerror = () => { db.close(); resolve(null) }
+            }
+            req.onerror = () => resolve(null)
+          })
+        })
+      } catch {
+        result = null // context destroyed by SW clientsClaim — will retry
+      }
+      expect(result).not.toBeNull()
+    }).toPass({ timeout: 30000 })
+
+    expect(result!.packsAllV1).toBe(true)
+    expect(result!.songsAllV1).toBe(true)
+    expect(result!.packsCount).toBe(2)
+    expect(result!.songsCount).toBe(150)
   })
 
   test('migration preserves all gameState fields', async ({ page }) => {

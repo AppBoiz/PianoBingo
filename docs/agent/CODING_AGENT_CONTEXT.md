@@ -1,6 +1,6 @@
 # PianoBingo — Coding Agent Context
 
-Last updated: 2026-03-18 (service layer extraction)
+Last updated: 2026-03-20 (build fix — resources copied to dist; integration test fixes)
 
 ## 0) Meta: Keeping this context file current
 
@@ -73,7 +73,8 @@ Current page entry files:
 ### 4.1 Offline usage and caching
 
 Build pipeline generates a Workbox service worker for production output:
-- Build scripts: `npm run build` runs Vite build + `scripts/generate-sw-manifest.js` + `scripts/generate-workbox-sw.js`.
+- Build scripts: `npm run build` runs Vite build + `cp -r resources dist/resources` + `scripts/generate-sw-manifest.js` + `scripts/generate-workbox-sw.js`.
+- **`resources/` must be in `dist/`**: Vite only copies `public/` automatically. The `resources/` folder (base64 PDFs, images, PDF files) is at the project root and is explicitly copied by the build script. Without this, all `fetch('/resources/...')` calls return 404 at runtime, `initializePreloadedData()` fails silently, `pdfMap` stays empty, and no PDF lookup-key like `'t2t9h8uF'` can ever resolve.
 - Output SW: `dist/service-worker.js` (this is what production app registers from `src/main.tsx`).
 
 Current runtime caching strategy (Workbox-generated):
@@ -94,6 +95,7 @@ Current runtime caching strategy (Workbox-generated):
 
 - IndexedDB (`src/shared/storage/indexedDb.ts`) stores songs/packs and is designed to preserve legacy schema expectations.
 - localStorage game state mirrors legacy helper model (`resources/state-helpers/gameStorage.js`) for continuity.
+- **IDB seeding is lazy**: `openDB()` is the entry point for seeding — it runs once (guarded by `firstTimeOpeningDB`) and seeds packs/songs from `window.BASE_PACK_DATA` / `window.BASE_SONG_DATA`. However, `openDB()` is only called on the first actual IDB access from a React component (e.g. `loadAllPacks()` in `PackManagement`). Simply loading the welcome page does **not** trigger seeding.
 - Compatibility-sensitive changes must preserve:
   - DB name/object store names/keys and migration behavior.
   - localStorage key names and expected field shapes.
@@ -121,6 +123,8 @@ Rules:
 - Base64 source resolution and legacy fallback loading are in `src/shared/services/pdf/pdfSourceService.ts`.
 - Canvas creation and PDF page rendering are in `pdfDocumentService.ts`; `PDFViewer.tsx` delegates all DOM/PDF.js API calls to these services.
 - PDF diagnostic flags (`window.__PDF_LOADED__`, `window.__PDF_RENDERED__`, `window.__PDF_RENDER_ERROR__`) are now written exclusively through `src/shared/services/runtime/windowGlobals.ts`.
+- **PDF URL resolution flow**: Songs in IndexedDB store short variable-name keys (e.g. `'t2t9h8uF'`) as `pdfUrl`, not raw base64. `resolvePdfBase64()` in `pdfSourceService.ts` looks the key up in `pdfMap` (populated at boot by `initializePreloadedData()`). If the value already starts with `'JVBERi0'` (PDF base64 prefix), it is returned directly. This means both raw base64 and lookup keys are valid `pdfUrl` values.
+- **The PDF viewer route is `/game` (or `/song-view/:id`)**: there is no `/pdf-reader` route in `src/App.tsx`. Tests or code that tries to navigate to `/pdf-reader` will get a 404/blank page.
 
 ### 4.5 Service layer — browser / runtime API boundaries
 
@@ -325,6 +329,43 @@ Covers all critical workflows with 16+ test cases:
 - ✅ **Offline Functionality** smoke test: App loads offline (service worker functionality)
 
 Ready to run: `npm run test:e2e -- tests/parity-smoke.spec.ts`
+
+### Build fix and integration test fixes (2026-03-20) ✅
+
+**Root cause: `resources/` not copied to `dist/`**
+
+The `resources/` directory (base64 PDFs, images, PDF files) was missing from `dist/` because Vite only copies `public/` automatically. This meant:
+- `fetch('/resources/...')` returned 404 in production/test builds.
+- `initializePreloadedData()` caught the error silently, leaving `pdfMap` empty.
+- All PDF lookup keys (e.g. `'t2t9h8uF'`) failed to resolve → `resolvePdfBase64()` returned `null` → "Loading PDF…" shown everywhere.
+- "Preloaded data initialized" was never logged, causing the DB preload test to time out.
+
+Fix: added `cp -r resources dist/resources` to the `build` script in `package.json`.
+
+**Integration test fixes**
+
+- `tests/integration/database-preload-initialization.spec.ts`: After confirming "Preloaded data initialized", navigate in-SPA to `/pack-management` (via `pushState`+`popstate`) to mount `PackManagement` and trigger `loadAllPacks()` → `openDB()` → IDB seeding. Then use `page.waitForFunction` (which retries on SW-triggered context destruction) polling until both stores reach their exact expected counts (2 packs, 150 songs).
+- `tests/integration/offline-pdf-caching.spec.ts`: Removed the manual IDB seeding workaround and `fs.readFileSync` of the PDF file. The test now sets localStorage game state pointing at song 1 and lets the real app data flow (pdfMap lookup chain) handle PDF resolution, both online (initial render) and offline (SW-cached assets). The target route changed from `/pdf-reader` (does not exist) to `/game`.
+
+**Service worker `clientsClaim()`, `page.evaluate`, and `page.waitForFunction`**
+
+The production SW uses `skipWaiting()` + `clientsClaim()`. When `clientsClaim()` fires after the page loads, Playwright can interpret it as a navigation and destroy a `page.evaluate` execution context mid-flight.
+
+**Critical gotcha — `waitForFunction` + Promise-returning functions (2026-03-20):** `page.waitForFunction` does **not** await Promises returned by the polling function. When the browser-side function returns a `new Promise(...)`, Playwright evaluates whether the return value is truthy — and a `Promise` object is always truthy, regardless of what it eventually resolves to. As a result, `waitForFunction` resolves immediately with a `JSHandle` pointing to the unresolved/pending Promise object. Calling `.jsonValue()` on that handle returns `null` because a Promise is not JSON-serializable. This causes intermittent test failures: when data is already seeded the Promise resolves synchronously (or quickly enough to look truthy), but when seeding is still in progress it resolves to `null`, the handle is still truthy (it's a Promise), and `jsonValue()` returns `null`.
+
+**Correct pattern for polling with a Promise-based browser check:** Use `page.evaluate` (which properly awaits Promises and returns the resolved value to Node.js) inside `expect(async () => { ... }).toPass({ timeout })`. Wrap the `page.evaluate` call in a `try/catch` and set `result = null` on any exception — when `clientsClaim()` fires it throws `"Execution context was destroyed"` which must be treated as "not ready yet" rather than a hard failure. When the evaluated result is falsy/wrong, the `expect` inside throws, and `toPass()` retries the whole async block until the timeout. This is the canonical pattern used in `tests/integration/database-preload-initialization.spec.ts` and `tests/integration/storage-migration-compatibility.spec.ts`:
+
+```ts
+let result: MyType | null = null
+await expect(async () => {
+  try {
+    result = await page.evaluate(() => new Promise<MyType | null>(resolve => { ... }))
+  } catch {
+    result = null // SW clientsClaim destroyed context — retry
+  }
+  expect(result).not.toBeNull()
+}).toPass({ timeout: 30000 })
+```
 
 ### Service layer extraction (2026-03-18) ✅
 

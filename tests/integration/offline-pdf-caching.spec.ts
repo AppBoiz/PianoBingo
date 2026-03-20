@@ -1,8 +1,4 @@
 import { test, expect } from '@playwright/test'
-import fs from 'fs'
-import path from 'path'
-
-const pdfPath = path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
 
 test.describe('Service Worker Offline PDF Caching', () => {
   /**
@@ -81,26 +77,28 @@ test.describe('Service Worker Offline PDF Caching', () => {
   })
 
   test('pdf viewer renders correctly in offline mode', async ({ page, context }) => {
-    const base64 = fs.readFileSync(pdfPath).toString('base64')
-
     await page.goto('/')
     await waitForServiceWorker(page)
 
-    // Set up a game state with a PDF so the viewer has content to render
-    await page.evaluate((pdf: string) => {
+    // Set up game state pointing at song 1. getCurrentSong() reads currentSong.songId
+    // from localStorage and loads the song record from IndexedDB — the IDB record
+    // is seeded by the app on first openDB() call with the base song data including
+    // the correct pdfUrl lookup key, which resolves via the populated pdfMap.
+    await page.evaluate(() => {
       const gameState = {
         selectedSongPackId: 1,
         shownSongIds: [1],
-        currentSong: { songId: 1, title: 'Test Song', pdfUrl: pdf }
+        currentSong: { songId: 1, title: 'Colours in her Hair' }
       }
       localStorage.setItem('gameState', JSON.stringify(gameState))
       ;(window as any).__PDF_RENDERED__ = false
       ;(window as any).__PDF_RENDER_ERROR__ = null
-    }, base64)
+    })
 
-    // Navigate to the PDF viewer while still online to verify baseline render
+    // Navigate to the game page (which contains PDFViewer) while still online to verify baseline render.
+    // /pdf-reader is not a React Router route; /game is the equivalent viewer in the current app.
     await page.evaluate(() => {
-      window.history.pushState({}, '', '/pdf-reader')
+      window.history.pushState({}, '', '/game')
       window.dispatchEvent(new PopStateEvent('popstate'))
     })
     await page.waitForSelector('#pdf-viewer', { state: 'attached', timeout: 30000 })
@@ -121,7 +119,7 @@ test.describe('Service Worker Offline PDF Caching', () => {
 
     await page.goto('/', { waitUntil: 'domcontentloaded' })
     await page.evaluate(() => {
-      window.history.pushState({}, '', '/pdf-reader')
+      window.history.pushState({}, '', '/game')
       window.dispatchEvent(new PopStateEvent('popstate'))
     })
     await page.waitForSelector('#pdf-viewer', { state: 'attached', timeout: 30000 })
