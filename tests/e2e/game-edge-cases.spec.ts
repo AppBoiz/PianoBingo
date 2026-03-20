@@ -6,7 +6,7 @@
 import { test, expect } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { pianoBingoLocator, pianoExpect } from './support/locators'
+import { pianoBingoLocator, pianoExpect } from '../support/locators'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -96,7 +96,6 @@ test.describe('Direct navigation without game state', () => {
   test('/game without game state renders without crash', async ({ page }) => {
     const app = pianoBingoLocator(page)
     // RISK 1.1: No route guards — navigating directly to /game should never throw a JS exception.
-    // The page shows a blank/loading PDF viewer because no song is loaded, but must not crash.
     const errors: string[] = []
     page.on('pageerror', (err) => errors.push(err.message))
 
@@ -107,17 +106,13 @@ test.describe('Direct navigation without game state', () => {
     })
     await page.waitForLoadState('networkidle')
 
-    // No JS exceptions
     expect(errors).toHaveLength(0)
-
-    // The root app shell should still render
     await pianoExpect(app).toBeVisible()
   })
 
   test('/game-history without game state shows "No active game"', async ({ page }) => {
     const app = pianoBingoLocator(page)
-    // RISK 1.3: Navigating directly to /game-history without a selected pack should show
-    // a graceful message rather than an error or blank screen.
+    // RISK 1.3: Navigating directly to /game-history without a selected pack shows a graceful message.
     await page.goto('/')
     await page.evaluate(() => {
       window.history.pushState({}, '', '/game-history')
@@ -144,7 +139,6 @@ test.describe('Direct navigation without game state', () => {
     await page.waitForLoadState('networkidle')
 
     expect(errors).toHaveLength(0)
-    // Page must render something — at minimum the layout shell
     await pianoExpect(app).toBeVisible()
   })
 })
@@ -163,7 +157,6 @@ test.describe('Pack exhaustion', () => {
     const errors: string[] = []
     page.on('pageerror', (err) => errors.push(err.message))
 
-    // Start game — sole song is drawn
     await app.pageWelcome().action('new-game').click()
     await app.pagePackSelect().packRadioInputs().first().click()
     await page.waitForLoadState('networkidle')
@@ -177,9 +170,7 @@ test.describe('Pack exhaustion', () => {
     await app.pageGame().nextSong().click()
     await page.waitForLoadState('networkidle')
 
-    // No crash
     expect(errors).toHaveLength(0)
-    // Nav bar still visible — page did not unmount
     await pianoExpect(app.pageGame().header()).toBeVisible()
   })
 })
@@ -195,12 +186,11 @@ test.describe('Hamburger menu behaviour', () => {
     await seedSingleSongPack(page)
   })
 
-  test('menu closes after clicking a menu item', async ({ page }) => {
+  test('menu closes after each menu item click', async ({ page }) => {
     const app = pianoBingoLocator(page)
     // BUG: Before the fix, the #menu-toggle checkbox was never unchecked after an action
-    // click, leaving the menu visually open.
+    // click, leaving the menu visually open. Verify the fix holds across multiple open/close cycles.
 
-    // Start a game so the game page (which has the hamburger) is shown
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
     await app.pagePackSelect().packRadioInputs().first().click()
@@ -208,32 +198,7 @@ test.describe('Hamburger menu behaviour', () => {
     await page.waitForLoadState('networkidle')
     await pianoExpect(app.pageGame().nextSong()).toBeVisible()
 
-    // Open the hamburger menu
-    await app.pageGame().menuToggle().click()
-    await pianoExpect(app.pageGame().menu()).toBeVisible()
-
-    // Click "Next Song" from inside the menu
-    await app.pageGame().menuItem('next-song').click()
-    await page.waitForLoadState('networkidle')
-
-    // The checkbox must be unchecked
-    const isChecked = await page.evaluate(() => {
-      const toggle = document.getElementById('menu-toggle') as HTMLInputElement | null
-      return toggle?.checked ?? true
-    })
-    expect(isChecked).toBe(false)
-  })
-
-  test('multiple sequential menu opens and closes work correctly', async ({ page }) => {
-    const app = pianoBingoLocator(page)
-    await app.pageWelcome().action('new-game').click()
-    await page.waitForLoadState('networkidle')
-    await app.pagePackSelect().packRadioInputs().first().click()
-    await app.pagePackSelect().startGameButton().click()
-    await page.waitForLoadState('networkidle')
-    await pianoExpect(app.pageGame().nextSong()).toBeVisible()
-
-    // First open/use
+    // First cycle: open menu, click "Next Song"
     await app.pageGame().menuToggle().click()
     await pianoExpect(app.pageGame().menu()).toBeVisible()
     await app.pageGame().menuItem('next-song').click()
@@ -244,7 +209,7 @@ test.describe('Hamburger menu behaviour', () => {
     })
     expect(isChecked).toBe(false)
 
-    // Second open/use — should work after the first close
+    // Second cycle: open menu again, click "Prev Song" — must also close
     await app.pageGame().menuToggle().click()
     await pianoExpect(app.pageGame().menu()).toBeVisible()
     await app.pageGame().menuItem('prev-song').click()
@@ -265,14 +230,12 @@ test.describe('Data deletion during active game', () => {
   test('deleting the currently-playing song then returning to game does not crash', async ({ page }) => {
     const app = pianoBingoLocator(page)
     // RISK 4.2: User deletes a song from song management while that song is actively
-    // being played. The game page receives a null from getCurrentSong() and must
-    // handle it gracefully rather than throwing.
+    // being played. The game page must handle it gracefully.
     await seedTwoSongPack(page)
 
     const errors: string[] = []
     page.on('pageerror', (err) => errors.push(err.message))
 
-    // Start a game — song 1 ("First Song") is current
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
     await app.pagePackSelect().packRadioInputs().first().click()
@@ -295,7 +258,6 @@ test.describe('Data deletion during active game', () => {
       })
     })
 
-    // Navigate away and back to /game to trigger a re-load of the current song
     await page.goto('/')
     await page.waitForLoadState('networkidle')
     await page.evaluate(() => {
@@ -304,22 +266,18 @@ test.describe('Data deletion during active game', () => {
     })
     await page.waitForLoadState('networkidle')
 
-    // No JS exceptions — the app must not crash
     expect(errors).toHaveLength(0)
-    // Nav bar still visible — React tree is intact
     await pianoExpect(app.pageGame().header()).toBeVisible()
   })
 
   test('deleting the active pack then returning to game does not crash', async ({ page }) => {
     const app = pianoBingoLocator(page)
     // RISK 4.3: User deletes the entire pack that is currently selected for the game.
-    // generateSong() will return null; the game page must not crash.
     await seedTwoSongPack(page)
 
     const errors: string[] = []
     page.on('pageerror', (err) => errors.push(err.message))
 
-    // Start a game with pack 1
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
     await app.pagePackSelect().packRadioInputs().first().click()
@@ -342,7 +300,7 @@ test.describe('Data deletion during active game', () => {
       })
     })
 
-    // Attempt to advance song — this calls generateSong() which now can't find the pack
+    // Attempt to advance song — generateSong() can now not find the pack
     await app.pageGame().nextSong().click()
     await page.waitForLoadState('networkidle')
 

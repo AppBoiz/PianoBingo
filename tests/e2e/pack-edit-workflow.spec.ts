@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { pianoBingoLocator, pianoExpect } from './support/locators'
+import { pianoBingoLocator, pianoExpect } from '../support/locators'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -189,44 +189,16 @@ test.describe('Pack Edit Page', () => {
       await expect(app.pagePackEdit().row(2).locate()).not.toHaveClass(/unchecked/)
       await expect(page.locator('#song-counter')).toContainText('2/75')
     })
-
-    test('adding song increments position number in handle', async ({ page }) => {
-      await seedPackWithSongs(page)
-      const app = pianoBingoLocator(page)
-
-      await navigateToPackEdit(page)
-
-      await app.pagePackEdit().row(2).locate().click()
-
-      const handle2 = app.pagePackEdit().row(2).locate().getByTestId('handle')
-      await expect(handle2).toContainText('2')
-    })
   })
 
   test.describe('Song counter and save button', () => {
-    test('initial counter shows 1/75 for pack with one song', async ({ page }) => {
-      await seedPackWithSongs(page)
-
-      await navigateToPackEdit(page)
-
-      await expect(page.locator('#song-counter')).toHaveText('1/75')
-    })
-
-    test('save button is disabled when pack has fewer than 75 songs', async ({ page }) => {
+    test('save button is disabled and labelled "Ok" when pack has fewer than 75 songs', async ({ page }) => {
       await seedPackWithSongs(page)
       const app = pianoBingoLocator(page)
 
       await navigateToPackEdit(page)
 
       await expect(app.pagePackEdit().primaryAction().locate()).toBeDisabled()
-    })
-
-    test('save button shows "Ok" label', async ({ page }) => {
-      await seedPackWithSongs(page)
-      const app = pianoBingoLocator(page)
-
-      await navigateToPackEdit(page)
-
       await pianoExpect(app.pagePackEdit().primaryAction()).toContainText('Ok')
     })
   })

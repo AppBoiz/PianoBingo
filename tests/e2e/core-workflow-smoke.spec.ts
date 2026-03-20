@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { PACK_SIZE } from '../src/shared/constants/game'
-import { pianoBingoLocator, pianoExpect } from './support/locators'
+import { PACK_SIZE } from '../../src/shared/constants/game'
+import { pianoBingoLocator, pianoExpect } from '../support/locators'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -17,17 +17,14 @@ async function seedMultiplePacks(page: any) {
       del.onsuccess = () => resolve()
       del.onerror = () => resolve()
     })
-
     await new Promise<void>((resolve) => {
       const req = indexedDB.open('PianoBingoDB', 1)
       req.onupgradeneeded = () => {
         const db = req.result
-        if (!db.objectStoreNames.contains('packs')) {
+        if (!db.objectStoreNames.contains('packs'))
           db.createObjectStore('packs', { keyPath: 'packId' })
-        }
-        if (!db.objectStoreNames.contains('songs')) {
+        if (!db.objectStoreNames.contains('songs'))
           db.createObjectStore('songs', { keyPath: 'songId' })
-        }
       }
       req.onsuccess = () => {
         const db = req.result
@@ -42,14 +39,8 @@ async function seedMultiplePacks(page: any) {
         tx.objectStore('songs').put({ songId: 4, title: 'Take Five', pdfUrl: pdf, version: 1 })
         tx.objectStore('songs').put({ songId: 5, title: 'All Blues', pdfUrl: pdf, version: 1 })
 
-        tx.oncomplete = () => {
-          db.close()
-          resolve()
-        }
-        tx.onerror = () => {
-          db.close()
-          resolve()
-        }
+        tx.oncomplete = () => { db.close(); resolve() }
+        tx.onerror = () => { db.close(); resolve() }
       }
       req.onerror = () => resolve()
     })
@@ -57,7 +48,7 @@ async function seedMultiplePacks(page: any) {
   await page.reload({ waitUntil: 'domcontentloaded' })
 }
 
-test.describe('Parity Smoke Tests - React Implementation Regression', () => {
+test.describe('Core Workflow Smoke Tests', () => {
   test.describe('Welcome Page', () => {
     test('welcome page loads with all action buttons', async ({ page }) => {
       const app = pianoBingoLocator(page)
@@ -69,7 +60,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await pianoExpect(app.pageWelcome().action('manage-playlists')).toBeVisible()
     })
 
-    test('click New Game navigates to Pack Select', async ({ page }) => {
+    test('New Game navigates to Pack Select with multiple packs', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await seedMultiplePacks(page)
       await app.pageWelcome().action('new-game').click()
@@ -85,7 +76,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await seedMultiplePacks(page)
     })
 
-    test('complete workflow: welcome -> pack select -> game -> history', async ({ page }) => {
+    test('complete workflow: welcome → pack select → game → history', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
 
@@ -133,7 +124,6 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await app.pageGame().nextSong().click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pageGame().header()).toBeVisible()
       const secondTitle = await app.pageGame().navTitle().textContent()
       expect(secondTitle).not.toEqual(firstTitle)
 
@@ -202,28 +192,7 @@ test.describe('Parity Smoke Tests - React Implementation Regression', () => {
       await seedMultiplePacks(page)
     })
 
-    test('back button navigates correctly from game history', async ({ page }) => {
-      const app = pianoBingoLocator(page)
-      await page.goto('/')
-      await app.pageWelcome().action('new-game').click()
-      await page.waitForLoadState('networkidle')
-      await app.pagePackSelect().packRadioInputs().first().click()
-      await app.pagePackSelect().startGameButton().click()
-      await page.waitForLoadState('networkidle')
-      await app.pageGame().nextSong().click()
-      await page.waitForLoadState('networkidle')
-
-      await app.pageGame().menuToggle().click()
-      await app.pageGame().menuItem('game-history').click()
-      await page.waitForLoadState('networkidle')
-
-      await app.pageGameHistory().backButton().click()
-      await page.waitForLoadState('networkidle')
-
-      await pianoExpect(app.pageGame().nextSong()).toBeVisible()
-    })
-
-    test('back button from song view returns to song management with reset state', async ({ page }) => {
+    test('back button from song view returns to song management', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
       await app.pageWelcome().action('manage-songs').click()

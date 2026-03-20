@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { pianoBingoLocator, pianoExpect } from './support/locators'
+import { pianoBingoLocator, pianoExpect } from '../support/locators'
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {

@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { PACK_SIZE } from '../src/shared/constants/game'
-import { pianoBingoLocator, pianoExpect } from './support/locators'
+import { PACK_SIZE } from '../../src/shared/constants/game'
+import { pianoBingoLocator, pianoExpect } from '../support/locators'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -17,31 +17,22 @@ async function seedPackAndSong(page: any) {
       del.onsuccess = () => resolve()
       del.onerror = () => resolve()
     })
-
     await new Promise<void>((resolve) => {
       const req = indexedDB.open('PianoBingoDB', 1)
       req.onupgradeneeded = () => {
         const db = req.result
-        if (!db.objectStoreNames.contains('packs')) {
+        if (!db.objectStoreNames.contains('packs'))
           db.createObjectStore('packs', { keyPath: 'packId' })
-        }
-        if (!db.objectStoreNames.contains('songs')) {
+        if (!db.objectStoreNames.contains('songs'))
           db.createObjectStore('songs', { keyPath: 'songId' })
-        }
       }
       req.onsuccess = () => {
         const db = req.result
         const tx = db.transaction(['packs', 'songs'], 'readwrite')
         tx.objectStore('packs').put({ packId: 1, packName: 'Test Pack', songs: [1], version: 1 })
         tx.objectStore('songs').put({ songId: 1, title: 'Test Song', pdfUrl: pdf, version: 1 })
-        tx.oncomplete = () => {
-          db.close()
-          resolve()
-        }
-        tx.onerror = () => {
-          db.close()
-          resolve()
-        }
+        tx.oncomplete = () => { db.close(); resolve() }
+        tx.onerror = () => { db.close(); resolve() }
       }
       req.onerror = () => resolve()
     })
@@ -49,7 +40,7 @@ async function seedPackAndSong(page: any) {
   await page.reload({ waitUntil: 'domcontentloaded' })
 }
 
-test.describe('GameHistory Page', () => {
+test.describe('Game History Page', () => {
   test.beforeEach(async ({ page }) => {
     await seedPackAndSong(page)
   })
@@ -60,7 +51,6 @@ test.describe('GameHistory Page', () => {
 
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
-
     await app.pagePackSelect().packRadioInputs().first().click()
     await app.pagePackSelect().startGameButton().click()
     await page.waitForLoadState('networkidle')
@@ -83,7 +73,7 @@ test.describe('GameHistory Page', () => {
     await pianoExpect(app.pageGameHistory().box(PACK_SIZE)).toHaveText(String(PACK_SIZE))
   })
 
-  test('shows message when no active game', async ({ page }) => {
+  test('shows empty state message when no active game', async ({ page }) => {
     const app = pianoBingoLocator(page)
     await page.waitForLoadState('networkidle')
 
@@ -93,10 +83,11 @@ test.describe('GameHistory Page', () => {
       window.dispatchEvent(new PopStateEvent('popstate'))
     })
     await page.waitForLoadState('networkidle')
+
     await pianoExpect(app.pageGameHistory().emptyState()).toBeVisible()
   })
 
-  test('back button navigates to game page', async ({ page }) => {
+  test('back button returns to game page', async ({ page }) => {
     const app = pianoBingoLocator(page)
     await page.waitForLoadState('networkidle')
 

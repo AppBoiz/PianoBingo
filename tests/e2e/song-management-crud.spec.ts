@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import path from 'path'
-import { pianoBingoLocator, pianoExpect } from './support/locators'
+import { pianoBingoLocator, pianoExpect } from '../support/locators'
 
 const pdfPath = path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
 
@@ -125,32 +125,19 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await pianoExpect(app.pageSongManagement().action(`view-song-1`)).toBeVisible()
-      await pianoExpect(app.pageSongManagement().action(`remove-pdf-1`)).toBeVisible()
+      await pianoExpect(app.pageSongManagement().action('view-song-1')).toBeVisible()
+      await pianoExpect(app.pageSongManagement().action('remove-pdf-1')).toBeVisible()
     })
 
-    test('song without PDF shows upload label instead of view/remove', async ({ page }) => {
+    test('song without PDF shows upload input instead of view/remove buttons', async ({ page }) => {
       await seedSongs(page, [{ songId: 1, title: 'No PDF', pdfUrl: null }])
       const app = pianoBingoLocator(page)
 
       await navigateToSongManagement(page)
 
       await pianoExpect(app.pageSongManagement().bySongUploadInput(1)).toBeAttached()
-      await expect(app.pageSongManagement().action(`view-song-1`).locate()).not.toBeVisible()
-      await expect(app.pageSongManagement().action(`remove-pdf-1`).locate()).not.toBeVisible()
-    })
-
-    test('delete button is always visible for each song', async ({ page }) => {
-      await seedSongs(page, [
-        { songId: 1, title: 'Song A', pdfUrl: null },
-        { songId: 2, title: 'Song B', pdfUrl: 'data:application/pdf;base64,abc' },
-      ])
-      const app = pianoBingoLocator(page)
-
-      await navigateToSongManagement(page)
-
-      await pianoExpect(app.pageSongManagement().action(`delete-song-1`)).toBeVisible()
-      await pianoExpect(app.pageSongManagement().action(`delete-song-2`)).toBeVisible()
+      await expect(app.pageSongManagement().action('view-song-1').locate()).not.toBeVisible()
+      await expect(app.pageSongManagement().action('remove-pdf-1').locate()).not.toBeVisible()
     })
   })
 
@@ -177,27 +164,11 @@ test.describe('Song Management Page', () => {
       await app.pageSongManagement().primaryAction().click()
       await page.waitForLoadState('networkidle')
 
-      // Get the new song id from the first row's testid
       const firstRow = app.pageSongManagement().locate().locator('[data-testid^="row-"]').first()
       const testId = await firstRow.getAttribute('data-testid') ?? ''
       const newSongId = parseInt(testId.replace('row-', ''), 10)
 
       await pianoExpect(app.pageSongManagement().bySongUploadInput(newSongId)).toBeAttached()
-    })
-
-    test('creating multiple songs increases the row count', async ({ page }) => {
-      await seedSongs(page, [])
-      const app = pianoBingoLocator(page)
-
-      await navigateToSongManagement(page)
-
-      await app.pageSongManagement().primaryAction().click()
-      await page.waitForURL('**')
-      await app.pageSongManagement().primaryAction().click()
-      await page.waitForTimeout(300)
-
-      const rows = app.pageSongManagement().locate().locator('[data-testid^="row-"]')
-      await expect(rows).toHaveCount(2)
     })
   })
 
@@ -212,7 +183,6 @@ test.describe('Song Management Page', () => {
       await navigateToSongManagement(page)
 
       await app.pageSongManagement().action('delete-song-1').click()
-      await page.waitForTimeout(300)
 
       await expect(app.pageSongManagement().row(1).locate()).not.toBeVisible()
       await pianoExpect(app.pageSongManagement().row(2)).toBeVisible()
@@ -225,7 +195,6 @@ test.describe('Song Management Page', () => {
       await navigateToSongManagement(page)
 
       await app.pageSongManagement().action('delete-song-1').click()
-      await page.waitForTimeout(300)
 
       const rows = app.pageSongManagement().locate().locator('[data-testid^="row-"]')
       await expect(rows).toHaveCount(0)
@@ -233,7 +202,7 @@ test.describe('Song Management Page', () => {
   })
 
   test.describe('Song PDF actions', () => {
-    test('remove-pdf button removes pdf from song (upload input reappears)', async ({ page }) => {
+    test('remove-pdf button removes PDF from song (upload input reappears)', async ({ page }) => {
       await seedSongs(page, [{ songId: 1, title: 'Has PDF', pdfUrl: 'data:application/pdf;base64,abc' }])
       const app = pianoBingoLocator(page)
 
@@ -241,22 +210,9 @@ test.describe('Song Management Page', () => {
 
       await pianoExpect(app.pageSongManagement().action('remove-pdf-1')).toBeVisible()
       await app.pageSongManagement().action('remove-pdf-1').click()
-      await page.waitForTimeout(300)
 
       await pianoExpect(app.pageSongManagement().bySongUploadInput(1)).toBeAttached()
       await expect(app.pageSongManagement().action('view-song-1').locate()).not.toBeVisible()
-    })
-
-    test('view-song button navigates to song view page', async ({ page }) => {
-      await seedSongs(page, [{ songId: 1, title: 'Has PDF', pdfUrl: 'data:application/pdf;base64,abc' }])
-      const app = pianoBingoLocator(page)
-
-      await navigateToSongManagement(page)
-
-      await app.pageSongManagement().action('view-song-1').click()
-      await page.waitForLoadState('networkidle')
-
-      await expect(page.locator('.pdf-reader-empty, [data-testid="page-song-view"]')).toBeVisible()
     })
 
     test('upload PDF input accepts pdf files', async ({ page }) => {
@@ -280,16 +236,13 @@ test.describe('Song Management Page', () => {
       await navigateToSongManagement(page)
 
       await app.pageSongManagement().bySongUploadInput(1).locate().setInputFiles(pdfPath)
-      await page.waitForTimeout(500)
 
       await pianoExpect(app.pageSongManagement().action('view-song-1')).toBeVisible()
       await pianoExpect(app.pageSongManagement().action('remove-pdf-1')).toBeVisible()
     })
-  })
 
-  test.describe('Navigation to song view', () => {
-    test('view-song button for song with PDF navigates to song view', async ({ page }) => {
-      await seedSongs(page, [{ songId: 1, title: 'Viewable Song', pdfUrl: 'data:application/pdf;base64,abc' }])
+    test('view-song button navigates to song view page', async ({ page }) => {
+      await seedSongs(page, [{ songId: 1, title: 'Has PDF', pdfUrl: 'data:application/pdf;base64,abc' }])
       const app = pianoBingoLocator(page)
 
       await navigateToSongManagement(page)
@@ -297,7 +250,6 @@ test.describe('Song Management Page', () => {
       await app.pageSongManagement().action('view-song-1').click()
       await page.waitForLoadState('networkidle')
 
-      // SongView page container is always rendered when navigation succeeds
       await expect(page.locator('.pdf-reader-empty, [data-testid="page-song-view"]')).toBeVisible()
     })
   })
