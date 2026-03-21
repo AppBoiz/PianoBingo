@@ -41,10 +41,12 @@ export default function PackSelectPage(){
     >
       <h1>Create New Game</h1>
       <h2>Select Song Pack</h2>
-      <div className="flex-col mb-40">
+      <div className="pack-list-shell flex-col mb-40">
         <PackRadioGroup packs={packs} selectedPackId={selected} onSelectPack={setSelected} />
       </div>
-      <button className="select-button" data-action="start-game" onClick={handleStartGame}>Start Game</button>
+      <div className="pack-select-footer">
+        <button className="select-button" data-action="start-game" onClick={handleStartGame}>Start Game</button>
+      </div>
       <img className="piano-banner" src="/resources/images/piano.png" />
     </PageLayout>
   )

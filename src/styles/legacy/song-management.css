@@ -249,7 +249,7 @@
 }
 
 .song-management-page-root .piano-banner{
-  position: absolute;
+  position: fixed;
   bottom: -100px;
   right:-500px;
   transform: rotate(-45deg);

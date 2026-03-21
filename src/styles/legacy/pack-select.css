@@ -1,18 +1,28 @@
 .pack-select-page-root {
     margin: 0;
     padding: 0;
+    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
+    overflow-x: hidden;
+    position: relative;
+    isolation: isolate;
     font-family: 'Inter', sans-serif;
     background: white;
     color: #333;
     text-align: center;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
 .pack-select-page-root h1 {
     font-size: 45px;
     font-family: 'Inter', sans-serif;
     color: black;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
 }
 
 .pack-select-page-root h2 {
@@ -20,13 +30,20 @@
     color: #7F7F7F;
     margin-top:60px;
     margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
 }
 
 .pack-select-page-root .back-container{
-    width: 100%;
+    width: auto;
     padding: 30px 40px;
     display: flex;
     align-items: center;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
 }
 
 .pack-select-page-root .back-container button{
@@ -40,17 +57,39 @@
 }
 
 .pack-select-page-root .piano-banner{
-    position: absolute;
+    position: fixed;
     bottom: -100px;
     right:-500px;
     transform: rotate(-45deg);
-    z-index: -100;
+    z-index: 0;
+    pointer-events: none;
 }
 
 .pack-select-page-root .flex-col{
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.pack-select-page-root .pack-list-shell {
+    flex: 0 1 auto;
+    min-height: 0;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    justify-content: flex-start;
+}
+
+.pack-select-page-root .pack-select-footer {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    z-index: 1;
 }
 
 .pack-select-page-root .mb-40{
@@ -64,6 +103,7 @@
     font-size: 25px;
     font-family: 'Inter', sans-serif;
     width: fit-content;
+    margin: 0 auto;
 }
 
 .pack-select-page-root .radio-label{
@@ -84,5 +124,10 @@
     font-size: 25px;
     font-family: 'Inter', sans-serif;
     margin-top: 50px;
+    margin-bottom: 24px;
+    align-self: center;
     cursor: pointer;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
 }
