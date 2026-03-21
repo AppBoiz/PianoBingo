@@ -6,6 +6,7 @@ interface GameHeaderProps {
   onNextSong: () => void
   onPreviousSong: () => void
   canGoPrevious: boolean
+  canGoNext: boolean
   onOpenGameHistory: () => void
   onEndGame: () => void
 }
@@ -16,6 +17,7 @@ export default function GamePageHeader({
   onNextSong,
   onPreviousSong,
   canGoPrevious,
+  canGoNext,
   onOpenGameHistory,
   onEndGame,
 }: GameHeaderProps) {
@@ -28,7 +30,7 @@ export default function GamePageHeader({
       <div style={{ width: '121px' }}>
         <GameMenu
           actions={[
-            { id: 'next-song', label: 'Next Song', onClick: onNextSong },
+            { id: 'next-song', label: 'Next Song', onClick: onNextSong, disabled: !canGoNext },
             { id: 'prev-song', label: 'Previous Song', onClick: onPreviousSong, disabled: !canGoPrevious },
             { id: 'game-history', label: 'Game History', onClick: onOpenGameHistory },
             { id: 'end-game', label: 'End Game', className: 'red', onClick: onEndGame },

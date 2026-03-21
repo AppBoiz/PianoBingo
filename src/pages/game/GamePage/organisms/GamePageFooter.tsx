@@ -1,11 +1,12 @@
 interface GameFooterProps {
   onNextSong: () => void
+  disabled?: boolean
 }
 
-export default function GamePageFooter({ onNextSong }: GameFooterProps) {
+export default function GamePageFooter({ onNextSong, disabled = false }: GameFooterProps) {
   return (
     <footer data-testid="footer">
-      <button data-action="next-song" onClick={onNextSong}>Next Song</button>
+      <button data-action="next-song" disabled={disabled} onClick={onNextSong}>Next Song</button>
     </footer>
   )
 }

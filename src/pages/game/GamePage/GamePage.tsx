@@ -41,6 +41,52 @@ function useCurrentSongPositionInSelectedPack(song: { songId: number; pdfUrl: st
   return songIndex
 }
 
+function useGameNavigationAvailability(song: { songId: number } | null | undefined) {
+  const [availability, setAvailability] = useState({ canGoPrevious: false, canGoNext: false })
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadAvailability = async () => {
+      if (!song) {
+        setAvailability({ canGoPrevious: false, canGoNext: false })
+        return
+      }
+
+      const shownSongIds = getShownSongIds()
+      const currentIndex = shownSongIds.findIndex(id => id === song.songId)
+      const selectedPackId = getSelectedSongPackId()
+
+      if (!selectedPackId) {
+        setAvailability({ canGoPrevious: currentIndex > 0, canGoNext: false })
+        return
+      }
+
+      const packData = await loadPack(selectedPackId)
+      if (cancelled) {
+        return
+      }
+
+      const packSongIds = packData?.songs ?? []
+      const hasNextInHistory = currentIndex !== -1 && currentIndex < shownSongIds.length - 1
+      const hasUnseenSongRemaining = packSongIds.some(id => !shownSongIds.includes(id))
+
+      setAvailability({
+        canGoPrevious: currentIndex > 0,
+        canGoNext: hasNextInHistory || hasUnseenSongRemaining,
+      })
+    }
+
+    void loadAvailability()
+
+    return () => {
+      cancelled = true
+    }
+  }, [song])
+
+  return availability
+}
+
 export default function GamePage(){
   const { loadPage } = useNavigation()
   const { song, base64, songTitle, nextSong, prevSong } = useLoadedSong(getCurrentSong, [], {
@@ -48,7 +94,7 @@ export default function GamePage(){
     loadPrevSong: loadPrevSongFromStorage,
   })
   const songIndex = useCurrentSongPositionInSelectedPack(song)
-  const canGoPrevious = song ? getShownSongIds().findIndex(id => id === song.songId) > 0 : false
+  const { canGoPrevious, canGoNext } = useGameNavigationAvailability(song)
 
   return (
     <PageLayout
@@ -61,12 +107,13 @@ export default function GamePage(){
           onNextSong={nextSong}
           onPreviousSong={prevSong}
           canGoPrevious={canGoPrevious}
+          canGoNext={canGoNext}
           onOpenGameHistory={() => loadPage(PAGE_NAME.GAME_HISTORY)}
           onEndGame={() => loadPage(PAGE_NAME.WELCOME)}
         />
       )}
       footer={(
-        <GamePageFooter onNextSong={nextSong} />
+        <GamePageFooter onNextSong={nextSong} disabled={!canGoNext} />
       )}
       skipMainWrapper
     >

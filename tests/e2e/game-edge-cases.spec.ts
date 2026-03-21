@@ -244,6 +244,24 @@ test.describe('Hamburger menu behaviour', () => {
     await expect(game.menuItem('prev-song')).toHaveAttribute('aria-disabled', 'true')
     await expect(game.navTitle()).toContainText('Solo Song')
   })
+
+  test('next song is disabled when there are no songs left in the pack', async ({ page }) => {
+    const app = pianoBingoLocator(page)
+
+    await app.welcomePage().action('new-game').click()
+    await page.waitForLoadState('networkidle')
+    const packSelect = app.packSelectPage()
+    await packSelect.packRadioInputs().first().click()
+    await packSelect.startGameButton().click()
+    await page.waitForLoadState('networkidle')
+
+    const game = app.gamePage()
+    await expect(game.nextSong()).toBeDisabled()
+
+    await game.menuToggle().click()
+    await expect(game.menu()).toBeVisible()
+    await expect(game.menuItem('next-song')).toHaveAttribute('aria-disabled', 'true')
+  })
 })
 
 // ---------------------------------------------------------------------------
