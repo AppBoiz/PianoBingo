@@ -60,41 +60,48 @@ export function openDB(): Promise<IDBDatabase> {
       if (firstTimeOpeningDB) {
         firstTimeOpeningDB = false
 
-        // Try to seed with legacy globals if available (migration safe)
+        // Seed from preloaded globals using the already-open `db` connection.
+        // Avoids opening extra connections (which can throw when the SW fires
+        // clientsClaim() mid-open and silently swallow seeding via the catch below).
         try {
-          const packs = await loadAllPacks()
           const basePackData = getBasePackData()
+          const baseSongData = getBaseSongData()
 
           if (basePackData.length) {
-            for (const BASE_PACK of basePackData) {
-              const existing = packs.find(p => p.packId === BASE_PACK.packId)
-              if (!existing || (existing.version ?? 0) < (BASE_PACK.version ?? 0)) {
-                // Seed directly without incrementing version
-                const db2 = await openDB()
-                const tx = db2.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode)
-                const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS)
-                store.put(normalizePack(BASE_PACK))
-                await waitForTransaction(tx)
-                db2.close()
+            const existingPacks = await requestToPromise(
+              db.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ as IDBTransactionMode)
+                .objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS).getAll() as IDBRequest<Pack[]>
+            )
+            const packsToSeed = basePackData.filter(BASE_PACK => {
+              const existing = existingPacks.find(p => p.packId === BASE_PACK.packId)
+              return !existing || (existing.version ?? 0) < (BASE_PACK.version ?? 0)
+            })
+            if (packsToSeed.length > 0) {
+              const packTx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.PACKS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode)
+              const packStore = packTx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.PACKS)
+              for (const BASE_PACK of packsToSeed) {
+                packStore.put(normalizePack(BASE_PACK))
               }
+              await waitForTransaction(packTx)
             }
           }
 
-          const songs = await loadAllSongs()
-          const baseSongData = getBaseSongData()
-
           if (baseSongData.length) {
-            for (const BASE_SONG of baseSongData) {
-              const existing = songs.find(s => s.songId === BASE_SONG.songId)
-              if (!existing || (existing.version ?? 0) < (BASE_SONG.version ?? 0)) {
-                // Seed directly without incrementing version
-                const db2 = await openDB()
-                const tx = db2.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode)
-                const store = tx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS)
-                store.put(BASE_SONG)
-                await waitForTransaction(tx)
-                db2.close()
+            const existingSongs = await requestToPromise(
+              db.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ as IDBTransactionMode)
+                .objectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS).getAll() as IDBRequest<Song[]>
+            )
+            const songsToSeed = baseSongData.filter(BASE_SONG => {
+              const existing = existingSongs.find(s => s.songId === BASE_SONG.songId)
+              return !existing || (existing.version ?? 0) < (BASE_SONG.version ?? 0)
+            })
+            if (songsToSeed.length > 0) {
+              const songTx = db.transaction(INDEXED_BD_CONFIG.SCHEMAS.SONGS, DB_TRANSACTION_TYPES.READ_WRITE as IDBTransactionMode)
+              const songStore = songTx.objectStore(INDEXED_BD_CONFIG.SCHEMAS.SONGS)
+              for (const BASE_SONG of songsToSeed) {
+                songStore.put(BASE_SONG)
               }
+              await waitForTransaction(songTx)
             }
           }
         } catch (err) {

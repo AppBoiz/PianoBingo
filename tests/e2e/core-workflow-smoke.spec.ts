@@ -88,11 +88,13 @@ test.describe('Core Workflow Smoke Tests', () => {
       await page.waitForLoadState('networkidle')
 
       await pianoExpect(app.pageGame().nextSong()).toBeVisible()
+      await pianoExpect(app.pageGame().navTitle()).not.toBeEmpty()
       const firstTitle = await app.pageGame().navTitle().textContent()
       expect(firstTitle).toBeTruthy()
 
       await app.pageGame().nextSong().click()
       await page.waitForLoadState('networkidle')
+      await pianoExpect(app.pageGame().navTitle()).not.toBeEmpty()
       const secondTitle = await app.pageGame().navTitle().textContent()
       expect(secondTitle).toBeTruthy()
 
@@ -119,13 +121,20 @@ test.describe('Core Workflow Smoke Tests', () => {
       await page.waitForLoadState('networkidle')
 
       await pianoExpect(app.pageGame().header()).toBeVisible()
+      await pianoExpect(app.pageGame().navTitle()).not.toBeEmpty()
       const firstTitle = await app.pageGame().navTitle().textContent()
 
       await app.pageGame().nextSong().click()
-      await page.waitForLoadState('networkidle')
-
-      const secondTitle = await app.pageGame().navTitle().textContent()
-      expect(secondTitle).not.toEqual(firstTitle)
+      // Poll until the nav title settles on a different song.
+      // Using toPass (not not.toHaveText) avoids a TOCTOU race where the element
+      // briefly disappears during a React re-render, causing not.toHaveText to pass
+      // prematurely before the new text has been rendered.
+      let secondTitle: string | null = null
+      await expect(async () => {
+        secondTitle = await app.pageGame().navTitle().textContent()
+        expect(secondTitle).not.toBeNull()
+        expect(secondTitle).not.toEqual(firstTitle)
+      }).toPass({ timeout: 10000 })
 
       await app.pageGame().menuToggle().click()
       await app.pageGame().menuItem('prev-song').click()

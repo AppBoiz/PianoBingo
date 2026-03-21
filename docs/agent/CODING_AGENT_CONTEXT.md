@@ -367,6 +367,22 @@ await expect(async () => {
 }).toPass({ timeout: 30000 })
 ```
 
+### IDB seeding reliability fixes (2026-03-21) ✅
+
+**Problem: seeding silently skipped due to extra `openDB()` calls inside the seeding block**
+
+The seeding logic in `openDB()` originally opened a new `openDB()` call per record (150 songs × 1 call each), then was refactored to batch per-store — but still called `openDB()` for each batch. Any of those extra `openDB()` calls can throw when the SW fires `clientsClaim()` mid-open. The surrounding `try/catch` swallowed the error with "Seeding skipped or failed", and `resolve(db)` was called with an empty database. Tests then polled for 30s and never saw data.
+
+**Fix (`src/shared/storage/indexedDb.ts`):** All seeding reads and writes now use the `db` connection that `openIndexedDb()` already opened — no extra `openDB()` calls happen during seeding. Concretely:
+- Replaced `loadAllPacks()` / `loadAllSongs()` (which each call `openDB()` internally) with direct `db.transaction(...).objectStore(...).getAll()` requests via `requestToPromise`.
+- Replaced per-batch `db2 = await openDB()` / `db2.close()` with transactions on the existing `db`.
+
+**Rule:** Never call `openDB()` from within the seeding block that runs inside `openDB()` itself. Always use the already-open `db` parameter for any reads/writes done during seeding.
+
+**Also fixed (2026-03-21): song progression test TOCTOU race (`core-workflow-smoke.spec.ts`)**
+
+`expect(locator).not.toHaveText(firstTitle!)` passes the instant the `nav h1` element disappears during a React re-render — before the new text is rendered. The subsequent `textContent()` then captures the old text. Fix: use `toPass()` to poll `textContent()` atomically within the assertion so the read and the check are never separated.
+
 ### Service layer extraction (2026-03-18) ✅
 
 All raw browser / runtime API calls pulled out of storage, component, and bootstrap code into dedicated service modules:
