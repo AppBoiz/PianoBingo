@@ -68,7 +68,7 @@ export default function GamePage(){
       )}
       skipMainWrapper
     >
-      <PDFViewer base64={base64} />
+      <PDFViewer base64={base64} scaleMode="fit-contain" />
     </PageLayout>
   )
 }
