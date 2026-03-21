@@ -1,6 +1,6 @@
 # PianoBingo — Coding Agent Context
 
-Last updated: 2026-03-20 (build fix — resources copied to dist; integration test fixes)
+Last updated: 2026-03-21
 
 ## 0) Meta: Keeping this context file current
 
@@ -50,14 +50,20 @@ Source organization:
 - `src/shared/services/*` for browser/runtime API service modules (see §4.5)
 
 Current page entry files:
-- `src/pages/game/Game/Game.tsx`
-- `src/pages/game/GameHistory/GameHistory.tsx`
-- `src/pages/game/PackSelect/PackSelect.tsx`
-- `src/pages/packs/PackEdit/PackEdit.tsx`
-- `src/pages/packs/PackManagement/PackManagement.tsx`
-- `src/pages/songs/SongManagement/SongManagement.tsx`
-- `src/pages/songs/SongView/SongView.tsx`
+- `src/pages/game/GamePage/GamePage.tsx`
+- `src/pages/game/GameHistoryPage/GameHistoryPage.tsx`
+- `src/pages/game/PackSelectPage/PackSelectPage.tsx`
+- `src/pages/packs/PackEditPage/PackEditPage.tsx`
+- `src/pages/packs/PackManagementPage/PackManagementPage.tsx`
+- `src/pages/songs/SongManagementPage/SongManagementPage.tsx`
+- `src/pages/songs/SongViewPage/SongViewPage.tsx`
 - `src/pages/welcome/WelcomePage/WelcomePage.tsx`
+
+Page naming conventions:
+- Every route-level page component and its folder ends in `Page` (e.g. `GamePage`, `PackSelectPage`).
+- Page-specific header/footer organisms also end in `Page*` (e.g. `GamePageHeader`, `GamePageFooter`, `PackSelectPageHeader`, `PackManagementPageFooter`, `SongViewPageHeader`).
+- `data-testid` on the root element of each page follows the format `{kebab-name}-page` (e.g. `game-page`, `pack-select-page`, `welcome-page`).
+- Locator builder methods match: `app.gamePage()`, `app.packSelectPage()`, `app.welcomePage()`, etc.
 
 
 ## 3) Feature parity snapshot (important migration status)
@@ -118,7 +124,7 @@ Rules:
 ### 4.3 PDF reader implementation
 
 - React PDF rendering uses `pdfjs-dist` via dynamic import.
-- `src/pages/game/hooks/usePdfSong.ts` centralizes the common song-loading flow used by both `Game` and `SongView`: load a `Song`, derive `pdfUrl`/title state, expose loading state, and provide a `reload()` helper.
+- `src/pages/game/hooks/usePdfSong.ts` centralizes the common song-loading flow used by both `GamePage` and `SongViewPage`: load a `Song`, derive `pdfUrl`/title state, expose loading state, and provide a `reload()` helper.
 - PDF.js worker is initialized once (module-level singleton) in `src/shared/services/pdf/pdfDocumentService.ts` via `GlobalWorkerOptions.workerSrc`; component code never touches `GlobalWorkerOptions` directly.
 - Base64 source resolution and legacy fallback loading are in `src/shared/services/pdf/pdfSourceService.ts`.
 - Canvas creation and PDF page rendering are in `pdfDocumentService.ts`; `PDFViewer.tsx` delegates all DOM/PDF.js API calls to these services.
@@ -167,7 +173,7 @@ Do not refactor structure or selector names casually during migration; layout pa
 - Data/storage: IndexedDB + localStorage.
 - PDF rendering: `pdfjs-dist`.
 - Drag reorder: `sortablejs`.
-- Testing: Playwright E2E (`tests/offline-pdf.spec.ts`, `tests/game-history.spec.ts`, `tests/mobile-viewport.spec.ts`).
+- Testing: Playwright E2E + integration (`tests/e2e/`, `tests/integration/`), Jest unit (`tests/unit/`). Run with `npm run test:all`.
 
 
 ## 6) Deployment model and steps (GitHub Pages/static hosting)
@@ -270,230 +276,19 @@ Each migration PR should include:
 - Test evidence (targeted checks + relevant Playwright run).
 
 
-## 12) Migration checklist
+## 12) Migration status
 
-### Completed ✅
-- **Storage compatibility fixes (2026-02-24)**: Resolved `currentSong.id` → `currentSong.songId` field mismatch between React and legacy surfaces. Added auto-migration in loadGameState(), aligned selectedSongPackId defaults to null, fixed version increment bug in seeding logic. Changes applied to `src/storage/indexedDb.ts`, `resources/state-helpers/gameStorage.js`, and `public/legacy-pages/song-view/song-view.html`. Test coverage: 4 critical compatibility tests passing in `tests/storage-compatibility.spec.ts`.
-- **WelcomePage initialization**: Resolved TODO - now calls `startNewGame()` before navigating to Pack Select to ensure proper game state setup.
-- **Early migration trigger**: Added `loadGameState()` call in `src/main.tsx` to run migrations on every app load.
-- **GameHistory page (2026-02-24)**: Implemented 75-box bingo grid matching legacy behavior. Shows numbered boxes 1-75 with highlighting for shown songs. Added missing CSS for both React (`src/styles/legacy/game-history.css`) and legacy (`public/legacy-pages/game-history/game-history.css`) surfaces. Back button correctly navigates to PDF reader (game page). Mobile-responsive grid with adaptive box sizing.
-- **Game UX enhancements (2026-02-24)**: Added contextual UI matching legacy. Nav bar displays song title with pack index, includes game menu actions (Next/Previous Song, Game History, End Game), and footer has "Next Song" button. PDF viewer keeps left/right click areas for page turning. Current files are under `src/pages/game/Game/*` and `src/shared/components/pdf/PDFViewer.tsx`.
-- **SongView navigation alignment (2026-02-24)**: Fixed navigation semantics to match legacy preview behavior. Back button now calls `startNewGame()` and navigates to Song Management (not Welcome). Removed Next/Prev song buttons (SongView is for single-song preview from management UI, not game progression). Created missing CSS file for legacy page. Updated in `src/pages/SongView.tsx`, `src/styles/legacy/song-view.css`, and `public/legacy-pages/song-view/song-view.css`.
-- **SongView data-passing decoupled from game cache (2026-03-15)**: `SongManagement` previously used `setSongId()` to write the chosen song into the game's localStorage cache as a workaround (legacy holdover from before React). Replaced with proper React Router navigation: `SongManagement` now navigates to `/song-view?songId=<id>` and `SongView` reads `useSearchParams()` then loads the song directly from IndexedDB via `loadSong()`. The `setSongId()` function was removed from `indexedDb.ts`. Game state is no longer polluted by song preview actions.
-- **Service worker cleanup (2026-02-24)**: Added deprecation notices to manual SW files (`/service-worker.js`, `src/sw-template.js`) clarifying they are no longer used in production. Enabled `cleanupOutdatedCaches: true` in Workbox generation to automatically purge old cache names like `pianobingo-cache-v1`. Updated documentation in context file explaining the SW architecture. Documented legacy PDF CDN worker limitation (affects offline for legacy pages only, will be resolved when legacy surface is removed).
-- **Testing coverage improvements (2026-02-24)**: Extended offline PDF test to validate render lifecycle (worker + first page render) in `tests/offline-pdf.spec.ts`. Added mobile viewport E2E coverage in `tests/mobile-viewport.spec.ts`.
-- **Playwright suite status (2026-02-24)**: 12 passed, 1 skipped (skipped: `base seed data uses version 1` test in `tests/storage-compatibility.spec.ts`).
+**Migration is complete.** The app is 100% React/TypeScript. Legacy surface was removed in early 2026.
 
-### Audit findings (2026-02-24)
+Key facts:
+- All pages migrated and at parity with legacy behavior.
+- Service worker: Workbox-generated only (`dist/service-worker.js`), `cleanupOutdatedCaches: true`.
+- `src/styles/legacy/` contains essential CSS for current React pages — do not delete.
+- `SongView` navigation uses React Router search params (`/song-view?songId=<id>`) — no game state pollution.
+- Test suite: 91 tests (Jest unit + Playwright E2E/integration) all passing.
+- Locator builder pattern: `expect` and `pianoBingoLocator` exported from `tests/support/locators/`; never import `expect` from `@playwright/test` in E2E tests.
 
-**Verification complete for all completed items:**
-- ✅ **Build status**: Clean production build with no errors (`npm run build` succeeds)
-- ✅ **Test status**: 13 total tests; 12 passing, 1 skipped as documented (storage-compatibility needs seeding strategy)
-- ✅ **Code cleanliness**: No pending TODO/FIXME/HACK/BUG comments found in src/ or pages/ directories
-- ✅ **Implementation verification** for key completed items:
-  - `loadGameState()` called in `src/main.tsx#20` ✅
-  - `startNewGame()` called in WelcomePage.tsx#8 and SongView.tsx#17 ✅
-  - PdfReader shows song title with pack index + hamburger menu with game controls ✅
-  - GameHistory displays 75-box bingo grid with proper highlighting ✅
-  - SongView navigation resets game state correctly ✅
-
-### Phase 1 Cleanup (2026-02-24) ✅
-
-**Legacy surface removal completed:**
-- ✅ Removed `public/legacy-pages/` directory (8 page directories with HTML/CSS/JS)
-- ✅ Removed `app.js` (legacy launcher)
-- ✅ Removed `services/navigation/` (iframe/postMessage navigation code)
-- ✅ Migrated PAGE route mapping into React navigation context at `src/shared/context/NavigationContext.tsx`
-- ✅ Deleted `/service-worker.js` (root, no longer needed - Workbox generates `dist/service-worker.js`)
-- ✅ Deleted `src/sw-template.js` (unused template from abandoned approach)
-- ✅ Build verified: Clean production build with no regressions
-- ✅ Tests verified: All tests passing (original 12 + new parity suite)
-
-**Important note on CSS:** The `src/styles/legacy/` directory contains styling for *current React pages*, not legacy surface code. These CSS files implement the UX design for WelcomePage, PdfReader, GameHistory, etc. They were initially labeled "legacy" to indicate they were ported from the legacy app's CSS, but they are essential for visual parity and are retained. (Early Phase 1 cleanup mistakenly deleted these files; they were restored 2026-02-24.)
-
-App is now **100% React/TypeScript with only necessary styling files**. Production deployment uses only Workbox-generated service workers.
-
-### Phase 2 Parity Smoke Tests (2026-02-24) ✅
-
-**Comprehensive regression test suite added: `tests/parity-smoke.spec.ts` (365 lines)**
-
-Covers all critical workflows with 16+ test cases:
-- ✅ **Welcome Page** tests: Page load, action button visibility, navigation to Pack Select
-- ✅ **Core Game Flow** tests: Complete workflow from welcome → pack select → game → history (with song progression, hamburger menu, game history grid)
-- ✅ **Song Progression** tests: Next/Previous song navigation, index tracking, state persistence
-- ✅ **Game End** test: Verify end-game returns to welcome with reset state
-- ✅ **Song Management** tests: Navigation, song preview, back button behavior
-- ✅ **Pack Management** test: Pack list display and navigation
-- ✅ **Navigation Consistency** tests: Back button behavior from game history and song view
-- ✅ **State Persistence** tests: Game state survives page reload, pack selection persists across navigation
-- ✅ **Offline Functionality** smoke test: App loads offline (service worker functionality)
-
-Ready to run: `npm run test:e2e -- tests/parity-smoke.spec.ts`
-
-### Build fix and integration test fixes (2026-03-20) ✅
-
-**Root cause: `resources/` not copied to `dist/`**
-
-The `resources/` directory (base64 PDFs, images, PDF files) was missing from `dist/` because Vite only copies `public/` automatically. This meant:
-- `fetch('/resources/...')` returned 404 in production/test builds.
-- `initializePreloadedData()` caught the error silently, leaving `pdfMap` empty.
-- All PDF lookup keys (e.g. `'t2t9h8uF'`) failed to resolve → `resolvePdfBase64()` returned `null` → "Loading PDF…" shown everywhere.
-- "Preloaded data initialized" was never logged, causing the DB preload test to time out.
-
-Fix: added `cp -r resources dist/resources` to the `build` script in `package.json`.
-
-**Integration test fixes**
-
-- `tests/integration/database-preload-initialization.spec.ts`: After confirming "Preloaded data initialized", navigate in-SPA to `/pack-management` (via `pushState`+`popstate`) to mount `PackManagement` and trigger `loadAllPacks()` → `openDB()` → IDB seeding. Then use `page.waitForFunction` (which retries on SW-triggered context destruction) polling until both stores reach their exact expected counts (2 packs, 150 songs).
-- `tests/integration/offline-pdf-caching.spec.ts`: Removed the manual IDB seeding workaround and `fs.readFileSync` of the PDF file. The test now sets localStorage game state pointing at song 1 and lets the real app data flow (pdfMap lookup chain) handle PDF resolution, both online (initial render) and offline (SW-cached assets). The target route changed from `/pdf-reader` (does not exist) to `/game`.
-
-**Service worker `clientsClaim()`, `page.evaluate`, and `page.waitForFunction`**
-
-The production SW uses `skipWaiting()` + `clientsClaim()`. When `clientsClaim()` fires after the page loads, Playwright can interpret it as a navigation and destroy a `page.evaluate` execution context mid-flight.
-
-**Critical gotcha — `waitForFunction` + Promise-returning functions (2026-03-20):** `page.waitForFunction` does **not** await Promises returned by the polling function. When the browser-side function returns a `new Promise(...)`, Playwright evaluates whether the return value is truthy — and a `Promise` object is always truthy, regardless of what it eventually resolves to. As a result, `waitForFunction` resolves immediately with a `JSHandle` pointing to the unresolved/pending Promise object. Calling `.jsonValue()` on that handle returns `null` because a Promise is not JSON-serializable. This causes intermittent test failures: when data is already seeded the Promise resolves synchronously (or quickly enough to look truthy), but when seeding is still in progress it resolves to `null`, the handle is still truthy (it's a Promise), and `jsonValue()` returns `null`.
-
-**Correct pattern for polling with a Promise-based browser check:** Use `page.evaluate` (which properly awaits Promises and returns the resolved value to Node.js) inside `expect(async () => { ... }).toPass({ timeout })`. Wrap the `page.evaluate` call in a `try/catch` and set `result = null` on any exception — when `clientsClaim()` fires it throws `"Execution context was destroyed"` which must be treated as "not ready yet" rather than a hard failure. When the evaluated result is falsy/wrong, the `expect` inside throws, and `toPass()` retries the whole async block until the timeout. This is the canonical pattern used in `tests/integration/database-preload-initialization.spec.ts` and `tests/integration/storage-migration-compatibility.spec.ts`:
-
-```ts
-let result: MyType | null = null
-await expect(async () => {
-  try {
-    result = await page.evaluate(() => new Promise<MyType | null>(resolve => { ... }))
-  } catch {
-    result = null // SW clientsClaim destroyed context — retry
-  }
-  expect(result).not.toBeNull()
-}).toPass({ timeout: 30000 })
-```
-
-### IDB seeding reliability fixes (2026-03-21) ✅
-
-**Problem: seeding silently skipped due to extra `openDB()` calls inside the seeding block**
-
-The seeding logic in `openDB()` originally opened a new `openDB()` call per record (150 songs × 1 call each), then was refactored to batch per-store — but still called `openDB()` for each batch. Any of those extra `openDB()` calls can throw when the SW fires `clientsClaim()` mid-open. The surrounding `try/catch` swallowed the error with "Seeding skipped or failed", and `resolve(db)` was called with an empty database. Tests then polled for 30s and never saw data.
-
-**Fix (`src/shared/storage/indexedDb.ts`):** All seeding reads and writes now use the `db` connection that `openIndexedDb()` already opened — no extra `openDB()` calls happen during seeding. Concretely:
-- Replaced `loadAllPacks()` / `loadAllSongs()` (which each call `openDB()` internally) with direct `db.transaction(...).objectStore(...).getAll()` requests via `requestToPromise`.
-- Replaced per-batch `db2 = await openDB()` / `db2.close()` with transactions on the existing `db`.
-
-**Rule:** Never call `openDB()` from within the seeding block that runs inside `openDB()` itself. Always use the already-open `db` parameter for any reads/writes done during seeding.
-
-**Also fixed (2026-03-21): song progression test TOCTOU race (`core-workflow-smoke.spec.ts`)**
-
-`expect(locator).not.toHaveText(firstTitle!)` passes the instant the `nav h1` element disappears during a React re-render — before the new text is rendered. The subsequent `textContent()` then captures the old text. Fix: use `toPass()` to poll `textContent()` atomically within the assertion so the read and the check are never separated.
-
-**Also fixed (2026-03-21): `navTitle` empty-string race after game page load (`core-workflow-smoke.spec.ts`)**
-
-`waitForLoadState('networkidle')` resolves before the IndexedDB async song-load (`useLoadedSong`) completes. When `textContent()` was called immediately afterwards, the `nav h1` was still empty (`""`), causing `expect(firstTitle).toBeTruthy()` to fail. Fix: insert `await pianoExpect(app.pageGame().navTitle()).not.toBeEmpty()` before each `textContent()` read. This uses Playwright's built-in auto-retrying assertion to block until the `h1` is populated, regardless of how long the IndexedDB round-trip takes. Applied to the "complete workflow" and "song progression increments correctly" tests.
-
-### Service layer extraction (2026-03-18) ✅
-
-All raw browser / runtime API calls pulled out of storage, component, and bootstrap code into dedicated service modules:
-- `src/shared/services/storage/indexedDbClient.ts` — IndexedDB open/transaction/request primitives.
-- `src/shared/services/storage/localStorageService.ts` — localStorage get/set/remove with JSON serialization.
-- `src/shared/services/network/resourceLoader.ts` — `fetch()` with error handling for text resources.
-- `src/shared/services/runtime/windowGlobals.ts` — typed read/write for `window.BASE_PACK_DATA`, `window.BASE_SONG_DATA`, `window.resolvePdfUrl`, and PDF diagnostic flags.
-- `src/shared/services/runtime/serviceWorkerService.ts` — `navigator.serviceWorker.register()` with production guard and `window.addEventListener('load')` lifecycle.
-- `src/shared/services/runtime/fileReaderService.ts` — `FileReader.readAsDataURL()` as a promise.
-- `src/shared/services/runtime/frameMessaging.ts` — `window.parent.postMessage()` with same-origin target derivation (replaces insecure wildcard `'*'` origin).
-- `src/shared/services/runtime/domService.ts` — `document.getElementById()` and `querySelectorAll()` readback.
-- `src/shared/services/pdf/pdfSourceService.ts` — base64 validation, resolver dispatch, legacy fallback fetch, `atob()` decode.
-- `src/shared/services/pdf/pdfDocumentService.ts` — PDF.js module singleton (worker initialized once), `getDocument()`, canvas render.
-
-Consumers updated: `src/shared/storage/indexedDb.ts`, `src/init/preloadData.ts`, `src/shared/components/pdf/PDFViewer.tsx`, `src/shared/utils/fileUtils.ts`, `src/shared/services/navigation/legacyNavigation.ts`, `src/pages/packs/hooks/useSortable.ts`, `src/main.tsx`.
-
-Additional fix: `initializePreloadedData()` in `preloadData.ts` is now idempotent (singleton promise guard prevents double init).
-
-Security note: `frameMessaging.ts` now derives target origin from `document.referrer` instead of using `'*'`.
-
-Build verified: `npm run build` clean after extraction.
-
-### Unit test suite (2026-03-21) ✅
-
-**8 new test files added under `tests/unit/` — 112 unit tests total (up from 2 architecture contract tests).**
-
-Packages added: `jest-environment-jsdom`, `@testing-library/react`.
-
-New npm scripts:
-- `npm run test:unit` — Jest unit tests only.
-- `npm run test:e2e:ui` — Playwright interactive UI mode.
-- `npm run test:all` — Jest unit tests then Playwright e2e + integration (full suite).
-
-| File | Tests | Coverage |
-|---|---|---|
-| `tests/unit/utils/sort.test.ts` | 9 | `compareSongsByPackMembershipThenPackOrder` — all sort branches |
-| `tests/unit/services/localStorageService.test.ts` | 11 | Save/load/remove round-trips, edge types, missing keys |
-| `tests/unit/services/indexedDbClient.test.ts` | 13 | `requestToPromise`, `waitForTransaction` (complete/error/abort), `openIndexedDb` |
-| `tests/unit/services/pdfSourceService.test.ts` | 20 | `isPdfBase64`, `resolvePdfBase64` (resolver/fallback/warning), legacy fallback, `decodePdfBase64ToBytes` |
-| `tests/unit/services/domService.test.ts` | 10 | `getRequiredElementById`, `getOrderedIdsFromContainer` |
-| `tests/unit/storage/gameState.test.ts` | 19 | `saveGameState/loadGameState`, legacy `id→songId` migration, `clearGameState`, `startNewGame`, `selectPack` |
-| `tests/unit/hooks/useLoadedSong.test.ts` | 16 | Loading states, `base64`/`songTitle` derivation, `reload()`, `nextSong()`/`prevSong()` delegation, rejection |
-| `tests/unit/hooks/useGameHistory.test.ts` | 14 | No-game/null-pack cases, pack loading, `shownSongIds`, `hasSongIdBeenShown()` |
-
-**Mocking conventions used:**
-- `jest.mock(...)` for service layer dependencies (windowGlobals, resourceLoader, indexedDb).
-- Manual IDBRequest/IDBTransaction/indexedDB stubs (no external IDB mock package) in `indexedDbClient.test.ts`.
-- `jest-environment-jsdom` for tests that touch `localStorage` / DOM APIs.
-- `renderHook` + `waitFor` from `@testing-library/react` for React hook tests.
-
-**Tiers NOT yet covered (lower priority — E2E provides sufficient coverage):**
-- `usePacks`, `useSongs` data-loading hooks.
-- `pdfDocumentService` (requires heavy canvas + pdfjs mocking).
-- `useSortable` SortableJS integration hook.
-- React component rendering tests (`Header`, `PDFViewer`, etc.).
-- `serviceWorkerService`, `legacyNavigation`, `fileReaderService`.
-
-### Remaining incomplete work
-
-#### 12.1 Optional CSS optimization
-- [ ] **Further Tailwind consolidation**: Migrate remaining per-page CSS to Tailwind utilities (current per-page CSS working well, low priority)
-
-
-### E2E test locator system refactor (2026-03-22) ✅
-
-**Custom `expect` wrapper and `.locate()`-free test style**
-
-All E2E tests now use a project-level `expect` wrapper exported from `tests/support/locators/`. The wrapper automatically unwraps `LocatorBuilder` instances before delegating to Playwright's native `expect`, so no test ever needs to call `.locate()` manually.
-
-**Import rule for every E2E test file:**
-```ts
-import { test }                        from '@playwright/test'  // expect NOT imported here
-import { expect, pianoBingoLocator }   from '../support/locators'
-```
-Never import `expect` from `@playwright/test` in an E2E test. The locators export is the single source.
-
-**How the wrapper works (`tests/support/locators/LocatorBuilder.ts`):**
-```ts
-import { expect as pwExpect, type Locator } from '@playwright/test'
-
-function _expectLocator(l: Locator) { return pwExpect(l) }
-type LocatorAssertions = ReturnType<typeof _expectLocator>
-type ExpectFn = ((value: LocatorBuilder) => LocatorAssertions) & typeof pwExpect
-
-export const expect = ((value: unknown) => {
-  if (value instanceof LocatorBuilder) return pwExpect(value.locate())
-  return pwExpect(value as never)
-}) as unknown as ExpectFn
-```
-`LocatorAssertions` is not a named export from `@playwright/test` — derive it via `ReturnType<typeof _expectLocator>`. Use `as unknown as ExpectFn` to satisfy TypeScript.
-
-**No `.locate()` in tests — ever.** If a `LocatorBuilder` method is missing, add it to `LocatorBuilder` rather than escaping to raw Playwright. Currently delegated: `click`, `fill`, `press`, `count`, `textContent`, `getByTestId`, `getByText`, `getByRole`, `locator`, `nth`, `filter`, `first`, `getAttribute`, `setInputFiles`.
-
-**`const` extraction rule:** If a locator accessor (e.g. `app.pagePackEdit()`) is called more than once inside a single test, extract it to a named `const` before first use:
-```ts
-const packEdit = app.pagePackEdit()
-// then use packEdit.* throughout the test
-```
-
-**Support file locations:**
-- `tests/support/locators/LocatorBuilder.ts` — base class + `expect` export
-- `tests/support/locators/HtmlLocatorBuilder.ts` — HTML-specific locator helpers
-- `tests/support/locators/PianoBingoLocatorBuilder.ts` — all page-specific accessors
-- `tests/support/locators/index.ts` — public re-exports for tests
-
-**Test run status after refactor:** 76/76 E2E tests passing.
-
+---
 
 ## 13) Confirmed project decisions
 
