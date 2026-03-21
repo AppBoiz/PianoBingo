@@ -1,5 +1,3 @@
-import { LEGACY_PDF_FALLBACK_PATH } from '../../constants/pdf'
-import { fetchTextResource } from '../network/resourceLoader'
 import { getPdfResolver, getWindowStringValue } from '../runtime/windowGlobals'
 
 const PDF_BASE64_PREFIX = 'JVBERi0'
@@ -27,9 +25,29 @@ export function resolvePdfBase64(base64: string): string | null {
 }
 
 export async function loadLegacyFallbackPdfBase64(): Promise<string | null> {
-  const fileContents = await fetchTextResource(LEGACY_PDF_FALLBACK_PATH)
-  const firstPdfMatch = fileContents.match(/(['"])(JVBERi0[A-Za-z0-9+/=]+)\1/)
-  return firstPdfMatch?.[2] ?? null
+  const header = '%PDF-1.4\n'
+  const objects = [
+    '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n',
+    '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n',
+    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] >>\nendobj\n',
+  ]
+
+  let body = ''
+  const offsets = objects.map(objectText => {
+    const offset = header.length + body.length
+    body += objectText
+    return offset
+  })
+
+  const xrefOffset = header.length + body.length
+  const xref = [
+    `xref\n0 ${objects.length + 1}\n`,
+    '0000000000 65535 f \n',
+    ...offsets.map(offset => `${offset.toString().padStart(10, '0')} 00000 n \n`),
+  ].join('')
+  const trailer = `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`
+
+  return btoa(`${header}${body}${xref}${trailer}`)
 }
 
 export function decodePdfBase64ToBytes(pdfBase64: string): Uint8Array {
