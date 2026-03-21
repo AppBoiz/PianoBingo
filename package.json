@@ -32,8 +32,6 @@
     "autoprefixer": "latest",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
-    "pixelmatch": "^7.1.0",
-    "pngjs": "^7.0.0",
     "postcss": "latest",
     "tailwindcss": "latest",
     "ts-jest": "^29.4.6",
