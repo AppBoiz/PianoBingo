@@ -26,29 +26,19 @@ export async function loadPdfDocumentFromBase64(pdfBase64: string): Promise<PDFD
 export async function renderPdfPageIntoContainer(
   container: HTMLDivElement,
   page: PDFPageProxy,
-  scaleMode: 'fit-width' | 'fit-contain' | 'fit-height' = 'fit-width',
+  scaleMode: 'fit-width' | 'fit-contain' = 'fit-width',
 ): Promise<void> {
   const styles = window.getComputedStyle(container)
-  const insetLeft = Number.parseFloat(styles.getPropertyValue('--pdf-render-inset-left'))
-  const insetRight = Number.parseFloat(styles.getPropertyValue('--pdf-render-inset-right'))
-  const insetTop = Number.parseFloat(styles.getPropertyValue('--pdf-render-inset-top'))
-  const insetBottom = Number.parseFloat(styles.getPropertyValue('--pdf-render-inset-bottom'))
   const insetX = Number.parseFloat(styles.getPropertyValue('--pdf-render-inset-x')) || 0
   const insetY = Number.parseFloat(styles.getPropertyValue('--pdf-render-inset-y')) || 0
-  const resolvedInsetLeft = Number.isFinite(insetLeft) ? insetLeft : insetX
-  const resolvedInsetRight = Number.isFinite(insetRight) ? insetRight : insetX
-  const resolvedInsetTop = Number.isFinite(insetTop) ? insetTop : insetY
-  const resolvedInsetBottom = Number.isFinite(insetBottom) ? insetBottom : insetY
-  const availableWidth = Math.max(container.clientWidth - resolvedInsetLeft - resolvedInsetRight, 1)
-  const availableHeight = Math.max(container.clientHeight - resolvedInsetTop - resolvedInsetBottom, 1)
+  const availableWidth = Math.max(container.clientWidth - insetX * 2, 1)
+  const availableHeight = Math.max(container.clientHeight - insetY * 2, 1)
   const unscaledViewport = page.getViewport({ scale: 1 })
   const widthScale = availableWidth / unscaledViewport.width
   const heightScale = availableHeight / unscaledViewport.height
   const scale = scaleMode === 'fit-contain'
     ? Math.min(widthScale, heightScale)
-    : scaleMode === 'fit-height'
-      ? heightScale
-      : widthScale
+    : widthScale
   const viewport = page.getViewport({ scale })
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d')

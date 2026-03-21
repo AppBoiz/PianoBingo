@@ -23,7 +23,7 @@ type PdfPage = PDFPageProxy
 
 type Props = {
   base64: string | null | undefined
-  scaleMode?: 'fit-width' | 'fit-contain' | 'fit-height'
+  scaleMode?: 'fit-width' | 'fit-contain'
 }
 
 function useResolvedPdfBase64(base64: string | null | undefined) {
@@ -115,7 +115,7 @@ function useRenderedPdfPage(
   containerRef: React.RefObject<HTMLDivElement | null>,
   pdfDocument: PdfDocument | null,
   currentPage: number,
-  scaleMode: 'fit-width' | 'fit-contain' | 'fit-height',
+  scaleMode: 'fit-width' | 'fit-contain',
 ) {
   useEffect(() => {
     if (!pdfDocument) {
