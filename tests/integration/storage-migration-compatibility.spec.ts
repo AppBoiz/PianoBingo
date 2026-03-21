@@ -93,6 +93,13 @@ test.describe('Storage compatibility and migration', () => {
       expect(consoleLogs.join('\n')).toContain('Preloaded data initialized')
     }).toPass({ timeout: 10000 })
 
+    // Wait for the React app (BrowserRouter) to mount so React Router is listening
+    // for popstate events before we fire the synthetic navigation below.
+    // "Preloaded data initialized" fires inside initializePreloadedData(), which is
+    // awaited in main.tsx before createRoot().render() is called — so React hasn't
+    // mounted yet at that exact moment.
+    await page.waitForSelector('[data-testid="page-welcome"]')
+
     // Navigate to pack management to trigger openDB() → IDB seeding
     await page.evaluate(() => {
       window.history.pushState({}, '', '/pack-management')
