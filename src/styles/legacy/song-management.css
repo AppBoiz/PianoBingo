@@ -12,7 +12,7 @@ html, body {
   flex-grow: 1;              /* take all remaining space */
   display: flex;
   flex-direction: column;
-  overflow-y: auto;          /* this makes it scroll */
+  overflow: hidden;          /* let .playlist-container inside handle scrolling */
 }
 
 body {

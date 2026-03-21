@@ -1,17 +1,11 @@
-html, body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden auto !important;
-    height: 100%;
-  }
-
-/* Hide scrollbars (cross-browser) */
-body {
+/* Game history page scrolls within its container without a visible scrollbar */
+.game-history-root {
+    overflow-y: auto;
     scrollbar-width: none;      /* Firefox */
     -ms-overflow-style: none;   /* IE 10+ */
 }
 
-body::-webkit-scrollbar {
+.game-history-root::-webkit-scrollbar {
     display: none;              /* Chrome, Safari, Opera */
 }
 
@@ -38,7 +32,8 @@ h1 {
     font-size: 45px;
 }
 
-.nav-bar button {
+/* Scope button positioning to game-history page only — other pages use .nav-bar-left for placement */
+.game-history-root .nav-bar button {
     position: absolute;
     left: 20px;
     color: #F14D8A;
@@ -51,7 +46,7 @@ h1 {
     padding: 0;
 }
 
-.nav-bar button:hover {
+.game-history-root .nav-bar button:hover {
     opacity: 0.8;
 }
 
