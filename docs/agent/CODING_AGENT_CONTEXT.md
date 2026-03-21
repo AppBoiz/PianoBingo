@@ -409,6 +409,41 @@ Security note: `frameMessaging.ts` now derives target origin from `document.refe
 
 Build verified: `npm run build` clean after extraction.
 
+### Unit test suite (2026-03-21) ✅
+
+**8 new test files added under `tests/unit/` — 112 unit tests total (up from 2 architecture contract tests).**
+
+Packages added: `jest-environment-jsdom`, `@testing-library/react`.
+
+New npm scripts:
+- `npm run test:unit` — Jest unit tests only.
+- `npm run test:e2e:ui` — Playwright interactive UI mode.
+- `npm run test:all` — Jest unit tests then Playwright e2e + integration (full suite).
+
+| File | Tests | Coverage |
+|---|---|---|
+| `tests/unit/utils/sort.test.ts` | 9 | `compareSongsByPackMembershipThenPackOrder` — all sort branches |
+| `tests/unit/services/localStorageService.test.ts` | 11 | Save/load/remove round-trips, edge types, missing keys |
+| `tests/unit/services/indexedDbClient.test.ts` | 13 | `requestToPromise`, `waitForTransaction` (complete/error/abort), `openIndexedDb` |
+| `tests/unit/services/pdfSourceService.test.ts` | 20 | `isPdfBase64`, `resolvePdfBase64` (resolver/fallback/warning), legacy fallback, `decodePdfBase64ToBytes` |
+| `tests/unit/services/domService.test.ts` | 10 | `getRequiredElementById`, `getOrderedIdsFromContainer` |
+| `tests/unit/storage/gameState.test.ts` | 19 | `saveGameState/loadGameState`, legacy `id→songId` migration, `clearGameState`, `startNewGame`, `selectPack` |
+| `tests/unit/hooks/useLoadedSong.test.ts` | 16 | Loading states, `base64`/`songTitle` derivation, `reload()`, `nextSong()`/`prevSong()` delegation, rejection |
+| `tests/unit/hooks/useGameHistory.test.ts` | 14 | No-game/null-pack cases, pack loading, `shownSongIds`, `hasSongIdBeenShown()` |
+
+**Mocking conventions used:**
+- `jest.mock(...)` for service layer dependencies (windowGlobals, resourceLoader, indexedDb).
+- Manual IDBRequest/IDBTransaction/indexedDB stubs (no external IDB mock package) in `indexedDbClient.test.ts`.
+- `jest-environment-jsdom` for tests that touch `localStorage` / DOM APIs.
+- `renderHook` + `waitFor` from `@testing-library/react` for React hook tests.
+
+**Tiers NOT yet covered (lower priority — E2E provides sufficient coverage):**
+- `usePacks`, `useSongs` data-loading hooks.
+- `pdfDocumentService` (requires heavy canvas + pdfjs mocking).
+- `useSortable` SortableJS integration hook.
+- React component rendering tests (`Header`, `PDFViewer`, etc.).
+- `serviceWorkerService`, `legacyNavigation`, `fileReaderService`.
+
 ### Remaining incomplete work
 
 #### 12.1 Optional CSS optimization
