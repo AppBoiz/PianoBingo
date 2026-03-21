@@ -24,7 +24,7 @@ export function resolvePdfBase64(base64: string): string | null {
   return null
 }
 
-export async function loadLegacyFallbackPdfBase64(): Promise<string | null> {
+export async function loadFallbackPdfBase64(): Promise<string | null> {
   const header = '%PDF-1.4\n'
   const objects = [
     '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n',

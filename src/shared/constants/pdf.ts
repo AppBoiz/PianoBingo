@@ -1,1 +1,0 @@
-export const LEGACY_PDF_FALLBACK_PATH = '/resources/base64/pack_tom.js'

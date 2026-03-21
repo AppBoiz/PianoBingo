@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
 import {
-  loadLegacyFallbackPdfBase64,
+  loadFallbackPdfBase64,
   resolvePdfBase64,
 } from '../../services/pdf/pdfSourceService'
 import {
@@ -39,12 +39,12 @@ function useResolvedPdfBase64(base64: string | null | undefined) {
       }
 
       try {
-        const fallbackBase64 = await loadLegacyFallbackPdfBase64()
+        const fallbackBase64 = await loadFallbackPdfBase64()
         if (!cancelled) {
           setPdfBase64(fallbackBase64)
         }
       } catch (error) {
-        console.error('failed loading legacy base64 fallback', error)
+        console.error('failed loading fallback pdf', error)
       }
     }
 

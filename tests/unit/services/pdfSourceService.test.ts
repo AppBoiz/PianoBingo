@@ -1,7 +1,7 @@
 import {
   isPdfBase64,
   resolvePdfBase64,
-  loadLegacyFallbackPdfBase64,
+  loadFallbackPdfBase64,
   decodePdfBase64ToBytes,
 } from '../../../src/shared/services/pdf/pdfSourceService'
 
@@ -10,12 +10,7 @@ jest.mock('../../../src/shared/services/runtime/windowGlobals', () => ({
   getWindowStringValue: jest.fn(),
 }))
 
-jest.mock('../../../src/shared/services/network/resourceLoader', () => ({
-  fetchTextResource: jest.fn(),
-}))
-
 import { getPdfResolver, getWindowStringValue } from '../../../src/shared/services/runtime/windowGlobals'
-import { fetchTextResource } from '../../../src/shared/services/network/resourceLoader'
 
 // A minimal valid PDF base64 prefix (PDF magic bytes "JVBERi0")
 const VALID_PDF_BASE64 = 'JVBERi0xLjQgdGVzdA=='
@@ -115,35 +110,26 @@ describe('resolvePdfBase64', () => {
 })
 
 // ---------------------------------------------------------------------------
-// loadLegacyFallbackPdfBase64
+// loadFallbackPdfBase64
 // ---------------------------------------------------------------------------
 
-describe('loadLegacyFallbackPdfBase64', () => {
-  test('extracts base64 from a double-quoted PDF string in file contents', async () => {
-    jest.mocked(fetchTextResource).mockResolvedValue(`var x = "${VALID_PDF_BASE64}";`)
-    const result = await loadLegacyFallbackPdfBase64()
-    expect(result).toBe(VALID_PDF_BASE64)
+describe('loadFallbackPdfBase64', () => {
+  test('returns a generated valid PDF base64 string', async () => {
+    const result = await loadFallbackPdfBase64()
+    expect(result).not.toBeNull()
+    expect(isPdfBase64(result)).toBe(true)
   })
 
-  test('extracts base64 from a single-quoted PDF string', async () => {
-    jest.mocked(fetchTextResource).mockResolvedValue(`var x = '${VALID_PDF_BASE64}';`)
-    const result = await loadLegacyFallbackPdfBase64()
-    expect(result).toBe(VALID_PDF_BASE64)
+  test('returns the same blank PDF across calls', async () => {
+    const first = await loadFallbackPdfBase64()
+    const second = await loadFallbackPdfBase64()
+    expect(first).toBe(second)
   })
 
-  test('returns null when no PDF base64 string is present', async () => {
-    jest.mocked(fetchTextResource).mockResolvedValue('var x = "not-a-pdf";')
-    const result = await loadLegacyFallbackPdfBase64()
-    expect(result).toBeNull()
-  })
-
-  test('returns the first match when multiple PDF strings are in the file', async () => {
-    const second = 'JVBERi0second=='
-    jest.mocked(fetchTextResource).mockResolvedValue(
-      `var a = "${VALID_PDF_BASE64}"; var b = "${second}";`
-    )
-    const result = await loadLegacyFallbackPdfBase64()
-    expect(result).toBe(VALID_PDF_BASE64)
+  test('decodes into a non-empty byte array', async () => {
+    const result = await loadFallbackPdfBase64()
+    expect(result).not.toBeNull()
+    expect(decodePdfBase64ToBytes(result!)).not.toHaveLength(0)
   })
 })
 
