@@ -383,6 +383,10 @@ The seeding logic in `openDB()` originally opened a new `openDB()` call per reco
 
 `expect(locator).not.toHaveText(firstTitle!)` passes the instant the `nav h1` element disappears during a React re-render — before the new text is rendered. The subsequent `textContent()` then captures the old text. Fix: use `toPass()` to poll `textContent()` atomically within the assertion so the read and the check are never separated.
 
+**Also fixed (2026-03-21): `navTitle` empty-string race after game page load (`core-workflow-smoke.spec.ts`)**
+
+`waitForLoadState('networkidle')` resolves before the IndexedDB async song-load (`useLoadedSong`) completes. When `textContent()` was called immediately afterwards, the `nav h1` was still empty (`""`), causing `expect(firstTitle).toBeTruthy()` to fail. Fix: insert `await pianoExpect(app.pageGame().navTitle()).not.toBeEmpty()` before each `textContent()` read. This uses Playwright's built-in auto-retrying assertion to block until the `h1` is populated, regardless of how long the IndexedDB round-trip takes. Applied to the "complete workflow" and "song progression increments correctly" tests.
+
 ### Service layer extraction (2026-03-18) ✅
 
 All raw browser / runtime API calls pulled out of storage, component, and bootstrap code into dedicated service modules:

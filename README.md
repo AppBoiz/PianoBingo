@@ -64,8 +64,18 @@ npm run build
 npm run preview
 ```
 
-## E2E Tests
+## Tests
 
 ```bash
+# E2E + integration tests (Playwright)
 npm run test:e2e
+
+# E2E + integration tests with Playwright interactive UI
+npm run test:e2e:ui
+
+# Unit tests (Jest)
+npm run test:unit
+
+# All tests (unit + E2E + integration)
+npm run test:all
 ```

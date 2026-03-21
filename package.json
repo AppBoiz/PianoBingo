@@ -7,9 +7,11 @@
     "build": "vite build && cp -r resources dist/resources && node scripts/generate-sw-manifest.js && node scripts/generate-workbox-sw.js",
     "preview": "vite preview",
     "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "test:arch": "jest --config jest.config.cjs tests/unit/architecture",
     "test:unit": "jest --config jest.config.cjs",
-    "test:unit:watch": "jest --config jest.config.cjs --watch"
+    "test:unit:watch": "jest --config jest.config.cjs --watch",
+    "test:all": "jest --config jest.config.cjs && playwright test"
   },
   "dependencies": {
     "pdfjs-dist": "latest",
@@ -21,6 +23,7 @@
   "devDependencies": {
     "@playwright/test": "latest",
     "@tailwindcss/postcss": "latest",
+    "@testing-library/react": "^16.3.2",
     "@types/jest": "^30.0.0",
     "@types/react": "latest",
     "@types/react-dom": "latest",
@@ -28,6 +31,7 @@
     "@vitejs/plugin-react": "latest",
     "autoprefixer": "latest",
     "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
     "pixelmatch": "^7.1.0",
     "pngjs": "^7.0.0",
     "postcss": "latest",
