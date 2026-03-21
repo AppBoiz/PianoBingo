@@ -44,9 +44,15 @@ await app.packSelectPage().startGameButton().click()
 ```
 
 ### `expect` wrapper
-Because tests operate on builders, import `expect` from `tests/support/locators/` in E2E files:
+Because tests operate on builders, import `expect` from `tests/support/locators/` in Playwright spec files:
 - If value is a `LocatorBuilder`, it auto-calls `.locate()` before delegating to Playwright.
-- Never import `expect` from `@playwright/test` in E2E spec files.
+- Never import `expect` from `@playwright/test` in `tests/e2e/**` or `tests/integration/**`.
+
+### Extending the locator builder
+- Page-root, page-specific, and app-domain methods belong in `PianoBingoLocatorBuilder`.
+- Generic structural helpers belong in `HtmlLocatorBuilder`.
+- Keep builder methods immutable and return a new builder instance.
+- If a test needs the same raw locator pattern more than once, add a builder method instead of repeating inline selectors.
 
 ---
 
@@ -103,6 +109,8 @@ Format: `{kebab-name}-page`
 - Replace `page.waitForTimeout()` with `page.waitForFunction()` or auto-retrying `expect(...).toBeVisible()`.
 - Console listener race: use `expect(async () => { ... }).toPass({ timeout })` to poll for messages.
 - Direct URL navigation can be less reliable than in-app flows; keep tests path-independent where possible.
+- `page.waitForFunction()` does not await a returned Promise. For Promise-based browser polling, use `page.evaluate()` inside `expect(async () => { ... }).toPass(...)`.
+- Service worker activation can destroy the browser execution context. Treat `Execution context was destroyed` as a retryable condition in preload/offline tests.
 
 ---
 
@@ -110,6 +118,37 @@ Format: `{kebab-name}-page`
 
 - Wrap all IndexedDB operations in a `Promise` with `tx.oncomplete` as the resolve trigger.
 - Never rely on implicit IDB completion ordering.
+- Welcome page load does not trigger seeding. Trigger the real data path if the test relies on app seeding behavior.
+
+Canonical pattern:
+
+```ts
+await page.evaluate(async (payload) => {
+	await new Promise<void>((resolve, reject) => {
+		const request = indexedDB.open('PianoBingoDB')
+
+		request.onerror = () => reject(request.error)
+
+		request.onsuccess = () => {
+			const db = request.result
+			const tx = db.transaction(['songs', 'packs'], 'readwrite')
+
+			tx.oncomplete = () => {
+				db.close()
+				resolve()
+			}
+			tx.onerror = () => reject(tx.error)
+			tx.onabort = () => reject(tx.error)
+
+			const songStore = tx.objectStore('songs')
+			const packStore = tx.objectStore('packs')
+
+			for (const song of payload.songs) songStore.put(song)
+			for (const pack of payload.packs) packStore.put(pack)
+		}
+	})
+}, payload)
+```
 
 ---
 
@@ -123,14 +162,14 @@ page → body → list → row(id) → action element
 
 Example:
 ```ts
-const row = app.songManagementPage().body().list().row(songId)
+const row = app.songManagementPage().pageBody().list().row(songId)
 await row.name().click()
 ```
 
 For repeated structures, use scoped blocks to keep names short and local:
 
 ```ts
-await app.songManagementPage().body().list().first().as(async (row) => {
+await app.songManagementPage().pageBody().list().first().as(async (row) => {
 	await expect(row.name()).toBeVisible()
 	await row.click()
 })

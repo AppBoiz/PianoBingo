@@ -8,6 +8,13 @@
 - Treat `.github/copilot-instructions.md` and `.github/instructions/*.instructions.md` as the authoritative machine-readable source for Copilot behavior.
 - Treat `docs/agent/` as deeper human reference only; avoid duplicating normative rules there.
 
+## Available customizations
+- Use the `storage-compatibility-auditor` custom agent for IndexedDB/localStorage schema, migration, and persistence work.
+- Use the `offline-pwa-debugger` custom agent for preload, service worker, offline, build-output, and PDF loading issues.
+- Use the `test-maintainer` custom agent for Playwright/Jest, locator builder, and flaky test work.
+- Use the `/offline-pwa-debugging` skill for reusable offline/PWA debugging workflows.
+- Use the `/e2e-database-seeding` skill for IndexedDB seeding and storage-reset patterns in Playwright tests.
+
 ---
 
 ## Project overview
@@ -105,7 +112,7 @@ Two distinct numeric identifiers exist; never conflate them:
 
 ## PDF notes
 
-- PDF viewer route is `/game` (or `/song-view/:id`) — there is **no** `/pdf-reader` route.
+- PDF viewing is embedded in `GamePage` (`/game`) and `SongViewPage` (`/song-view/:songId`) — there is **no** `/pdf-reader` route.
 - PDF.js worker initialized once (module-level singleton) in `pdfDocumentService.ts`; never touch `GlobalWorkerOptions` in component code.
 - Songs store short lookup keys (e.g. `'t2t9h8uF'`) as `pdfUrl`, not raw base64. `resolvePdfBase64()` in `pdfSourceService.ts` resolves them via `pdfMap` (populated at boot by `initializePreloadedData()`).
 
