@@ -13,7 +13,6 @@ import { compareSongsByPackMembershipThenPackOrder } from '../../../shared/utils
 import { PACK_SIZE } from '../../../shared/constants/game'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
 import { useParams } from 'react-router-dom'
-import '../../../styles/legacy/pack-edit.css'
 
 function useLoadPackFromPathParam(packIdParam: string | undefined) {
   const [pack, setPack] = useState<Pack | null>(null)
@@ -61,8 +60,8 @@ export default function PackEditPage() {
     { rowSelector: '.playlist-row', idAttribute: 'data-song-id' }
   )
 
-  if (isLoading) return <div>Loading...</div>
-  if (!pack) return <div>Pack not found</div>
+  if (isLoading) return <div className="flex min-h-screen items-center justify-center px-6 text-xl text-zinc-600">Loading...</div>
+  if (!pack) return <div className="flex min-h-screen items-center justify-center px-6 text-xl text-zinc-600">Pack not found</div>
 
   const songsSortedByPackOrder = songs.sort(compareSongsByPackMembershipThenPackOrder(pack.songs))
 
@@ -88,7 +87,7 @@ export default function PackEditPage() {
 
   return (
     <PageLayout
-      rootClassName="pack-edit-page-root"
+      rootClassName="pack-edit-page-root text-center"
       rootTestId="pack-edit-page"
       header={(
         <Header
@@ -99,7 +98,7 @@ export default function PackEditPage() {
       )}
       footer={<PrimaryActionFooter label="Ok" actionId="save-pack" disabled={!isPackComplete} onClick={handleSave} />}
     >
-      <PlaylistContainer containerRef={containerRef} style={{ flexGrow: 1 }}>
+      <PlaylistContainer containerRef={containerRef} className="my-4 w-full px-4 pb-6 md:px-6">
         {songsSortedByPackOrder.map(song => {
           const packPosition = pack.songs.indexOf(song.songId) + 1
           const isInPack = packPosition !== 0

@@ -160,12 +160,27 @@ export default function PDFViewer({ base64, scaleMode = 'fit-width' }: Props){
 
   useRenderedPdfPage(containerRef, pdfDocument, currentPage, scaleMode)
 
-  if (!pdfBase64) return <div>Loading PDF…</div>
+  if (!pdfBase64) {
+    return <div className="flex min-h-0 flex-1 items-center justify-center px-6 text-center text-xl text-zinc-600">Loading PDF...</div>
+  }
 
   return (
-    <div id="pdf-viewer" data-testid="pdf-viewer" ref={containerRef}>
-      <span data-testid="pdf-prev-page-zone" className="left" onClick={() => setCurrentPage(p => Math.max(1, p-1))} />
-      <span data-testid="pdf-next-page-zone" className="right" onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} />
+    <div
+      id="pdf-viewer"
+      data-testid="pdf-viewer"
+      ref={containerRef}
+      className="relative flex min-h-0 flex-1 flex-wrap items-center justify-center overflow-hidden [--pdf-render-inset-x:16px] [--pdf-render-inset-y:16px] [&_canvas]:max-h-full [&_canvas]:max-w-full [&_canvas]:rounded-xl [&_canvas]:shadow-pdf"
+    >
+      <span
+        data-testid="pdf-prev-page-zone"
+        className="left absolute left-0 top-0 h-full w-1/2 cursor-pointer"
+        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+      />
+      <span
+        data-testid="pdf-next-page-zone"
+        className="right absolute left-1/2 top-0 h-full w-1/2 cursor-pointer"
+        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+      />
     </div>
   )
 }

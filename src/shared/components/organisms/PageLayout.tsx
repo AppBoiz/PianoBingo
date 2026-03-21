@@ -21,10 +21,19 @@ export default function PageLayout({
   mainClassName = 'main-content',
   skipMainWrapper = false,
 }: PageLayoutProps) {
+  const rootClasses = [
+    'flex h-[100dvh] min-h-screen w-full flex-col bg-white text-zinc-800',
+    rootClassName,
+  ].filter(Boolean).join(' ')
+  const mainClasses = [
+    'main-content flex min-h-0 flex-1 flex-col overflow-hidden',
+    mainClassName,
+  ].filter(Boolean).join(' ')
+
   return (
-    <div id={rootId} className={rootClassName} data-testid={rootTestId}>
+    <div id={rootId} className={rootClasses} data-testid={rootTestId}>
       {header}
-      {skipMainWrapper ? children : <div className={mainClassName} data-testid="body">{children}</div>}
+      {skipMainWrapper ? children : <div className={mainClasses} data-testid="body">{children}</div>}
       {footer}
     </div>
   )

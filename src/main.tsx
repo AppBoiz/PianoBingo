@@ -1,5 +1,6 @@
 // Initialize preloaded data FIRST - must happen before IndexedDB initialization
 import { initializePreloadedData } from './init/preloadData'
+import './styles/tailwind.css'
 
 import React from 'react'
 import { createRoot } from 'react-dom/client'

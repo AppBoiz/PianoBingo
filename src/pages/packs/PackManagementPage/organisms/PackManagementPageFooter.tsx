@@ -4,8 +4,14 @@ interface PackManagementFooterProps {
 
 export default function PackManagementPageFooter({ onCreateNewPack }: PackManagementFooterProps) {
   return (
-    <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem 0' }}>
-      <button className="create-button" data-action="create-pack" onClick={onCreateNewPack}>Create New</button>
+    <div className="flex w-full items-center justify-center px-4 py-4">
+      <button
+        className="create-button rounded-lg bg-fuchsia-600 px-5 py-2.5 text-base font-semibold text-white shadow-md transition hover:bg-fuchsia-700"
+        data-action="create-pack"
+        onClick={onCreateNewPack}
+      >
+        Create New
+      </button>
     </div>
   )
 }

@@ -7,7 +7,6 @@ import { useLoadedSong } from '../../game/hooks/usePdfSong'
 import { loadSong, startNewGame } from '../../../shared/storage/indexedDb'
 import { useNavigation } from '../../../shared/context/NavigationContext'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
-import '../../../styles/legacy/song-view.css'
 
 export default function SongViewPage(){
   const { loadPage } = useNavigation()
@@ -30,13 +29,13 @@ export default function SongViewPage(){
     loadPage(PAGE_NAME.SONG_MANAGEMENT)
   }
 
-  if (isLoading) return <div className="song-view-page-root pdf-reader-empty">Loading song...</div>
+  if (isLoading) return <div className="song-view-page-root flex min-h-screen items-center justify-center px-6 text-center text-2xl text-zinc-600">Loading song...</div>
 
-  if (!base64) return <div className="song-view-page-root pdf-reader-empty">No song selected</div>
+  if (!base64) return <div className="song-view-page-root flex min-h-screen items-center justify-center px-6 text-center text-2xl text-zinc-600">No song selected</div>
 
   return (
     <PageLayout
-      rootClassName="song-view-page-root pdf-page"
+      rootClassName="song-view-page-root pdf-page overflow-hidden"
       rootTestId="song-view-page"
       header={(
         <SongViewPageHeader onBack={handleBack} />

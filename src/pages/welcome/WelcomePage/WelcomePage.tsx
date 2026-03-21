@@ -3,7 +3,6 @@ import { startNewGame } from '../../../shared/storage/indexedDb'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
 import WelcomeActionGroup from './molecules/WelcomeActionGroup'
 import PageLayout from '../../../shared/components/organisms/PageLayout'
-import '../../../styles/legacy/welcome-page.css'
 
 export default function WelcomePage(){
   const { loadPage } = useNavigation()
@@ -14,15 +13,20 @@ export default function WelcomePage(){
   }
 
   return (
-    <PageLayout rootId="welcome-page-container" rootTestId="welcome-page" skipMainWrapper>
+    <PageLayout
+      rootId="welcome-page-container"
+      rootTestId="welcome-page"
+      rootClassName="relative isolate items-center justify-start overflow-hidden px-6 text-center"
+      skipMainWrapper
+    >
       <WelcomeActionGroup
-        logo={<img src="/resources/images/logo.png" alt="PianoBingo Logo" id="logo" style={{ width: 306 }} />}
+        logo={<img src="/resources/images/logo.png" alt="PianoBingo Logo" id="logo" className="w-[306px] max-w-full" />}
         actions={[
           { id: 'new-game', label: 'New Game', onClick: newGameButtonHandler },
           { id: 'manage-songs', label: 'Manage Songs', onClick: () => loadPage(PAGE_NAME.SONG_MANAGEMENT) },
           { id: 'manage-playlists', label: 'Manage Playlists', onClick: () => loadPage(PAGE_NAME.PACK_MANAGEMENT) },
         ]}
-        banner={<img className="piano-banner" src="/resources/images/piano.png" />}
+        banner={<img className="pointer-events-none fixed -bottom-24 -right-[31rem] hidden -rotate-45 lg:block" src="/resources/images/piano.png" alt="" aria-hidden="true" />}
       />
     </PageLayout>
   )

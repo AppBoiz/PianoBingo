@@ -22,12 +22,12 @@ export default function GamePageHeader({
   onEndGame,
 }: GameHeaderProps) {
   return (
-    <nav data-testid="header">
-      <div style={{ width: '121px' }}></div>
-      <h1 id="title">
+    <nav className="flex w-full items-center justify-between gap-4 px-3 py-3 md:px-4" data-testid="header">
+      <div className="w-[121px] shrink-0"></div>
+      <h1 id="title" className="flex-1 truncate text-center text-xl font-semibold tracking-tight text-black md:text-2xl">
         {songIndex > 0 ? `${songIndex} - ${songTitle}` : songTitle}
       </h1>
-      <div style={{ width: '121px' }}>
+      <div className="flex w-[121px] shrink-0 justify-end">
         <GameMenu
           actions={[
             { id: 'next-song', label: 'Next Song', onClick: onNextSong, disabled: !canGoNext },
