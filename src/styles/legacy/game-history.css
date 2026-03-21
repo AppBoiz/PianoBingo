@@ -1,14 +1,38 @@
 .game-history-page-root {
     margin: 0;
     padding: 0;
-    overflow: hidden auto;
-    min-height: 100%;
-    scrollbar-width: none;      /* Firefox */
-    -ms-overflow-style: none;   /* IE 10+ */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(140, 140, 140, 0.5) transparent;
+    -ms-overflow-style: auto;
 }
 
 .game-history-page-root::-webkit-scrollbar {
-    display: none;              /* Chrome, Safari, Opera */
+    width: 8px;
+}
+
+.game-history-page-root::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.game-history-page-root::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.game-history-page-root::-webkit-scrollbar-thumb {
+    background: rgba(140, 140, 140, 0.5);
+    border-radius: 999px;
+}
+
+.game-history-page-root::-webkit-scrollbar-thumb:hover {
+    background: rgba(110, 110, 110, 0.65);
 }
 
 .game-history-page-root h1 {
@@ -16,6 +40,7 @@
     font-family: 'Inter', sans-serif;
     color: black;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .game-history-page-root .back-container{
@@ -23,6 +48,8 @@
     padding: 30px 40px;
     display: flex;
     align-items: center;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .game-history-page-root .back-container button{
