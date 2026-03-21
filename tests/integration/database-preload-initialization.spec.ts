@@ -17,6 +17,10 @@ test.describe('IndexedDB preloaded data initialization', () => {
       expect(consoleMessages.join('\n')).toContain('Preloaded data initialized');
     }).toPass({ timeout: 10000 });
 
+    // The preload log is emitted before React finishes mounting.
+    // Wait for the welcome page root so BrowserRouter is ready before SPA navigation.
+    await expect(page.getByTestId('welcome-page')).toBeVisible();
+
     // IDB seeding is lazy: openDB() (which seeds on first call) only runs when a component
     // first accesses the database.  Navigate in-SPA to pack management so that the
     // PackManagement component mounts and calls loadAllPacks() → openDB().
@@ -24,6 +28,8 @@ test.describe('IndexedDB preloaded data initialization', () => {
       window.history.pushState({}, '', '/pack-management');
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
+
+    await expect(page.getByTestId('pack-management-page')).toBeVisible();
 
     // Poll until both stores are fully seeded (2 packs, 150 songs).
     // Uses page.evaluate inside expect().toPass() so that the Node-side retry

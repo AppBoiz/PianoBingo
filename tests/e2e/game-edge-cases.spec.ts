@@ -152,7 +152,7 @@ test.describe('Pack exhaustion', () => {
   test('advancing past last song in single-song pack does not crash', async ({ page }) => {
     const app = pianoBingoLocator(page)
     // RISK 1.5: generateSong() returns null when there are no more songs to show.
-    // Clicking Next Song at that point must not throw or crash the page.
+    // The UI should disable forward navigation at that point and remain stable.
     await seedSingleSongPack(page)
 
     const errors: string[] = []
@@ -169,12 +169,12 @@ test.describe('Pack exhaustion', () => {
     await expect(game.nextSong()).toBeVisible()
     await expect(game.header().getByText('Solo Song')).toBeVisible()
 
-    // Attempt to advance — pack is now exhausted, generateSong() returns null
-    await game.nextSong().click()
-    await page.waitForLoadState('networkidle')
+    // Single-song pack is already exhausted after the first draw.
+    await expect(game.nextSong()).toBeDisabled()
 
     expect(errors).toHaveLength(0)
     await expect(game.header()).toBeVisible()
+    await expect(game.header().getByText('Solo Song')).toBeVisible()
   })
 })
 
@@ -185,14 +185,11 @@ test.describe('Pack exhaustion', () => {
 test.describe('Hamburger menu behaviour', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 
-  test.beforeEach(async ({ page }) => {
-    await seedSingleSongPack(page)
-  })
-
   test('menu closes after each menu item click', async ({ page }) => {
     const app = pianoBingoLocator(page)
     // BUG: Before the fix, the #menu-toggle checkbox was never unchecked after an action
     // click, leaving the menu visually open. Verify the fix holds across multiple open/close cycles.
+    await seedTwoSongPack(page)
 
     await app.welcomePage().action('new-game').click()
     await page.waitForLoadState('networkidle')
@@ -228,6 +225,7 @@ test.describe('Hamburger menu behaviour', () => {
 
   test('previous song is disabled on the first shown song', async ({ page }) => {
     const app = pianoBingoLocator(page)
+    await seedSingleSongPack(page)
 
     await app.welcomePage().action('new-game').click()
     await page.waitForLoadState('networkidle')
@@ -247,6 +245,7 @@ test.describe('Hamburger menu behaviour', () => {
 
   test('next song is disabled when there are no songs left in the pack', async ({ page }) => {
     const app = pianoBingoLocator(page)
+    await seedSingleSongPack(page)
 
     await app.welcomePage().action('new-game').click()
     await page.waitForLoadState('networkidle')
