@@ -5,6 +5,7 @@ interface GameMenuAction {
   label: string
   onClick: () => void
   className?: string
+  disabled?: boolean
 }
 
 interface GameMenuProps {
@@ -14,6 +15,10 @@ interface GameMenuProps {
 export default function GameMenu({ actions }: GameMenuProps) {
   function handleActionClick(event: MouseEvent<HTMLAnchorElement>, action: GameMenuAction) {
     event.preventDefault()
+    if (action.disabled) {
+      return
+    }
+
     const toggle = document.getElementById('menu-toggle') as HTMLInputElement | null
     if (toggle) toggle.checked = false
     action.onClick()
@@ -33,8 +38,10 @@ export default function GameMenu({ actions }: GameMenuProps) {
             <a
               key={action.id}
               href="#"
-              className={action.className}
+              className={action.disabled ? `${action.className ?? ''} disabled`.trim() : action.className}
               data-action={action.id}
+              aria-disabled={action.disabled ? 'true' : undefined}
+              tabIndex={action.disabled ? -1 : undefined}
               onClick={(event) => handleActionClick(event, action)}
             >
               {action.label}

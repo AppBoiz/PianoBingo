@@ -124,6 +124,18 @@ describe('useLoadedSong — nextSong()', () => {
     expect(loader).toHaveBeenCalledTimes(2)
     expect(result.current.song?.songId).toBe(2)
   })
+
+  test('keeps the current song when loadNextSong returns null', async () => {
+    const loader = jest.fn().mockResolvedValue(song1)
+    const loadNextSong = jest.fn().mockResolvedValue(null)
+    const { result } = renderHook(() => useLoadedSong(loader, [], { loadNextSong }))
+    await waitFor(() => expect(result.current.song?.songId).toBe(1))
+
+    await act(async () => { await result.current.nextSong() })
+
+    expect(result.current.song?.songId).toBe(1)
+    expect(result.current.songTitle).toBe('Song One')
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -154,5 +166,17 @@ describe('useLoadedSong — prevSong()', () => {
 
     expect(loader).toHaveBeenCalledTimes(2)
     expect(result.current.song?.songId).toBe(1)
+  })
+
+  test('keeps the current song when loadPrevSong returns null', async () => {
+    const loader = jest.fn().mockResolvedValue(song1)
+    const loadPrevSong = jest.fn().mockResolvedValue(null)
+    const { result } = renderHook(() => useLoadedSong(loader, [], { loadPrevSong }))
+    await waitFor(() => expect(result.current.song?.songId).toBe(1))
+
+    await act(async () => { await result.current.prevSong() })
+
+    expect(result.current.song?.songId).toBe(1)
+    expect(result.current.songTitle).toBe('Song One')
   })
 })

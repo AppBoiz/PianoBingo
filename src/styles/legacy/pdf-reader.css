@@ -209,6 +209,13 @@ nav h1 {
     color: #E96262;
   }
 
+  .game-page-root .menu a.disabled,
+  .game-page-root .menu a[aria-disabled="true"] {
+    color: #b8b8b8;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
   /* Show the menu when checked */
   .game-page-root #menu-toggle:checked ~ .menu {
     opacity: 1;

@@ -225,6 +225,25 @@ test.describe('Hamburger menu behaviour', () => {
     })
     expect(isChecked).toBe(false)
   })
+
+  test('previous song is disabled on the first shown song', async ({ page }) => {
+    const app = pianoBingoLocator(page)
+
+    await app.welcomePage().action('new-game').click()
+    await page.waitForLoadState('networkidle')
+    const packSelect = app.packSelectPage()
+    await packSelect.packRadioInputs().first().click()
+    await packSelect.startGameButton().click()
+    await page.waitForLoadState('networkidle')
+
+    const game = app.gamePage()
+    await expect(game.navTitle()).toContainText('Solo Song')
+
+    await game.menuToggle().click()
+    await expect(game.menu()).toBeVisible()
+    await expect(game.menuItem('prev-song')).toHaveAttribute('aria-disabled', 'true')
+    await expect(game.navTitle()).toContainText('Solo Song')
+  })
 })
 
 // ---------------------------------------------------------------------------

@@ -85,7 +85,9 @@ export function useLoadedSong(
     setIsLoading(true)
     try {
       const nextSongValue = await navigationLoaders.loadNextSong()
-      setSong(nextSongValue)
+      if (nextSongValue) {
+        setSong(nextSongValue)
+      }
       return nextSongValue
     } finally {
       setIsLoading(false)
@@ -100,7 +102,9 @@ export function useLoadedSong(
     setIsLoading(true)
     try {
       const prevSongValue = await navigationLoaders.loadPrevSong()
-      setSong(prevSongValue)
+      if (prevSongValue) {
+        setSong(prevSongValue)
+      }
       return prevSongValue
     } finally {
       setIsLoading(false)

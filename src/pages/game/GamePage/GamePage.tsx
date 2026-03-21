@@ -4,7 +4,7 @@ import PageLayout from '../../../shared/components/organisms/PageLayout'
 import GamePageHeader from './organisms/GamePageHeader'
 import GamePageFooter from './organisms/GamePageFooter'
 import { useLoadedSong } from '../hooks/usePdfSong'
-import { getCurrentSong, getSelectedSongPackId, loadPack, nextSong as loadNextSongFromStorage, prevSong as loadPrevSongFromStorage } from '../../../shared/storage/indexedDb'
+import { getCurrentSong, getSelectedSongPackId, getShownSongIds, loadPack, nextSong as loadNextSongFromStorage, prevSong as loadPrevSongFromStorage } from '../../../shared/storage/indexedDb'
 import { useNavigation } from '../../../shared/context/NavigationContext'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
 import '../../../styles/legacy/pdf-reader.css'
@@ -48,6 +48,7 @@ export default function GamePage(){
     loadPrevSong: loadPrevSongFromStorage,
   })
   const songIndex = useCurrentSongPositionInSelectedPack(song)
+  const canGoPrevious = song ? getShownSongIds().findIndex(id => id === song.songId) > 0 : false
 
   return (
     <PageLayout
@@ -59,6 +60,7 @@ export default function GamePage(){
           songTitle={songTitle}
           onNextSong={nextSong}
           onPreviousSong={prevSong}
+          canGoPrevious={canGoPrevious}
           onOpenGameHistory={() => loadPage(PAGE_NAME.GAME_HISTORY)}
           onEndGame={() => loadPage(PAGE_NAME.WELCOME)}
         />
