@@ -16,7 +16,7 @@ PianoBingo is an offline-capable React + TypeScript web app for running song-dra
 - TypeScript
 - React Router 6
 - Vite
-- Tailwind CSS + legacy parity CSS
+- Page-owned legacy CSS for visual parity
 - IndexedDB + localStorage
 - Workbox-generated service worker
 - pdfjs-dist for PDF rendering
@@ -164,7 +164,7 @@ Then publish the contents of `dist/` to your static host.
 - App bootstrap starts in `src/main.tsx` and preloads data before React mounts.
 - IndexedDB seeding is lazy and happens on first real database access, not just on app load.
 - PDF rendering is embedded in the game and song-view flows. There is no standalone `/pdf-reader` route.
-- Styling is hybrid: Tailwind is used alongside legacy CSS that is still important for visual parity.
+- Styling follows the original app model: each route page imports its own legacy CSS for parity-sensitive layout.
 - `Song.songId` is a technical database identifier. User-facing numbering in gameplay is based on pack position, not the raw song ID.
 
 ## Documentation

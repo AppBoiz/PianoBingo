@@ -9,6 +9,7 @@ import PageLayout from '../../../shared/components/organisms/PageLayout'
 import PlaylistContainer from '../../../shared/components/organisms/PlaylistContainer'
 import PrimaryActionFooter from '../../../shared/components/organisms/PrimaryActionFooter'
 import { PAGE, PAGE_NAME } from '../../../shared/constants/navigation'
+import '../../../styles/legacy/song-management.css'
 
 export default function SongManagementPage(){
   const { songs, refresh: refreshSongs } = useSongs()
@@ -46,11 +47,12 @@ export default function SongManagementPage(){
 
   return (
     <PageLayout
+      rootClassName="song-management-page-root"
       rootTestId="song-management-page"
       header={<Header title="Manage Songs" backAction={() => { startNewGame(); loadPage(PAGE_NAME.WELCOME) }} />}
       footer={<PrimaryActionFooter label="New Song" actionId="create-song" onClick={handleCreateNewSong} />}
     >
-      <PlaylistContainer>
+      <PlaylistContainer style={{ flexGrow: 1 }}>
         {songs.map(song => {
           const hasPdf = !!song.pdfUrl
           return (

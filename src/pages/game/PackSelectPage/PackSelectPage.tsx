@@ -6,6 +6,7 @@ import { PAGE_NAME } from '../../../shared/constants/navigation'
 import PackRadioGroup from './molecules/PackRadioGroup'
 import PageLayout from '../../../shared/components/organisms/PageLayout'
 import PackSelectPageHeader from './organisms/PackSelectPageHeader'
+import '../../../styles/legacy/pack-select.css'
 
 export default function PackSelectPage(){
   const { packs } = usePacks()
@@ -33,7 +34,7 @@ export default function PackSelectPage(){
 
   return (
     <PageLayout
-      rootClassName="p-4"
+      rootClassName="pack-select-page-root"
       rootTestId="pack-select-page"
       header={<PackSelectPageHeader onBack={handleBack} />}
       skipMainWrapper

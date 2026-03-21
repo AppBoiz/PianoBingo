@@ -1,4 +1,4 @@
-body {
+.pack-select-page-root {
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -9,27 +9,27 @@ body {
     box-sizing: border-box;
 }
 
-h1 {
+.pack-select-page-root h1 {
     font-size: 45px;
     font-family: 'Inter', sans-serif;
     color: black;
 }
 
-h2 {
+.pack-select-page-root h2 {
     font-size: 35px;
     color: #7F7F7F;
     margin-top:60px;
     margin-bottom: 40px;
 }
 
-.back-container{
+.pack-select-page-root .back-container{
     width: 100%;
     padding: 30px 40px;
     display: flex;
     align-items: center;
 }
 
-.back-container button{
+.pack-select-page-root .back-container button{
     color: #F14D8A;
     font-size: 30px;
     font-weight: bold;
@@ -39,7 +39,7 @@ h2 {
     cursor: pointer;
 }
 
-.piano-banner{
+.pack-select-page-root .piano-banner{
     position: absolute;
     bottom: -100px;
     right:-500px;
@@ -47,24 +47,33 @@ h2 {
     z-index: -100;
 }
 
-.radios-container{
+.pack-select-page-root .flex-col{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pack-select-page-root .mb-40{
+    margin-bottom: 40px;
+}
+
+.pack-select-page-root .radios-container{
     display: flex;
     flex-direction: column;
     accent-color: #F14D8A;
     font-size: 25px;
     font-family: 'Inter', sans-serif;
     width: fit-content;
-    margin: 0 auto;
 }
 
-.radio-label{
+.pack-select-page-root .radio-label{
     display: grid;
     grid-template-columns: 1em max-content;
     gap: 0.5em;
     margin-bottom: 30px;
 }
 
-.select-button {
+.pack-select-page-root .select-button {
     background-color: #F14D8A;
     color: white;
     border: none;

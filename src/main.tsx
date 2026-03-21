@@ -9,18 +9,6 @@ import { loadGameState } from './shared/storage/indexedDb'
 import { getRequiredElementById } from './shared/services/runtime/domService'
 import { registerProductionServiceWorker } from './shared/services/runtime/serviceWorkerService'
 
-import './styles/tailwind.css'
-import '/styles.css'
-// Legacy styles applied globally to help achieve visual parity
-import './styles/legacy/welcome-page.css'
-import './styles/legacy/pack-select.css'
-import './styles/legacy/pack-management.css'
-import './styles/legacy/pack-edit.css'
-import './styles/legacy/song-management.css'
-import './styles/legacy/pdf-reader.css'
-import './styles/legacy/game-history.css'
-import './styles/legacy/song-view.css'
-
 // Initialize and then render
 async function bootstrap() {
   // Wait for preloaded data to load

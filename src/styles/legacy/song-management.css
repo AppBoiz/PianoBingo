@@ -1,142 +1,135 @@
-html, body {
+.song-management-page-root {
   height: 100%;
-}
-
-#app {
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background: white;
+  color: #333;
+  text-align: center;
+  box-sizing: border-box;
 }
 
-.main-content {
+.song-management-page-root .main-content {
   flex-grow: 1;              /* take all remaining space */
   display: flex;
   flex-direction: column;
-  overflow: hidden;          /* let .playlist-container inside handle scrolling */
+  overflow-y: auto;          /* this makes it scroll */
 }
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
-    background: white;
-    color: #333;
-    text-align: center;
-    box-sizing: border-box;
+.song-management-page-root h1 {
+  font-size: 45px;
+  font-family: 'Inter', sans-serif;
+  color: black;
 }
 
-h1 {
-    font-size: 45px;
-    font-family: 'Inter', sans-serif;
-    color: black;
+.song-management-page-root h2 {
+  font-size: 35px;
+  color: #7F7F7F;
+  margin-top:60px;
+  margin-bottom: 40px;
+  height: 113px;
 }
 
-h2 {
-    font-size: 35px;
-    color: #7F7F7F;
-    margin-top:60px;
-    margin-bottom: 40px;
-    height: 113px;
-}
-
-.pdf-btn, 
-.remove-pdf-btn, 
-.pdf-upload-label {
-    border: none;
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.song-management-page-root .pdf-btn,
+.song-management-page-root .remove-pdf-btn,
+.song-management-page-root .pdf-upload-label {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 /* View PDF button - pink theme */
-.pdf-btn {
-    background-color: #F14D8A;
-    color: white;
+.song-management-page-root .pdf-btn {
+  background-color: #F14D8A;
+  color: white;
 }
 
-.pdf-btn:hover {
-    background-color: #d81b60;
+.song-management-page-root .pdf-btn:hover {
+  background-color: #d81b60;
 }
 
 /* Remove PDF button - subtle red */
-.remove-pdf-btn {
-    background-color: #ff3366;
-    color: white;
+.song-management-page-root .remove-pdf-btn {
+  background-color: #ff3366;
+  color: white;
 }
 
-.remove-pdf-btn:hover {
-    background-color: #cc294f;
+.song-management-page-root .remove-pdf-btn:hover {
+  background-color: #cc294f;
 }
 
 /* PDF upload label styled as a button */
-.pdf-upload-label {
-    background-color: #ff0080;
-    color: white;
+.song-management-page-root .pdf-upload-label {
+  background-color: #ff0080;
+  color: white;
 }
 
-.pdf-upload-label:hover {
-    background-color: #e60073;
+.song-management-page-root .pdf-upload-label:hover {
+  background-color: #e60073;
 }
 
 /* hide default file input */
-.pdf-upload {
-    display: none;
+.song-management-page-root .pdf-upload {
+  display: none;
 }
 
-.nav-bar {
-    height: 113px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+.song-management-page-root .nav-bar {
+  height: 113px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
-.nav-bar-left {
-    position: absolute;
-    left: 1rem;
+.song-management-page-root .nav-bar-left {
+  position: absolute;
+  left: 1rem;
 }
 
-.nav-bar-right {
-    position: absolute;
-    right: 1rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #333;
+.song-management-page-root .nav-bar-right {
+  position: absolute;
+  right: 1rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
 }
 
-.back-container{
-    width: 100%;
-    padding: 30px 40px;
-    display: flex;
-    align-items: center;
+.song-management-page-root .back-container{
+  width: 100%;
+  padding: 30px 40px;
+  display: flex;
+  align-items: center;
 }
 
-.back-container button{
-    color: #F14D8A;
-    font-size: 30px;
-    font-weight: bold;
-    background: none;
-    outline: none;
-    border: none;
-    cursor: pointer;
+.song-management-page-root .back-container button{
+  color: #F14D8A;
+  font-size: 30px;
+  font-weight: bold;
+  background: none;
+  outline: none;
+  border: none;
+  cursor: pointer;
 }
 
-.playlist-container {
+.song-management-page-root .playlist-container {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
   margin: 1rem auto;
   width: 90%;           /* take most of the screen width */
-  max-width: 800px;     /* but don’t get too wide on desktop */
+  max-width: 600px;     /* but don’t get too wide on desktop */
   padding: 0 0.5rem;
 }
 
-.playlist-row {
+.song-management-page-root .playlist-row {
   background-color: white;
   border-radius: 12px;
   padding: 1rem;
@@ -148,7 +141,7 @@ h2 {
   box-sizing: border-box;
 }
 
-.playlist-checkbox {
+.song-management-page-root .playlist-checkbox {
   appearance: none;             /* remove default */
   width: 22px;
   height: 22px;
@@ -159,12 +152,12 @@ h2 {
   transition: all 0.2s ease;
 }
 
-.playlist-checkbox:checked {
+.song-management-page-root .playlist-checkbox:checked {
   background-color: #F14D8A;
   border-color: #F14D8A;
 }
 
-.playlist-checkbox:checked::after {
+.song-management-page-root .playlist-checkbox:checked::after {
   content: "✓";
   position: absolute;
   color: white;
@@ -174,13 +167,13 @@ h2 {
   top: -1px;
 }
 
-.playlist-name {
+.song-management-page-root .playlist-name {
   font-size: 1rem;
   font-weight: 500;
   color: #333;
 }
 
-.playlist-name-input {
+.song-management-page-root .playlist-name-input {
   border: none;
   background: transparent;
   font-size: 1rem;
@@ -194,18 +187,18 @@ h2 {
 }
 
 /* Subtle highlight when focused */
-.playlist-name-input:focus {
+.song-management-page-root .playlist-name-input:focus {
   border-bottom: 1px solid #888;
   background: #f9f9f9;
 }
 
-.playlist-actions {
+.song-management-page-root .playlist-actions {
   display: flex;
   gap: 0.5rem;
 }
 
-.edit-btn,
-.delete-btn {
+.song-management-page-root .edit-btn,
+.song-management-page-root .delete-btn {
   border: none;
   border-radius: 4px;
   padding: 0.4rem 0.6rem;
@@ -215,27 +208,27 @@ h2 {
 }
 
 /* Edit button style */
-.edit-btn {
+.song-management-page-root .edit-btn {
   background-color: #ffcc00;
   color: white;
 }
 
 /* Delete button style */
-.delete-btn {
+.song-management-page-root .delete-btn {
   background-color: #ff3366;
   color: white;
 }
 
-.edit-btn:hover {
+.song-management-page-root .edit-btn:hover {
   background-color: #e6b800;
 }
 
-.delete-btn:hover {
+.song-management-page-root .delete-btn:hover {
   background-color: #cc294f;
 }
 
 
-.create-button {
+.song-management-page-root .create-button {
   background-color: #ff0080;      /* Bright pink background */
   color: white;                   /* White text */
   border: none;                   /* No border */
@@ -248,130 +241,93 @@ h2 {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow */
 }
 
-.create-button:hover {
+.song-management-page-root .create-button:hover {
   background-color: #e60073; /* Darker pink on hover */
 }
 
-.piano-banner{
-    position: absolute;
-    bottom: -100px;
-    right:-500px;
-    transform: rotate(-45deg);
-    z-index: -100;
+.song-management-page-root .piano-banner{
+  position: absolute;
+  bottom: -100px;
+  right:-500px;
+  transform: rotate(-45deg);
+  z-index: -100;
 }
 
-.radios-container{
-    display: flex;
-    flex-direction: column;
-    accent-color: #F14D8A;
-    font-size: 25px;
-    font-family: 'Inter', sans-serif;
-    width: fit-content;
-    margin: 0 auto;
+.song-management-page-root .flex-col{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.radio-label{
-    display: grid;
-    grid-template-columns: 1em max-content;
-    gap: 0.5em;
-    margin-bottom: 30px;
+.song-management-page-root .mb-40{
+  margin-bottom: 40px;
 }
 
-.select-button {
-    background-color: #F14D8A;
-    color: white;
-    border: none;
-    outline: none;
-    width: 250px;
-    height: 70px;
-    border-radius: 20px;
-    font-size: 25px;
-    font-family: 'Inter', sans-serif;
-    margin-top: 50px;
-    cursor: pointer;
+.song-management-page-root .radios-container{
+  display: flex;
+  flex-direction: column;
+  accent-color: #F14D8A;
+  font-size: 25px;
+  font-family: 'Inter', sans-serif;
+  width: fit-content;
 }
 
-.footer {
-    position: sticky;
-    bottom: 0;
-    width: 100%;
-    background: #f9f9f9; /* light background */
-    padding: 12px;
-    display: flex;
-    justify-content: center;
-    border-top: 1px solid #ddd;
+.song-management-page-root .radio-label{
+  display: grid;
+  grid-template-columns: 1em max-content;
+  gap: 0.5em;
+  margin-bottom: 30px;
 }
 
-.primary-btn {
-    background-color: #F14D8A; /* pink */
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+.song-management-page-root .select-button {
+  background-color: #F14D8A;
+  color: white;
+  border: none;
+  outline: none;
+  width: 250px;
+  height: 70px;
+  border-radius: 20px;
+  font-size: 25px;
+  font-family: 'Inter', sans-serif;
+  margin-top: 50px;
+  cursor: pointer;
 }
 
-.primary-btn:hover {
-    background-color: #d81b60; /* darker pink */
+.song-management-page-root .footer {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  background: #f9f9f9; /* light background */
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #ddd;
 }
 
-.primary-btn:active {
-    background-color: #c2185b;
-    transform: scale(0.97);
+.song-management-page-root .primary-btn {
+  background-color: #F14D8A; /* pink */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
-.primary-btn:disabled {
-    background-color: #f8a5c2; /* lighter pink */
-    cursor: not-allowed;
-    opacity: 0.6;
+.song-management-page-root .primary-btn:hover {
+  background-color: #d81b60; /* darker pink */
 }
 
-/* Responsive adjustments for small screens */
-@media (max-width: 768px) {
-  .playlist-container {
-    width: 95%;
-    max-width: 100%;
-    padding: 0 1rem;
-  }
-  
-  .playlist-row {
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-  
-  .playlist-name-input {
-    flex: 1 1 100%;
-    min-width: 150px;
-  }
-  
-  .playlist-actions {
-    flex: 1 1 100%;
-    display: flex;
-    gap: 0.5rem;
-    justify-content: space-around;
-  }
-  
-  .pdf-btn, .remove-pdf-btn, .pdf-upload-label, .delete-btn {
-    flex: 1;
-    min-width: 0;
-  }
+.song-management-page-root .primary-btn:active {
+  background-color: #c2185b;
+  transform: scale(0.97);
 }
 
-@media (max-width: 480px) {
-  .playlist-row {
-    padding: 0.75rem;
-  }
-  
-  .playlist-actions {
-    gap: 0.25rem;
-  }
-  
-  .pdf-btn, .remove-pdf-btn, .pdf-upload-label, .delete-btn {
-    font-size: 0.75rem;
-    padding: 4px 8px;
-  }
+.song-management-page-root .primary-btn:disabled {
+  background-color: #f8a5c2; /* lighter pink */
+  cursor: not-allowed;
+  opacity: 0.6;
 }

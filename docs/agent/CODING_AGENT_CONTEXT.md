@@ -168,7 +168,7 @@ Do not refactor structure or selector names casually during migration; layout pa
 
 - Framework/runtime: React 18, React Router 6, TypeScript.
 - Build/dev server: Vite.
-- Styling: Tailwind (PostCSS) + legacy global/per-page CSS.
+- Styling: page-owned legacy CSS imported by each route page; `styles.css` remains only for the legacy HTML shell.
 - Offline/PWA: Service Worker (Workbox-generated in build), web app manifest.
 - Data/storage: IndexedDB + localStorage.
 - PDF rendering: `pdfjs-dist`.
@@ -198,10 +198,10 @@ Local validation helpers:
 
 ## 7) Styling system and visual constraints
 
-Styling architecture is hybrid and parity-oriented:
-- Base/utilities: `src/styles/tailwind.css`
-- Legacy global look-and-feel: `styles.css`
-- Legacy page CSS imported in `src/main.tsx` from `src/styles/legacy/*`
+Styling architecture is parity-oriented and page-owned:
+- React route pages import their matching CSS from `src/styles/legacy/*`
+- `styles.css` remains only for the old iframe-based legacy shell in `public/legacy-index.html`
+- Avoid app-wide CSS imports in `src/main.tsx`; route pages own their styling
 
 Observed visual conventions:
 - Primary accent pink family (e.g., `#F14D8A` and darker hover variants).

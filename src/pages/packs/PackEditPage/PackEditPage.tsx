@@ -13,6 +13,7 @@ import { compareSongsByPackMembershipThenPackOrder } from '../../../shared/utils
 import { PACK_SIZE } from '../../../shared/constants/game'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
 import { useParams } from 'react-router-dom'
+import '../../../styles/legacy/pack-edit.css'
 
 function useLoadPackFromPathParam(packIdParam: string | undefined) {
   const [pack, setPack] = useState<Pack | null>(null)
@@ -87,6 +88,7 @@ export default function PackEditPage() {
 
   return (
     <PageLayout
+      rootClassName="pack-edit-page-root"
       rootTestId="pack-edit-page"
       header={(
         <Header

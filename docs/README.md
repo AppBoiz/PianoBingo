@@ -164,15 +164,14 @@ If `dist/resources` is missing, preload and PDF resolution will fail.
 
 ## Styling Strategy
 
-The styling system is hybrid.
+The React app styling is page-owned and parity-oriented.
 
 ### Current Setup
 
-- `src/styles/tailwind.css`: Tailwind base and utilities
-- `styles.css`: global legacy-compatible styling
-- `src/styles/legacy/*.css`: page-level parity styles still imported globally
+- `src/styles/legacy/*.css`: page-level parity styles imported by the matching route page component
+- `styles.css`: retained only for the legacy HTML shell under `public/legacy-index.html`
 
-This project is still carrying legacy CSS intentionally to preserve layout and visual parity. Avoid assuming that a page is safe to convert fully to Tailwind without validating desktop and mobile behavior.
+This project carries legacy CSS intentionally to preserve layout and visual parity. Prefer page-scoped CSS ownership, and do not reintroduce app-wide style imports unless there is a clear cross-page requirement.
 
 ## Service Layer Boundary
 

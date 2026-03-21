@@ -121,7 +121,7 @@ Two distinct numeric identifiers exist; never conflate them:
 ## Tech stack
 
 - React 18, React Router 6, TypeScript
-- Vite (build/dev), Tailwind + PostCSS (styling), legacy per-page CSS in `src/styles/legacy/`
+- Vite (build/dev), legacy per-page CSS in `src/styles/legacy/`
 - IndexedDB + localStorage for persistence
 - Service Worker: Workbox-generated (`dist/service-worker.js`); `cleanupOutdatedCaches: true`
 - `pdfjs-dist` for PDF rendering, `sortablejs` for drag reorder
@@ -147,9 +147,9 @@ npm run test:e2e     # Playwright only
 
 ## Styling
 
-- Tailwind base: `src/styles/tailwind.css`
-- Global look-and-feel: `styles.css`
-- Page CSS (ported from original app, still essential): `src/styles/legacy/*.css`
+- React page CSS (ported from original app, still essential): `src/styles/legacy/*.css`
+- Each route page imports its own CSS; do not centralize page styles in `src/main.tsx`
+- `styles.css` exists only for the legacy HTML shell and should not be used by the React app
 - Primary accent: pink family (`#F14D8A`). White cards, gray separators, rounded corners, high-contrast CTAs.
 - Do not rename/remove legacy CSS selectors without explicit visual parity validation.
 

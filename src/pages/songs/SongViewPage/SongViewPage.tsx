@@ -7,11 +7,12 @@ import { useLoadedSong } from '../../game/hooks/usePdfSong'
 import { loadSong, startNewGame } from '../../../shared/storage/indexedDb'
 import { useNavigation } from '../../../shared/context/NavigationContext'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
+import '../../../styles/legacy/song-view.css'
 
 export default function SongViewPage(){
   const { loadPage } = useNavigation()
   const { songId: songIdParam } = useParams<{ songId: string }>()
-  const { base64, songTitle, isLoading } = useLoadedSong(async () => {
+  const { base64, isLoading } = useLoadedSong(async () => {
     if (!songIdParam) {
       return null
     }
@@ -29,20 +30,20 @@ export default function SongViewPage(){
     loadPage(PAGE_NAME.SONG_MANAGEMENT)
   }
 
-  if (isLoading) return <div className="pdf-reader-empty">Loading song...</div>
+  if (isLoading) return <div className="song-view-page-root pdf-reader-empty">Loading song...</div>
 
-  if (!base64) return <div className="pdf-reader-empty">No song selected</div>
+  if (!base64) return <div className="song-view-page-root pdf-reader-empty">No song selected</div>
 
   return (
     <PageLayout
-      rootClassName="pdf-page"
+      rootClassName="song-view-page-root pdf-page"
       rootTestId="song-view-page"
       header={(
-        <SongViewPageHeader title={songTitle} onBack={handleBack} />
+        <SongViewPageHeader onBack={handleBack} />
       )}
       skipMainWrapper
     >
-      <PDFViewer base64={base64} />
+      <PDFViewer base64={base64} scaleMode="fit-contain" />
     </PageLayout>
   )
 }

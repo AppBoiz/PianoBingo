@@ -1,63 +1,30 @@
-/* Game history page scrolls within its container without a visible scrollbar */
-.game-history-root {
-    overflow-y: auto;
+.game-history-page-root {
+    margin: 0;
+    padding: 0;
+    overflow: hidden auto;
+    min-height: 100%;
     scrollbar-width: none;      /* Firefox */
     -ms-overflow-style: none;   /* IE 10+ */
 }
 
-.game-history-root::-webkit-scrollbar {
+.game-history-page-root::-webkit-scrollbar {
     display: none;              /* Chrome, Safari, Opera */
 }
 
-h1 {
+.game-history-page-root h1 {
     font-size: 45px;
     font-family: 'Inter', sans-serif;
     color: black;
 }
 
-/* Header styling for GameHistory */
-.nav-bar {
-    height: 113px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    background-color: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.nav-bar h1 {
-    margin: 0;
-    font-size: 45px;
-}
-
-/* Scope button positioning to game-history page only — other pages use .nav-bar-left for placement */
-.game-history-root .nav-bar button {
-    position: absolute;
-    left: 20px;
-    color: #F14D8A;
-    font-size: 30px;
-    font-weight: bold;
-    background: none;
-    outline: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-}
-
-.game-history-root .nav-bar button:hover {
-    opacity: 0.8;
-}
-
-.back-container{
+.game-history-page-root .back-container{
     width: 100%;
     padding: 30px 40px;
     display: flex;
     align-items: center;
 }
 
-.back-container button{
+.game-history-page-root .back-container button{
     color: #F14D8A;
     font-size: 30px;
     font-weight: bold;
@@ -67,7 +34,7 @@ h1 {
     cursor: pointer;
 }
 
-.box-container{
+.game-history-page-root .box-container{
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -76,52 +43,22 @@ h1 {
     padding: 60px 10vw;
 }
 
-.box {
-    width: 60px;
-    height: 60px;
+.game-history-page-root .box{
+    width: 120px;
+    height: 120px;
+    background-color: #F0F0F0;
+    color: #AEAEAE;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    font-weight: 600;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    background: white;
-    color: #6b7280;
-    margin: 4px;
-    transition: all 0.2s ease;
+    margin:20px;
+    font-size: 40px;
 }
 
-.box.highlighted {
-    background: #F14D8A;
-    color: white;
-    border-color: #F14D8A;
-    box-shadow: 0 2px 4px rgba(241, 77, 138, 0.2);
-}
-
-@media (max-width: 768px) {
-    .box {
-        width: 45px;
-        height: 45px;
-        font-size: 14px;
-        margin: 3px;
-    }
-    
-    .box-container {
-        padding: 40px 5vw !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .box {
-        width: 35px;
-        height: 35px;
-        font-size: 12px;
-        margin: 2px;
-    }
-    
-    h1 {
-        font-size: 32px !important;
-    }
+.game-history-page-root .box.highlighted{
+    background-color: #E4E4E4;
+    color: #282828;
+    border: 2px black solid;
 }
 

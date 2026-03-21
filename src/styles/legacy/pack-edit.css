@@ -1,21 +1,17 @@
-html, body {
+.pack-edit-page-root {
   height: 100%;
-}
-
-#app {
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 
-.main-content {
+.pack-edit-page-root .main-content {
   flex-grow: 1;              /* take all remaining space */
   display: flex;
   flex-direction: column;
-  overflow: hidden;          /* let .playlist-container inside handle scrolling */
+  overflow-y: auto;          /* this makes it scroll */
 }
 
-body {
+.pack-edit-page-root {
     margin: 0;
     padding: 0;
     font-family: 'Inter', sans-serif;
@@ -25,13 +21,13 @@ body {
     box-sizing: border-box;
 }
 
-h1 {
+  .pack-edit-page-root h1 {
     font-size: 45px;
     font-family: 'Inter', sans-serif;
     color: black;
 }
 
-h2 {
+.pack-edit-page-root h2 {
     font-size: 35px;
     color: #7F7F7F;
     margin-top:60px;
@@ -39,7 +35,7 @@ h2 {
     height: 113px;
 }
 
-.nav-bar {
+.pack-edit-page-root .nav-bar {
     height: 113px;
     width: 100%;
     display: flex;
@@ -48,12 +44,12 @@ h2 {
     position: relative;
 }
 
-.nav-bar-left {
+.pack-edit-page-root .nav-bar-left {
     position: absolute;
     left: 1rem;
 }
 
-.nav-bar-right {
+.pack-edit-page-root .nav-bar-right {
     position: absolute;
     right: 1rem;
     font-size: 1.2rem;
@@ -61,14 +57,14 @@ h2 {
     color: #333;
 }
 
-.back-container{
+.pack-edit-page-root .back-container{
     width: 100%;
     padding: 30px 40px;
     display: flex;
     align-items: center;
 }
 
-.back-container button{
+.pack-edit-page-root .back-container button{
     color: #F14D8A;
     font-size: 30px;
     font-weight: bold;
@@ -78,7 +74,7 @@ h2 {
     cursor: pointer;
 }
 
-.playlist-container {
+.pack-edit-page-root .playlist-container {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
@@ -88,7 +84,7 @@ h2 {
   padding: 0 0.5rem;
 }
 
-.playlist-row {
+.pack-edit-page-root .playlist-row {
   background-color: white;
   border-radius: 12px;
   padding: 1rem;
@@ -100,17 +96,17 @@ h2 {
   box-sizing: border-box;
 }
 
-.playlist-row.unchecked {
+.pack-edit-page-root .playlist-row.unchecked {
     opacity: 0.5;               /* makes it look faded */
     color: #999;                 /* optional: fade text color */
 }
 
-.playlist-row.unchecked .playlist-name,
-.playlist-row.unchecked .drag-handle {
+.pack-edit-page-root .playlist-row.unchecked .playlist-name,
+.pack-edit-page-root .playlist-row.unchecked .drag-handle {
     color: #999;                /* fade handle and song number too */
 }
 
-.drag-handle {
+.pack-edit-page-root .drag-handle {
     cursor: grab;
     font-weight: bold;
     width: 30px;
@@ -120,7 +116,7 @@ h2 {
     color: #F14D8A;
 }
 
-.playlist-checkbox {
+.pack-edit-page-root .playlist-checkbox {
   appearance: none;             /* remove default */
   width: 22px;
   height: 22px;
@@ -131,12 +127,12 @@ h2 {
   transition: all 0.2s ease;
 }
 
-.playlist-checkbox:checked {
+.pack-edit-page-root .playlist-checkbox:checked {
   background-color: #F14D8A;
   border-color: #F14D8A;
 }
 
-.playlist-checkbox:checked::after {
+.pack-edit-page-root .playlist-checkbox:checked::after {
   content: "✓";
   position: absolute;
   color: white;
@@ -146,19 +142,19 @@ h2 {
   top: -1px;
 }
 
-.playlist-name {
+.pack-edit-page-root .playlist-name {
   font-size: 1rem;
   font-weight: 500;
   color: #333;
 }
 
-.playlist-actions {
+.pack-edit-page-root .playlist-actions {
   display: flex;
   gap: 0.5rem;
 }
 
-.edit-btn,
-.delete-btn {
+.pack-edit-page-root .edit-btn,
+.pack-edit-page-root .delete-btn {
   border: none;
   border-radius: 4px;
   padding: 0.4rem 0.6rem;
@@ -168,27 +164,27 @@ h2 {
 }
 
 /* Edit button style */
-.edit-btn {
+.pack-edit-page-root .edit-btn {
   background-color: #ffcc00;
   color: white;
 }
 
 /* Delete button style */
-.delete-btn {
+.pack-edit-page-root .delete-btn {
   background-color: #ff3366;
   color: white;
 }
 
-.edit-btn:hover {
+.pack-edit-page-root .edit-btn:hover {
   background-color: #e6b800;
 }
 
-.delete-btn:hover {
+.pack-edit-page-root .delete-btn:hover {
   background-color: #cc294f;
 }
 
 
-.create-button {
+.pack-edit-page-root .create-button {
   background-color: #ff0080;      /* Bright pink background */
   color: white;                   /* White text */
   border: none;                   /* No border */
@@ -201,11 +197,11 @@ h2 {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow */
 }
 
-.create-button:hover {
+.pack-edit-page-root .create-button:hover {
   background-color: #e60073; /* Darker pink on hover */
 }
 
-.piano-banner{
+.pack-edit-page-root .piano-banner{
     position: absolute;
     bottom: -100px;
     right:-500px;
@@ -213,24 +209,33 @@ h2 {
     z-index: -100;
 }
 
-.radios-container{
+.pack-edit-page-root .flex-col{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pack-edit-page-root .mb-40{
+    margin-bottom: 40px;
+  }
+
+  .pack-edit-page-root .radios-container{
     display: flex;
     flex-direction: column;
     accent-color: #F14D8A;
     font-size: 25px;
     font-family: 'Inter', sans-serif;
     width: fit-content;
-    margin: 0 auto;
 }
 
-.radio-label{
+.pack-edit-page-root .radio-label{
     display: grid;
     grid-template-columns: 1em max-content;
     gap: 0.5em;
     margin-bottom: 30px;
 }
 
-.select-button {
+.pack-edit-page-root .select-button {
     background-color: #F14D8A;
     color: white;
     border: none;
@@ -244,7 +249,7 @@ h2 {
     cursor: pointer;
 }
 
-.footer {
+.pack-edit-page-root .footer {
     position: sticky;
     bottom: 0;
     width: 100%;
@@ -255,7 +260,7 @@ h2 {
     border-top: 1px solid #ddd;
 }
 
-.primary-btn {
+.pack-edit-page-root .primary-btn {
     background-color: #F14D8A; /* pink */
     color: white;
     border: none;
@@ -268,16 +273,16 @@ h2 {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
-.primary-btn:hover {
+.pack-edit-page-root .primary-btn:hover {
     background-color: #d81b60; /* darker pink */
 }
 
-.primary-btn:active {
+.pack-edit-page-root .primary-btn:active {
     background-color: #c2185b;
     transform: scale(0.97);
 }
 
-.primary-btn:disabled {
+.pack-edit-page-root .primary-btn:disabled {
     background-color: #f8a5c2; /* lighter pink */
     cursor: not-allowed;
     opacity: 0.6;

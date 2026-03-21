@@ -26,9 +26,14 @@ export async function loadPdfDocumentFromBase64(pdfBase64: string): Promise<PDFD
 export async function renderPdfPageIntoContainer(
   container: HTMLDivElement,
   page: PDFPageProxy,
+  scaleMode: 'fit-width' | 'fit-contain' = 'fit-width',
 ): Promise<void> {
   const unscaledViewport = page.getViewport({ scale: 1 })
-  const scale = container.clientWidth / unscaledViewport.width
+  const widthScale = container.clientWidth / unscaledViewport.width
+  const heightScale = container.clientHeight / unscaledViewport.height
+  const scale = scaleMode === 'fit-contain'
+    ? Math.min(widthScale, heightScale)
+    : widthScale
   const viewport = page.getViewport({ scale })
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d')

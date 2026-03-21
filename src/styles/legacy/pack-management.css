@@ -1,16 +1,12 @@
-body, html {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-#app {
+.pack-management-page-root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
     display: flex;
     flex-direction: column;
-    height: 100%;
 }
 
-.main-content {
+.pack-management-page-root .main-content {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -18,7 +14,7 @@ body, html {
     width: 100%;      /* container is full width so scrollbar is at far right */
 }
 
-.playlist-container {
+  .pack-management-page-root .playlist-container {
     flex-grow: 1;
     overflow-y: auto;          /* enable vertical scroll */
     display: flex;
@@ -29,8 +25,8 @@ body, html {
     padding: 0;                /* no horizontal padding here */
 }
 
-.playlist-row {
-    max-width: 800px;          /* content width */
+.pack-management-page-root .playlist-row {
+  max-width: 500px;          /* content width */
     margin: 0 auto;            /* center content inside container */
     padding: 0.75rem 1rem;
     background-color: white;
@@ -42,20 +38,21 @@ body, html {
     gap: 0.5rem;
     box-sizing: border-box;
 }
-h1 {
+
+  .pack-management-page-root h1 {
     font-size: 45px;
     font-family: 'Inter', sans-serif;
     color: black;
 }
 
-h2 {
+  .pack-management-page-root h2 {
     font-size: 35px;
     color: #7F7F7F;
     margin-top:60px;
     margin-bottom: 40px;
 }
 
-.nav-bar{
+  .pack-management-page-root .nav-bar{
     width:100%; 
     display: flex; 
     flex-direction: row; 
@@ -63,19 +60,19 @@ h2 {
     align-items: center;
 }
 
-.nav-bar-left {
+  .pack-management-page-root .nav-bar-left {
     position: absolute;
     left: 1rem;
 }
 
-.back-container{
+  .pack-management-page-root .back-container{
     width: 100%;
     padding: 30px 40px;
     display: flex;
     align-items: center;
 }
 
-.back-container button{
+  .pack-management-page-root .back-container button{
     color: #F14D8A;
     font-size: 30px;
     font-weight: bold;
@@ -86,19 +83,19 @@ h2 {
 }
 
 
-.playlist-name {
+.pack-management-page-root .playlist-name {
   font-size: 1rem;
   font-weight: 500;
   color: #333;
 }
 
-.playlist-actions {
+.pack-management-page-root .playlist-actions {
   display: flex;
   gap: 0.5rem;
 }
 
-.edit-btn,
-.delete-btn {
+.pack-management-page-root .edit-btn,
+.pack-management-page-root .delete-btn {
   border: none;
   border-radius: 4px;
   padding: 0.4rem 0.6rem;
@@ -108,27 +105,27 @@ h2 {
 }
 
 /* Edit button style */
-.edit-btn {
+.pack-management-page-root .edit-btn {
   background-color: #ffcc00;
   color: white;
 }
 
 /* Delete button style */
-.delete-btn {
+.pack-management-page-root .delete-btn {
   background-color: #ff3366;
   color: white;
 }
 
-.edit-btn:hover {
+.pack-management-page-root .edit-btn:hover {
   background-color: #e6b800;
 }
 
-.delete-btn:hover {
+.pack-management-page-root .delete-btn:hover {
   background-color: #cc294f;
 }
 
 
-.create-button {
+.pack-management-page-root .create-button {
   background-color: #ff0080;      /* Bright pink background */
   color: white;                   /* White text */
   border: none;                   /* No border */
@@ -141,11 +138,11 @@ h2 {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow */
 }
 
-.create-button:hover {
+.pack-management-page-root .create-button:hover {
   background-color: #e60073; /* Darker pink on hover */
 }
 
-.piano-banner{
+.pack-management-page-root .piano-banner{
     position: absolute;
     bottom: -100px;
     right:-500px;
@@ -153,24 +150,33 @@ h2 {
     z-index: -100;
 }
 
-.radios-container{
+.pack-management-page-root .flex-col{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+.pack-management-page-root .mb-40{
+    margin-bottom: 40px;
+  }
+
+.pack-management-page-root .radios-container{
     display: flex;
     flex-direction: column;
     accent-color: #F14D8A;
     font-size: 25px;
     font-family: 'Inter', sans-serif;
     width: fit-content;
-    margin: 0 auto;
 }
 
-.radio-label{
+  .pack-management-page-root .radio-label{
     display: grid;
     grid-template-columns: 1em max-content;
     gap: 0.5em;
     margin-bottom: 30px;
 }
 
-.select-button {
+  .pack-management-page-root .select-button {
     background-color: #F14D8A;
     color: white;
     border: none;
@@ -184,7 +190,7 @@ h2 {
     cursor: pointer;
 }
 
-.playlist-name-input {
+.pack-management-page-root .playlist-name-input {
   border: none;
   background: transparent;
   font-size: 1rem;
@@ -197,54 +203,7 @@ h2 {
 }
 
 /* Subtle highlight when focused */
-.playlist-name-input:focus {
+.pack-management-page-root .playlist-name-input:focus {
   border-bottom: 1px solid #888;
   background: #f9f9f9;
-}
-
-/* Responsive adjustments for small screens */
-@media (max-width: 768px) {
-  .playlist-container {
-    width: 95%;
-    max-width: 100%;
-    padding: 0 1rem;
-  }
-  
-  .playlist-row {
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin: 0.5rem auto;
-  }
-  
-  .playlist-name-input {
-    flex: 1 1 100%;
-    min-width: 150px;
-  }
-  
-  .playlist-actions {
-    flex: 1 1 100%;
-    display: flex;
-    gap: 0.5rem;
-    justify-content: space-around;
-  }
-  
-  .edit-btn, .delete-btn {
-    flex: 1;
-    min-width: 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .playlist-row {
-    padding: 0.75rem;
-  }
-  
-  .playlist-actions {
-    gap: 0.25rem;
-  }
-  
-  .edit-btn, .delete-btn {
-    font-size: 0.75rem;
-    padding: 4px 8px;
-  }
 }

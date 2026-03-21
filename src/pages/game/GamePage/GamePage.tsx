@@ -7,6 +7,7 @@ import { useLoadedSong } from '../hooks/usePdfSong'
 import { getCurrentSong, getSelectedSongPackId, loadPack, nextSong as loadNextSongFromStorage, prevSong as loadPrevSongFromStorage } from '../../../shared/storage/indexedDb'
 import { useNavigation } from '../../../shared/context/NavigationContext'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
+import '../../../styles/legacy/pdf-reader.css'
 
 function useCurrentSongPositionInSelectedPack(song: { songId: number; pdfUrl: string | null } | null | undefined) {
   const [songIndex, setSongIndex] = useState<number>(0)
@@ -50,7 +51,7 @@ export default function GamePage(){
 
   return (
     <PageLayout
-      rootClassName="pdf-page"
+      rootClassName="game-page-root pdf-page"
       rootTestId="game-page"
       header={(
         <GamePageHeader

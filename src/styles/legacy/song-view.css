@@ -1,6 +1,6 @@
 
 /* Specific layout for PDF page */
-.pdf-page {
+.song-view-page-root.pdf-page {
     margin: 0;
     overflow: hidden;
     height: 100vh;
@@ -8,13 +8,13 @@
 }
 
 /* Headings */
-h1 {
+.song-view-page-root h1 {
     color: #2c3e50;
     margin-bottom: 20px;
 }
 
 /* Button Styling */
-button {
+.song-view-page-root button {
     color: white;
     background-color: #F14D8A;
     border: none;
@@ -26,7 +26,24 @@ button {
     font-weight: bold;
 }
 
-#pdf-viewer {
+/* PDF Container */
+.song-view-page-root .pdf-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+  .song-view-page-root .pdf-container embed {
+    width: 90%;
+    height: 80vh;
+    border: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+}
+
+  .song-view-page-root #pdf-viewer {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -34,11 +51,10 @@ button {
     height: calc(100vh - 140px);
     width: 100%;
     position: relative;
-    overflow: auto;
-    background-color: #f5f5f5;
+    overflow: hidden;
 }
 
-#pdf-viewer .left {
+  .song-view-page-root #pdf-viewer .left {
     content: "";
     position: absolute;
     height: 100%;
@@ -47,7 +63,7 @@ button {
     cursor: pointer;
 }
 
-#pdf-viewer .right {
+.song-view-page-root #pdf-viewer .right {
     content: "";
     position: absolute;
     height: 100%;
@@ -56,16 +72,14 @@ button {
     cursor: pointer;
 }
 
-canvas {
+.song-view-page-root canvas {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     border-radius: 12px;
-    max-width: 95%;
-    max-height: 95%;
-    display: block;
-    margin: auto;
+  max-width: 100%;
+  max-height: 100%;
 }
 
-nav {
+.song-view-page-root nav {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -73,15 +87,13 @@ nav {
     margin:10px;
 }
 
-nav h1{
+  .song-view-page-root nav h1{
     margin:0;
     font-family: 'Inter', sans-serif;
     color: black;
-    flex: 1;
-    text-align: center;
 }
 
-nav button{
+  .song-view-page-root nav button{
     color: #F14D8A;
     font-size: 30px;
     font-weight: bold;
@@ -92,6 +104,108 @@ nav button{
     margin:0;
 }
 
-nav button:hover{
+  .song-view-page-root nav button:hover{
     background-color: white;
 }
+
+  .song-view-page-root.pdf-reader-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  color: #4E4E4E;
+  text-align: center;
+}
+
+
+footer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin:10px;
+}
+
+
+.checkboxNav {
+    position: relative;  /* so .menu can position absolutely inside it */
+    padding: 1rem;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+}
+
+.checkBoxBox {
+    background-color: #F14D8A;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+}
+
+  #menu-toggle {
+    display: none;
+  }
+
+  .hamburger {
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .hamburger .bar {
+    display: block;
+    width: 24px;
+    height: 3px;
+    margin: 5px 0;
+    background: #fff;
+    transition: 0.3s;
+  }
+
+  .menu {
+    position: absolute;
+    top: 100%;
+    background: #FBFBFB;
+    padding: 0.5rem 0;
+    width: 200px;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 100;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .menu a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #4E4E4E;
+    text-decoration: none;
+  }
+
+  .menu a.red {
+    color: #E96262;
+  }
+
+  /* Show the menu when checked */
+  #menu-toggle:checked ~ .menu {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  /* Turn hamburger into "X" */
+  #menu-toggle:checked + label .bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  #menu-toggle:checked + label .bar:nth-child(2) {
+    opacity: 0;
+  }
+  #menu-toggle:checked + label .bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }

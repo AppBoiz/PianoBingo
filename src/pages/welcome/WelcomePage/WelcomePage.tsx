@@ -3,6 +3,7 @@ import { startNewGame } from '../../../shared/storage/indexedDb'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
 import WelcomeActionGroup from './molecules/WelcomeActionGroup'
 import PageLayout from '../../../shared/components/organisms/PageLayout'
+import '../../../styles/legacy/welcome-page.css'
 
 export default function WelcomePage(){
   const { loadPage } = useNavigation()

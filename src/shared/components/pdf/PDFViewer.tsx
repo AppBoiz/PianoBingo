@@ -23,6 +23,7 @@ type PdfPage = PDFPageProxy
 
 type Props = {
   base64: string | null | undefined
+  scaleMode?: 'fit-width' | 'fit-contain'
 }
 
 function useResolvedPdfBase64(base64: string | null | undefined) {
@@ -110,7 +111,12 @@ function useLoadedPdfDocument(pdfBase64: string | null) {
   }
 }
 
-function useRenderedPdfPage(containerRef: React.RefObject<HTMLDivElement | null>, pdfDocument: PdfDocument | null, currentPage: number) {
+function useRenderedPdfPage(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  pdfDocument: PdfDocument | null,
+  currentPage: number,
+  scaleMode: 'fit-width' | 'fit-contain',
+) {
   useEffect(() => {
     if (!pdfDocument) {
       return
@@ -127,7 +133,7 @@ function useRenderedPdfPage(containerRef: React.RefObject<HTMLDivElement | null>
       }
 
       // Match the legacy viewer's width-first behavior so sizing stays visually consistent.
-      await renderPdfPageIntoContainer(container, page)
+      await renderPdfPageIntoContainer(container, page, scaleMode)
 
       if (!cancelled) {
         markPdfRendered()
@@ -144,24 +150,22 @@ function useRenderedPdfPage(containerRef: React.RefObject<HTMLDivElement | null>
     return () => {
       cancelled = true
     }
-  }, [containerRef, currentPage, pdfDocument])
+  }, [containerRef, currentPage, pdfDocument, scaleMode])
 }
 
-export default function PDFViewer({ base64 }: Props){
+export default function PDFViewer({ base64, scaleMode = 'fit-width' }: Props){
   const containerRef = useRef<HTMLDivElement | null>(null)
   const pdfBase64 = useResolvedPdfBase64(base64)
   const { pdfDocument, totalPages, currentPage, setCurrentPage } = useLoadedPdfDocument(pdfBase64)
 
-  useRenderedPdfPage(containerRef, pdfDocument, currentPage)
+  useRenderedPdfPage(containerRef, pdfDocument, currentPage, scaleMode)
 
   if (!pdfBase64) return <div>Loading PDF…</div>
 
   return (
-    <div>
-      <div id="pdf-viewer" data-testid="pdf-viewer" ref={containerRef} style={{height: 'calc(100vh - 140px)'}}>
-        <span data-testid="pdf-prev-page-zone" className="left" onClick={() => setCurrentPage(p => Math.max(1, p-1))} />
-        <span data-testid="pdf-next-page-zone" className="right" onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} />
-      </div>
+    <div id="pdf-viewer" data-testid="pdf-viewer" ref={containerRef}>
+      <span data-testid="pdf-prev-page-zone" className="left" onClick={() => setCurrentPage(p => Math.max(1, p-1))} />
+      <span data-testid="pdf-next-page-zone" className="right" onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} />
     </div>
   )
 }

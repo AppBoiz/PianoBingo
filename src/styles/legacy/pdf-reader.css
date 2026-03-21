@@ -1,6 +1,6 @@
 
 /* Specific layout for PDF page */
-.pdf-page {
+.game-page-root.pdf-page {
     margin: 0;
     overflow: hidden;
     height: 100vh;
@@ -8,12 +8,12 @@
 }
 
 /* Headings */
-h1 {
+.game-page-root h1 {
     color: #2c3e50;
     margin-bottom: 20px;
 }
 
-nav {
+.game-page-root nav {
   width: 100%;
   display: flex;
   align-items: center;
@@ -30,7 +30,7 @@ nav h1 {
 }
 
 /* Button Styling */
-button {
+.game-page-root button {
     color: white;
     background-color: #F14D8A;
     border: none;
@@ -43,7 +43,7 @@ button {
 }
 
 /* PDF Container */
-.pdf-container {
+.game-page-root .pdf-container {
     flex-grow: 1;
     display: flex;
     justify-content: center;
@@ -51,7 +51,7 @@ button {
     margin-bottom: 20px;
 }
 
-.pdf-container embed {
+  .game-page-root .pdf-container embed {
     width: 90%;
     height: 80vh;
     border: none;
@@ -59,19 +59,16 @@ button {
     border-radius: 12px;
 }
 
-#pdf-viewer {
+  .game-page-root #pdf-viewer {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: center;
     height: calc(100vh - 140px);
     width: 100%;
     position: relative;
-    overflow: auto;
-    background-color: #f5f5f5;
 }
 
-#pdf-viewer .left {
+  .game-page-root #pdf-viewer .left {
     content: "";
     position: absolute;
     height: 100%;
@@ -80,7 +77,7 @@ button {
     cursor: pointer;
 }
 
-#pdf-viewer .right {
+  .game-page-root #pdf-viewer .right {
     content: "";
     position: absolute;
     height: 100%;
@@ -89,16 +86,12 @@ button {
     cursor: pointer;
 }
 
-canvas {
+  .game-page-root canvas {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     border-radius: 12px;
-    max-width: 95%;
-    max-height: 95%;
-    display: block;
-    margin: auto;
 }
 
-nav {
+  .game-page-root nav {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -106,13 +99,13 @@ nav {
     margin:10px;
 }
 
-nav h1{
+  .game-page-root nav h1{
     margin:0;
     font-family: 'Inter', sans-serif;
     color: black;
 }
 
-nav button{
+  .game-page-root nav button{
     color: #F14D8A;
     font-size: 30px;
     font-weight: bold;
@@ -123,12 +116,12 @@ nav button{
     margin:0;
 }
 
-nav button:hover{
+  .game-page-root nav button:hover{
     background-color: white;
 }
 
 
-footer {
+  .game-page-root footer {
     width: 100%;
     display: flex;
     align-items: center;
@@ -137,7 +130,7 @@ footer {
 }
 
 
-.checkboxNav {
+  .game-page-root .checkboxNav {
     position: relative;  /* so .menu can position absolutely inside it */
     padding: 1rem;
     color: #fff;
@@ -145,7 +138,7 @@ footer {
     justify-content: center;
 }
 
-.checkBoxBox {
+.game-page-root .checkBoxBox {
     background-color: #F14D8A;
     width: 35px;
     height: 35px;
@@ -155,16 +148,16 @@ footer {
     border-radius: 5px;
 }
 
-  #menu-toggle {
+  .game-page-root #menu-toggle {
     display: none;
   }
 
-  .hamburger {
+  .game-page-root .hamburger {
     cursor: pointer;
     display: inline-block;
   }
 
-  .hamburger .bar {
+  .game-page-root .hamburger .bar {
     display: block;
     width: 24px;
     height: 3px;
@@ -173,7 +166,7 @@ footer {
     transition: 0.3s;
   }
 
-  .menu {
+  .game-page-root .menu {
     position: absolute;
     top: 100%;
     background: #FBFBFB;
@@ -188,31 +181,31 @@ footer {
     font-family: 'Inter', sans-serif;
   }
 
-  .menu a {
+  .game-page-root .menu a {
     display: block;
     padding: 0.75rem 1rem;
     color: #4E4E4E;
     text-decoration: none;
   }
 
-  .menu a.red {
+  .game-page-root .menu a.red {
     color: #E96262;
   }
 
   /* Show the menu when checked */
-  #menu-toggle:checked ~ .menu {
+  .game-page-root #menu-toggle:checked ~ .menu {
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0);
   }
 
   /* Turn hamburger into "X" */
-  #menu-toggle:checked + label .bar:nth-child(1) {
+  .game-page-root #menu-toggle:checked + label .bar:nth-child(1) {
     transform: translateY(8px) rotate(45deg);
   }
-  #menu-toggle:checked + label .bar:nth-child(2) {
+  .game-page-root #menu-toggle:checked + label .bar:nth-child(2) {
     opacity: 0;
   }
-  #menu-toggle:checked + label .bar:nth-child(3) {
+  .game-page-root #menu-toggle:checked + label .bar:nth-child(3) {
     transform: translateY(-8px) rotate(-45deg);
   }

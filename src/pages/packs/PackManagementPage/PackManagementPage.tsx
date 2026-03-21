@@ -8,6 +8,7 @@ import PageLayout from '../../../shared/components/organisms/PageLayout'
 import PlaylistContainer from '../../../shared/components/organisms/PlaylistContainer'
 import PackManagementPageFooter from './organisms/PackManagementPageFooter'
 import { PAGE, PAGE_NAME } from '../../../shared/constants/navigation'
+import '../../../styles/legacy/pack-management.css'
 
 export default function PackManagementPage(){
   const { packs, refresh: refreshPacks } = usePacks()
@@ -34,9 +35,9 @@ export default function PackManagementPage(){
 
   return (
     <PageLayout
+      rootClassName="pack-management-page-root"
       rootTestId="pack-management-page"
       header={<Header title="Manage Playlists" backAction={() => loadPage(PAGE_NAME.WELCOME)} />}
-      footer={<PackManagementPageFooter onCreateNewPack={handleCreateNewPack} />}
     >
       <PlaylistContainer containerId="playlist-container">
         {packs.map(pack => (
@@ -54,6 +55,7 @@ export default function PackManagementPage(){
           />
         ))}
       </PlaylistContainer>
+      <PackManagementPageFooter onCreateNewPack={handleCreateNewPack} />
     </PageLayout>
   )
 }
