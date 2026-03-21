@@ -6,36 +6,36 @@ export class PianoBingoLocatorBuilder extends HtmlLocatorBuilder {
     super(locator)
   }
 
-  pageWelcome(): PianoBingoLocatorBuilder {
-    return new PianoBingoLocatorBuilder(this.locate().getByTestId('page-welcome'))
+  welcomePage(): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId('welcome-page'))
   }
 
-  pagePackSelect(): PianoBingoLocatorBuilder {
-    return new PianoBingoLocatorBuilder(this.locate().getByTestId('page-pack-select'))
+  packSelectPage(): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId('pack-select-page'))
   }
 
-  pageGame(): PianoBingoLocatorBuilder {
-    return new PianoBingoLocatorBuilder(this.locate().getByTestId('page-game'))
+  gamePage(): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId('game-page'))
   }
 
-  pageGameHistory(): PianoBingoLocatorBuilder {
-    return new PianoBingoLocatorBuilder(this.locate().getByTestId('page-game-history'))
+  gameHistoryPage(): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId('game-history-page'))
   }
 
-  pagePackManagement(): PianoBingoLocatorBuilder {
-    return new PianoBingoLocatorBuilder(this.locate().getByTestId('page-pack-management'))
+  packManagementPage(): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId('pack-management-page'))
   }
 
-  pagePackEdit(): PianoBingoLocatorBuilder {
-    return new PianoBingoLocatorBuilder(this.locate().getByTestId('page-pack-edit'))
+  packEditPage(): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId('pack-edit-page'))
   }
 
-  pageSongManagement(): PianoBingoLocatorBuilder {
-    return new PianoBingoLocatorBuilder(this.locate().getByTestId('page-song-management'))
+  songManagementPage(): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId('song-management-page'))
   }
 
-  pageSongView(): PianoBingoLocatorBuilder {
-    return new PianoBingoLocatorBuilder(this.locate().getByTestId('page-song-view'))
+  songViewPage(): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId('song-view-page'))
   }
 
   pageBody(): PianoBingoLocatorBuilder {

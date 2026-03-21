@@ -44,7 +44,7 @@ test.describe('Mobile viewport flows', () => {
     const app = pianoBingoLocator(page)
     await page.goto('/')
 
-    const welcome = app.pageWelcome()
+    const welcome = app.welcomePage()
     await expect(welcome.action('new-game')).toBeVisible()
     await expect(welcome.action('manage-songs')).toBeVisible()
     await expect(welcome.action('manage-playlists')).toBeVisible()
@@ -54,31 +54,31 @@ test.describe('Mobile viewport flows', () => {
     const app = pianoBingoLocator(page)
     await page.goto('/')
     await seedPackAndSong(page)
-    await app.pageWelcome().action('new-game').click()
+    await app.welcomePage().action('new-game').click()
     await page.waitForLoadState('networkidle')
 
-    const packSelect = app.pagePackSelect()
+    const packSelect = app.packSelectPage()
     await expect(packSelect.packRadioInputs().first()).toBeVisible()
     await expect(packSelect.startGameButton()).toBeVisible()
 
     await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    await expect(app.pageGame().nextSong()).toBeVisible()
+    await expect(app.gamePage().nextSong()).toBeVisible()
   })
 
   test('hamburger menu opens on mobile game screen', async ({ page }) => {
     const app = pianoBingoLocator(page)
     await page.goto('/')
     await seedPackAndSong(page)
-    await app.pageWelcome().action('new-game').click()
+    await app.welcomePage().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    const packSelect = app.pagePackSelect()
+    const packSelect = app.packSelectPage()
     await expect(packSelect.packRadioInputs().first()).toBeVisible()
     await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    const game = app.pageGame()
+    const game = app.gamePage()
     await expect(game.navTitle()).toBeVisible()
 
     await game.menuToggle().click()
@@ -91,10 +91,10 @@ test.describe('Mobile viewport flows', () => {
     const app = pianoBingoLocator(page)
     await page.goto('/')
     await seedPackAndSong(page)
-    await app.pageWelcome().action('manage-songs').click()
+    await app.welcomePage().action('manage-songs').click()
     await page.waitForLoadState('networkidle')
 
-    const songMgmt = app.pageSongManagement()
+    const songMgmt = app.songManagementPage()
     await expect(songMgmt.header()).toBeVisible()
     await expect(songMgmt.list()).toBeVisible()
   })

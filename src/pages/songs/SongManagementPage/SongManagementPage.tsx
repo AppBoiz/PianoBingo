@@ -4,13 +4,13 @@ import { useSongs } from '../hooks/useSongs'
 import { fileToBase64 } from '../../../shared/utils/fileUtils'
 import Header from '../../../shared/components/organisms/Header'
 import IconButton from '../../../shared/components/atoms/IconButton'
-import PlaylistRow from '../../packs/PackManagement/molecules/PlaylistRow'
+import PlaylistRow from '../../packs/PackManagementPage/molecules/PlaylistRow'
 import PageLayout from '../../../shared/components/organisms/PageLayout'
 import PlaylistContainer from '../../../shared/components/organisms/PlaylistContainer'
 import PrimaryActionFooter from '../../../shared/components/organisms/PrimaryActionFooter'
 import { PAGE, PAGE_NAME } from '../../../shared/constants/navigation'
 
-export default function SongManagement(){
+export default function SongManagementPage(){
   const { songs, refresh: refreshSongs } = useSongs()
   const { loadPage } = useNavigation()
 
@@ -46,7 +46,7 @@ export default function SongManagement(){
 
   return (
     <PageLayout
-      rootTestId="page-song-management"
+      rootTestId="song-management-page"
       header={<Header title="Manage Songs" backAction={() => { startNewGame(); loadPage(PAGE_NAME.WELCOME) }} />}
       footer={<PrimaryActionFooter label="New Song" actionId="create-song" onClick={handleCreateNewSong} />}
     >

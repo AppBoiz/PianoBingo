@@ -42,7 +42,7 @@ async function seedPacks(page: any, packs: Array<{ packId: number; packName: str
 
 async function navigateToPackManagement(page: any) {
   const app = pianoBingoLocator(page)
-  await app.pageWelcome().action('manage-playlists').click()
+  await app.welcomePage().action('manage-playlists').click()
   await page.waitForLoadState('networkidle')
 }
 
@@ -54,7 +54,7 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      const packMgmt = app.pagePackManagement()
+      const packMgmt = app.packManagementPage()
       await expect(packMgmt).toBeVisible()
       await expect(packMgmt.header()).toBeVisible()
       await expect(packMgmt.list()).toBeVisible()
@@ -66,10 +66,10 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      await app.pagePackManagement().backButton().click()
+      await app.packManagementPage().backButton().click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pageWelcome()).toBeVisible()
+      await expect(app.welcomePage()).toBeVisible()
     })
   })
 
@@ -84,7 +84,7 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      const packMgmt = app.pagePackManagement()
+      const packMgmt = app.packManagementPage()
       await expect(packMgmt.row(1)).toBeVisible()
       await expect(packMgmt.row(2)).toBeVisible()
       await expect(packMgmt.row(3)).toBeVisible()
@@ -101,7 +101,7 @@ test.describe('Pack Management Page', () => {
       await navigateToPackManagement(page)
 
       await expect(
-        app.pagePackManagement().locator('[data-testid^="row-"]')
+        app.packManagementPage().locator('[data-testid^="row-"]')
       ).toHaveCount(0)
     })
   })
@@ -113,7 +113,7 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      const packMgmt = app.pagePackManagement()
+      const packMgmt = app.packManagementPage()
       await expect(
         packMgmt.locator('[data-testid^="row-"]')
       ).toHaveCount(1)
@@ -134,7 +134,7 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      const packMgmt = app.pagePackManagement()
+      const packMgmt = app.packManagementPage()
       const nameInput = packMgmt.nameInput(1)
       await expect(nameInput).toHaveValue('Original Name')
 
@@ -156,7 +156,7 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      const packMgmt = app.pagePackManagement()
+      const packMgmt = app.packManagementPage()
       await expect(
         packMgmt.locator('[data-testid^="row-"]')
       ).toHaveCount(2)
@@ -176,7 +176,7 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      const packMgmt = app.pagePackManagement()
+      const packMgmt = app.packManagementPage()
       await packMgmt.action('delete-pack-1').click()
       await page.waitForLoadState('networkidle')
 
@@ -193,10 +193,10 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      await app.pagePackManagement().action('edit-pack-1').click()
+      await app.packManagementPage().action('edit-pack-1').click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pagePackEdit()).toBeVisible()
+      await expect(app.packEditPage()).toBeVisible()
     })
   })
 
@@ -210,7 +210,7 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      const packMgmt = app.pagePackManagement()
+      const packMgmt = app.packManagementPage()
       await packMgmt.action('create-pack').click()
       await page.waitForLoadState('networkidle')
 

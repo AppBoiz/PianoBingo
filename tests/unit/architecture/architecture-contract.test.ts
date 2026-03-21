@@ -69,13 +69,13 @@ describe('architecture rules', () => {
 
   test('required page entry files exist with explicit names', () => {
     const requiredEntries = [
-      ['game', 'Game', 'Game.tsx'],
-      ['game', 'GameHistory', 'GameHistory.tsx'],
-      ['game', 'PackSelect', 'PackSelect.tsx'],
-      ['packs', 'PackEdit', 'PackEdit.tsx'],
-      ['packs', 'PackManagement', 'PackManagement.tsx'],
-      ['songs', 'SongManagement', 'SongManagement.tsx'],
-      ['songs', 'SongView', 'SongView.tsx'],
+      ['game', 'GamePage', 'GamePage.tsx'],
+      ['game', 'GameHistoryPage', 'GameHistoryPage.tsx'],
+      ['game', 'PackSelectPage', 'PackSelectPage.tsx'],
+      ['packs', 'PackEditPage', 'PackEditPage.tsx'],
+      ['packs', 'PackManagementPage', 'PackManagementPage.tsx'],
+      ['songs', 'SongManagementPage', 'SongManagementPage.tsx'],
+      ['songs', 'SongViewPage', 'SongViewPage.tsx'],
       ['welcome', 'WelcomePage', 'WelcomePage.tsx'],
     ] as const
 
@@ -86,7 +86,7 @@ describe('architecture rules', () => {
   })
 
   test('game page naming is free of legacy PdfReader symbols', () => {
-    const gameRoot = path.join(srcRoot, 'pages', 'game', 'Game')
+    const gameRoot = path.join(srcRoot, 'pages', 'game', 'GamePage')
     const forbiddenTokens = ['PdfReader', 'PdfHamburgerMenu', 'PdfReaderHeader', 'PdfReaderFooter']
 
     for (const filePath of walkFiles(gameRoot).filter((file) => /\.(ts|tsx)$/.test(file))) {
@@ -102,7 +102,7 @@ describe('architecture rules', () => {
     const appText = fs.readFileSync(path.join(srcRoot, 'App.tsx'), 'utf8')
 
     expect(navigationText).toMatch(/GAME:\s*'\/game'/)
-    expect(appText).toContain("import Game from './pages/game/Game/Game'")
-    expect(appText).toMatch(/Route\s+path=\{PAGE\.GAME\}\s+element=\{<Game\/>\}/)
+    expect(appText).toContain("import GamePage from './pages/game/GamePage/GamePage'")
+    expect(appText).toMatch(/Route\s+path=\{PAGE\.GAME\}\s+element=\{<GamePage\/>\}/)
   })
 })

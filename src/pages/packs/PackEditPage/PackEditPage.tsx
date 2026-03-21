@@ -47,7 +47,7 @@ function useLoadPackFromPathParam(packIdParam: string | undefined) {
   return { pack, setPack, isLoading }
 }
 
-export default function PackEdit() {
+export default function PackEditPage() {
   const { packId } = useParams<{ packId: string }>()
   const { pack, setPack, isLoading } = useLoadPackFromPathParam(packId)
   const { songs } = useSongs()
@@ -87,7 +87,7 @@ export default function PackEdit() {
 
   return (
     <PageLayout
-      rootTestId="page-pack-edit"
+      rootTestId="pack-edit-page"
       header={(
         <Header
           title="Edit Pack"

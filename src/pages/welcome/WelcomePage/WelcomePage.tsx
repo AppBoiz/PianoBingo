@@ -13,7 +13,7 @@ export default function WelcomePage(){
   }
 
   return (
-    <PageLayout rootId="welcome-page-container" rootTestId="page-welcome" skipMainWrapper>
+    <PageLayout rootId="welcome-page-container" rootTestId="welcome-page" skipMainWrapper>
       <WelcomeActionGroup
         logo={<img src="/resources/images/logo.png" alt="PianoBingo Logo" id="logo" style={{ width: 306 }} />}
         actions={[

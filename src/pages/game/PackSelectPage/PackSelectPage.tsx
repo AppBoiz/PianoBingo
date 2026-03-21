@@ -5,9 +5,9 @@ import { usePacks } from '../../packs/hooks/usePacks'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
 import PackRadioGroup from './molecules/PackRadioGroup'
 import PageLayout from '../../../shared/components/organisms/PageLayout'
-import PackSelectHeader from './organisms/PackSelectHeader'
+import PackSelectPageHeader from './organisms/PackSelectPageHeader'
 
-export default function PackSelect(){
+export default function PackSelectPage(){
   const { packs } = usePacks()
   const [selected, setSelected] = useState<number | null>(null)
   const { loadPage } = useNavigation()
@@ -34,8 +34,8 @@ export default function PackSelect(){
   return (
     <PageLayout
       rootClassName="p-4"
-      rootTestId="page-pack-select"
-      header={<PackSelectHeader onBack={handleBack} />}
+      rootTestId="pack-select-page"
+      header={<PackSelectPageHeader onBack={handleBack} />}
       skipMainWrapper
     >
       <h1>Create New Game</h1>

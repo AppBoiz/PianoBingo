@@ -55,7 +55,7 @@ test.describe('Core Workflow Smoke Tests', () => {
       await page.goto('/')
       await page.waitForLoadState('networkidle')
 
-      const welcome = app.pageWelcome()
+      const welcome = app.welcomePage()
       await expect(welcome.action('new-game')).toBeVisible()
       await expect(welcome.action('manage-songs')).toBeVisible()
       await expect(welcome.action('manage-playlists')).toBeVisible()
@@ -64,10 +64,10 @@ test.describe('Core Workflow Smoke Tests', () => {
     test('New Game navigates to Pack Select with multiple packs', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await seedMultiplePacks(page)
-      await app.pageWelcome().action('new-game').click()
+      await app.welcomePage().action('new-game').click()
       await page.waitForLoadState('networkidle')
 
-      const packSelect = app.pagePackSelect()
+      const packSelect = app.packSelectPage()
       await expect(packSelect.packRadioInputs().first()).toBeVisible()
       await expect(packSelect.packRadioInputs().second()).toBeVisible()
     })
@@ -82,15 +82,15 @@ test.describe('Core Workflow Smoke Tests', () => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
 
-      await app.pageWelcome().action('new-game').click()
+      await app.welcomePage().action('new-game').click()
       await page.waitForLoadState('networkidle')
 
-      const packSelect = app.pagePackSelect()
+      const packSelect = app.packSelectPage()
       await packSelect.packRadioInputs().first().click()
       await packSelect.startGameButton().click()
       await page.waitForLoadState('networkidle')
 
-      const game = app.pageGame()
+      const game = app.gamePage()
       await expect(game.nextSong()).toBeVisible()
       await expect(game.navTitle()).not.toBeEmpty()
       const firstTitle = await game.navTitle().textContent()
@@ -108,7 +108,7 @@ test.describe('Core Workflow Smoke Tests', () => {
       await game.menuItem('game-history').click()
       await page.waitForLoadState('networkidle')
 
-      const gameHistory = app.pageGameHistory()
+      const gameHistory = app.gameHistoryPage()
       await expect(gameHistory.header()).toBeVisible()
       await expect(gameHistory.boxes()).toHaveCount(PACK_SIZE)
 
@@ -119,14 +119,14 @@ test.describe('Core Workflow Smoke Tests', () => {
     test('song progression increments correctly', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
-      await app.pageWelcome().action('new-game').click()
+      await app.welcomePage().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      const packSelect = app.pagePackSelect()
+      const packSelect = app.packSelectPage()
       await packSelect.packRadioInputs().first().click()
       await packSelect.startGameButton().click()
       await page.waitForLoadState('networkidle')
 
-      const game = app.pageGame()
+      const game = app.gamePage()
       await expect(game.header()).toBeVisible()
       await expect(game.navTitle()).not.toBeEmpty()
       const firstTitle = await game.navTitle().textContent()
@@ -153,9 +153,9 @@ test.describe('Core Workflow Smoke Tests', () => {
     test('end game returns to welcome page with reset state', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
-      const packSelect = app.pagePackSelect()
-      const welcome = app.pageWelcome()
-      const game = app.pageGame()
+      const packSelect = app.packSelectPage()
+      const welcome = app.welcomePage()
+      const game = app.gamePage()
       await welcome.action('new-game').click()
       await page.waitForLoadState('networkidle')
       await packSelect.packRadioInputs().first().click()
@@ -185,10 +185,10 @@ test.describe('Core Workflow Smoke Tests', () => {
     test('navigate to song management and back', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
-      await app.pageWelcome().action('manage-songs').click()
+      await app.welcomePage().action('manage-songs').click()
       await page.waitForLoadState('networkidle')
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       await expect(songMgmt.list()).toBeVisible()
       await expect(songMgmt.row(1)).toBeVisible()
     })
@@ -196,13 +196,13 @@ test.describe('Core Workflow Smoke Tests', () => {
     test('click song to preview', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
-      await app.pageWelcome().action('manage-songs').click()
+      await app.welcomePage().action('manage-songs').click()
       await page.waitForLoadState('networkidle')
 
-      await app.pageSongManagement().action('view-song-1').click()
+      await app.songManagementPage().action('view-song-1').click()
       await page.waitForLoadState('networkidle')
 
-      const songView = app.pageSongView()
+      const songView = app.songViewPage()
       await expect(songView).toBeVisible()
       await expect(songView.backButton()).toBeVisible()
     })
@@ -216,16 +216,16 @@ test.describe('Core Workflow Smoke Tests', () => {
     test('back button from song view returns to song management', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
-      await app.pageWelcome().action('manage-songs').click()
+      await app.welcomePage().action('manage-songs').click()
       await page.waitForLoadState('networkidle')
 
-      await app.pageSongManagement().action('view-song-1').click()
+      await app.songManagementPage().action('view-song-1').click()
       await page.waitForLoadState('networkidle')
 
-      await app.pageSongView().backButton().click()
+      await app.songViewPage().backButton().click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pageSongManagement().row(1)).toBeVisible()
+      await expect(app.songManagementPage().row(1)).toBeVisible()
     })
   })
 
@@ -237,14 +237,14 @@ test.describe('Core Workflow Smoke Tests', () => {
     test('game state survives page reload', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
-      await app.pageWelcome().action('new-game').click()
+      await app.welcomePage().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      const packSelect = app.pagePackSelect()
+      const packSelect = app.packSelectPage()
       await packSelect.packRadioInputs().first().click()
       await packSelect.startGameButton().click()
       await page.waitForLoadState('networkidle')
 
-      const game = app.pageGame()
+      const game = app.gamePage()
       const titleBefore = await game.navTitle().textContent()
       await game.nextSong().click()
       await page.waitForLoadState('networkidle')
@@ -272,9 +272,9 @@ test.describe('Core Workflow Smoke Tests', () => {
     test('pack selection persists across navigation', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
-      const packSelect = app.pagePackSelect()
-      const welcome = app.pageWelcome()
-      const game = app.pageGame()
+      const packSelect = app.packSelectPage()
+      const welcome = app.welcomePage()
+      const game = app.gamePage()
       await welcome.action('new-game').click()
       await page.waitForLoadState('networkidle')
       await packSelect.packRadioInputs().first().click()
@@ -286,7 +286,7 @@ test.describe('Core Workflow Smoke Tests', () => {
       await page.waitForLoadState('networkidle')
       await welcome.action('manage-songs').click()
       await page.waitForLoadState('networkidle')
-      await app.pageSongManagement().backButton().click()
+      await app.songManagementPage().backButton().click()
       await page.waitForLoadState('networkidle')
 
       await welcome.action('new-game').click()

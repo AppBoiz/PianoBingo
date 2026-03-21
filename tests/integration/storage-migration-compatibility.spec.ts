@@ -65,7 +65,7 @@ test.describe('Storage compatibility and migration', () => {
     await page.goto('/')
     await page.waitForLoadState('domcontentloaded')
 
-    await app.pageWelcome().action('new-game').click()
+    await app.welcomePage().action('new-game').click()
     await page.waitForLoadState('networkidle')
 
     const gameState = await page.evaluate(() => {
@@ -83,6 +83,7 @@ test.describe('Storage compatibility and migration', () => {
     // beforeEach cleared the DB and left the page in a post-boot state where
     // firstTimeOpeningDB === false. Reload to get a fresh module state so that
     // the next openDB() call triggers seeding again.
+    const app = pianoBingoLocator(page)
     const consoleLogs: string[] = []
     page.on('console', msg => consoleLogs.push(msg.text()))
 
@@ -98,7 +99,7 @@ test.describe('Storage compatibility and migration', () => {
     // "Preloaded data initialized" fires inside initializePreloadedData(), which is
     // awaited in main.tsx before createRoot().render() is called — so React hasn't
     // mounted yet at that exact moment.
-    await page.waitForSelector('[data-testid="page-welcome"]')
+    await expect(app.welcomePage()).toBeVisible()
 
     // Navigate to pack management to trigger openDB() → IDB seeding
     await page.evaluate(() => {
@@ -452,12 +453,12 @@ test.describe('version increments on every edit', () => {
 
     // Navigate to pack management and confirm the pack loaded.
     await spaNavigate(page, '/pack-management')
-    await expect(app.pagePackManagement()).toBeVisible()
-    await expect(app.pagePackManagement().nameInput(1).locate()).toHaveValue('Original Pack')
+    await expect(app.packManagementPage()).toBeVisible()
+    await expect(app.packManagementPage().nameInput(1).locate()).toHaveValue('Original Pack')
 
     // Rename — this calls renamePack → savePack which does version + 1.
-    await app.pagePackManagement().nameInput(1).fill('Renamed Pack')
-    await app.pagePackManagement().nameInput(1).press('Tab')
+    await app.packManagementPage().nameInput(1).fill('Renamed Pack')
+    await app.packManagementPage().nameInput(1).press('Tab')
     await page.waitForLoadState('networkidle')
 
     // Read the pack directly from IDB and verify the version was incremented.
@@ -482,12 +483,12 @@ test.describe('version increments on every edit', () => {
 
     // Navigate to song management and confirm the song loaded.
     await spaNavigate(page, '/song-management')
-    await expect(app.pageSongManagement()).toBeVisible()
-    await expect(app.pageSongManagement().nameInput(1).locate()).toHaveValue('Original Song')
+    await expect(app.songManagementPage()).toBeVisible()
+    await expect(app.songManagementPage().nameInput(1).locate()).toHaveValue('Original Song')
 
     // Rename — this calls renameSong → saveSong which does version + 1.
-    await app.pageSongManagement().nameInput(1).fill('Renamed Song')
-    await app.pageSongManagement().nameInput(1).press('Tab')
+    await app.songManagementPage().nameInput(1).fill('Renamed Song')
+    await app.songManagementPage().nameInput(1).press('Tab')
     await page.waitForLoadState('networkidle')
 
     // Read the song directly from IDB and verify the version was incremented.

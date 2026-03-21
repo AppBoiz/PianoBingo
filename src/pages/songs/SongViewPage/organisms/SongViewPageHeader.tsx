@@ -5,7 +5,7 @@ interface SongViewHeaderProps {
   onBack: () => void
 }
 
-export default function SongViewHeader({ title, onBack }: SongViewHeaderProps) {
+export default function SongViewPageHeader({ title, onBack }: SongViewHeaderProps) {
   return (
     <nav data-testid="header">
       <IconButton actionId="back" onClick={onBack} icon="Back" />

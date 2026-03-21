@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import PDFViewer from '../../../shared/components/pdf/PDFViewer'
 import PageLayout from '../../../shared/components/organisms/PageLayout'
-import GameHeader from './organisms/GameHeader'
-import GameFooter from './organisms/GameFooter'
+import GamePageHeader from './organisms/GamePageHeader'
+import GamePageFooter from './organisms/GamePageFooter'
 import { useLoadedSong } from '../hooks/usePdfSong'
 import { getCurrentSong, getSelectedSongPackId, loadPack, nextSong as loadNextSongFromStorage, prevSong as loadPrevSongFromStorage } from '../../../shared/storage/indexedDb'
 import { useNavigation } from '../../../shared/context/NavigationContext'
@@ -40,7 +40,7 @@ function useCurrentSongPositionInSelectedPack(song: { songId: number; pdfUrl: st
   return songIndex
 }
 
-export default function Game(){
+export default function GamePage(){
   const { loadPage } = useNavigation()
   const { song, base64, songTitle, nextSong, prevSong } = useLoadedSong(getCurrentSong, [], {
     loadNextSong: loadNextSongFromStorage,
@@ -51,9 +51,9 @@ export default function Game(){
   return (
     <PageLayout
       rootClassName="pdf-page"
-      rootTestId="page-game"
+      rootTestId="game-page"
       header={(
-        <GameHeader
+        <GamePageHeader
           songIndex={songIndex}
           songTitle={songTitle}
           onNextSong={nextSong}
@@ -63,7 +63,7 @@ export default function Game(){
         />
       )}
       footer={(
-        <GameFooter onNextSong={nextSong} />
+        <GamePageFooter onNextSong={nextSong} />
       )}
       skipMainWrapper
     >

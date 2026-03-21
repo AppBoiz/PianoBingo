@@ -49,21 +49,21 @@ test.describe('Game History Page', () => {
     const app = pianoBingoLocator(page)
     await page.waitForLoadState('networkidle')
 
-    await app.pageWelcome().action('new-game').click()
+    await app.welcomePage().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    const packSelect = app.pagePackSelect()
+    const packSelect = app.packSelectPage()
     await packSelect.packRadioInputs().first().click()
     await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    const game = app.pageGame()
+    const game = app.gamePage()
     await expect(game.nextSong()).toBeVisible()
 
     await game.menuToggle().click()
     await game.menuItem('game-history').click()
     await page.waitForLoadState('networkidle')
 
-    const gameHistory = app.pageGameHistory()
+    const gameHistory = app.gameHistoryPage()
     await expect(gameHistory.header()).toBeVisible()
 
     const boxes = gameHistory.boxes()
@@ -87,27 +87,27 @@ test.describe('Game History Page', () => {
     })
     await page.waitForLoadState('networkidle')
 
-    await expect(app.pageGameHistory().emptyState()).toBeVisible()
+    await expect(app.gameHistoryPage().emptyState()).toBeVisible()
   })
 
   test('back button returns to game page', async ({ page }) => {
     const app = pianoBingoLocator(page)
     await page.waitForLoadState('networkidle')
 
-    await app.pageWelcome().action('new-game').click()
+    await app.welcomePage().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    const packSelect = app.pagePackSelect()
+    const packSelect = app.packSelectPage()
     await packSelect.packRadioInputs().first().click()
     await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    const game = app.pageGame()
+    const game = app.gamePage()
     await expect(game.nextSong()).toBeVisible()
 
     await game.menuToggle().click()
     await game.menuItem('game-history').click()
     await page.waitForLoadState('networkidle')
-    const gameHistory = app.pageGameHistory()
+    const gameHistory = app.gameHistoryPage()
     await expect(gameHistory.header()).toBeVisible()
 
     await gameHistory.backButton().click()

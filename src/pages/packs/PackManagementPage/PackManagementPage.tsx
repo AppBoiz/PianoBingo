@@ -6,10 +6,10 @@ import IconButton from '../../../shared/components/atoms/IconButton'
 import PlaylistRow from './molecules/PlaylistRow'
 import PageLayout from '../../../shared/components/organisms/PageLayout'
 import PlaylistContainer from '../../../shared/components/organisms/PlaylistContainer'
-import PackManagementFooter from './organisms/PackManagementFooter'
+import PackManagementPageFooter from './organisms/PackManagementPageFooter'
 import { PAGE, PAGE_NAME } from '../../../shared/constants/navigation'
 
-export default function PackManagement(){
+export default function PackManagementPage(){
   const { packs, refresh: refreshPacks } = usePacks()
   const { loadPage } = useNavigation()
 
@@ -34,9 +34,9 @@ export default function PackManagement(){
 
   return (
     <PageLayout
-      rootTestId="page-pack-management"
+      rootTestId="pack-management-page"
       header={<Header title="Manage Playlists" backAction={() => loadPage(PAGE_NAME.WELCOME)} />}
-      footer={<PackManagementFooter onCreateNewPack={handleCreateNewPack} />}
+      footer={<PackManagementPageFooter onCreateNewPack={handleCreateNewPack} />}
     >
       <PlaylistContainer containerId="playlist-container">
         {packs.map(pack => (

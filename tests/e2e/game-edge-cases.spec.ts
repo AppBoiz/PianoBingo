@@ -120,7 +120,7 @@ test.describe('Direct navigation without game state', () => {
     })
     await page.waitForLoadState('networkidle')
 
-    const gameHistory = app.pageGameHistory()
+    const gameHistory = app.gameHistoryPage()
     await expect(gameHistory.header()).toBeVisible()
     await expect(gameHistory.emptyState()).toBeVisible()
     await expect(gameHistory.boxes()).toHaveCount(0)
@@ -158,14 +158,14 @@ test.describe('Pack exhaustion', () => {
     const errors: string[] = []
     page.on('pageerror', (err) => errors.push(err.message))
 
-    await app.pageWelcome().action('new-game').click()
-    const packSelect = app.pagePackSelect()
+    await app.welcomePage().action('new-game').click()
+    const packSelect = app.packSelectPage()
     await packSelect.packRadioInputs().first().click()
     await page.waitForLoadState('networkidle')
     await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    const game = app.pageGame()
+    const game = app.gamePage()
     await expect(game.nextSong()).toBeVisible()
     await expect(game.header().getByText('Solo Song')).toBeVisible()
 
@@ -194,13 +194,13 @@ test.describe('Hamburger menu behaviour', () => {
     // BUG: Before the fix, the #menu-toggle checkbox was never unchecked after an action
     // click, leaving the menu visually open. Verify the fix holds across multiple open/close cycles.
 
-    await app.pageWelcome().action('new-game').click()
+    await app.welcomePage().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    const packSelect = app.pagePackSelect()
+    const packSelect = app.packSelectPage()
     await packSelect.packRadioInputs().first().click()
     await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
-    const game = app.pageGame()
+    const game = app.gamePage()
     await expect(game.nextSong()).toBeVisible()
 
     // First cycle: open menu, click "Next Song"
@@ -241,13 +241,13 @@ test.describe('Data deletion during active game', () => {
     const errors: string[] = []
     page.on('pageerror', (err) => errors.push(err.message))
 
-    await app.pageWelcome().action('new-game').click()
+    await app.welcomePage().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    const packSelect = app.pagePackSelect()
+    const packSelect = app.packSelectPage()
     await packSelect.packRadioInputs().first().click()
     await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
-    const game = app.pageGame()
+    const game = app.gamePage()
     await expect(game.nextSong()).toBeVisible()
 
     // Delete song 1 directly from IndexedDB (simulates user deleting from song management)
@@ -285,13 +285,13 @@ test.describe('Data deletion during active game', () => {
     const errors: string[] = []
     page.on('pageerror', (err) => errors.push(err.message))
 
-    await app.pageWelcome().action('new-game').click()
+    await app.welcomePage().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    const packSelect = app.pagePackSelect()
+    const packSelect = app.packSelectPage()
     await packSelect.packRadioInputs().first().click()
     await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
-    const game = app.pageGame()
+    const game = app.gamePage()
     await expect(game.nextSong()).toBeVisible()
 
     // Delete pack 1 directly from IndexedDB

@@ -6,14 +6,14 @@ import GameHistoryGrid from './organisms/GameHistoryGrid'
 import PageLayout from '../../../shared/components/organisms/PageLayout'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
 
-export default function GameHistory(){
+export default function GameHistoryPage(){
   const { pack, hasSongIdBeenShown: isHighlighted } = useGameHistory()
   const { loadPage } = useNavigation()
 
   return (
     <PageLayout
       rootClassName="game-history-root"
-      rootTestId="page-game-history"
+      rootTestId="game-history-page"
       header={<Header title="Game History" backAction={() => loadPage(PAGE_NAME.GAME)} withContainers={false} />}
       skipMainWrapper
     >

@@ -48,7 +48,7 @@ async function seedSongs(
 
 async function navigateToSongManagement(page: any) {
   const app = pianoBingoLocator(page)
-  await app.pageWelcome().action('manage-songs').click()
+  await app.welcomePage().action('manage-songs').click()
   await page.waitForLoadState('networkidle')
 }
 
@@ -60,7 +60,7 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await expect(app.pageSongManagement()).toBeVisible()
+      await expect(app.songManagementPage()).toBeVisible()
     })
 
     test('shows header with "Manage Songs" title', async ({ page }) => {
@@ -69,7 +69,7 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       await expect(songMgmt.header()).toBeVisible()
       await expect(songMgmt.header()).toContainText('Manage Songs')
     })
@@ -80,7 +80,7 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       await expect(songMgmt.primaryAction()).toBeVisible()
       await expect(songMgmt.primaryAction()).toContainText('New Song')
     })
@@ -90,10 +90,10 @@ test.describe('Song Management Page', () => {
       const app = pianoBingoLocator(page)
 
       await navigateToSongManagement(page)
-      await app.pageSongManagement().backButton().click()
+      await app.songManagementPage().backButton().click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pageWelcome()).toBeVisible()
+      await expect(app.welcomePage()).toBeVisible()
     })
   })
 
@@ -104,7 +104,7 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      const rows = app.pageSongManagement().locator('[data-testid^="row-"]')
+      const rows = app.songManagementPage().locator('[data-testid^="row-"]')
       await expect(rows).toHaveCount(0)
     })
 
@@ -117,7 +117,7 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       await expect(songMgmt.row(1)).toBeVisible()
       await expect(songMgmt.row(2)).toBeVisible()
     })
@@ -128,7 +128,7 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       await expect(songMgmt.action('view-song-1')).toBeVisible()
       await expect(songMgmt.action('remove-pdf-1')).toBeVisible()
     })
@@ -139,7 +139,7 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       await expect(songMgmt.bySongUploadInput(1)).toBeAttached()
       await expect(songMgmt.action('view-song-1')).not.toBeVisible()
       await expect(songMgmt.action('remove-pdf-1')).not.toBeVisible()
@@ -153,10 +153,10 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await app.pageSongManagement().primaryAction().click()
+      await app.songManagementPage().primaryAction().click()
       await page.waitForLoadState('networkidle')
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       const rows = songMgmt.locator('[data-testid^="row-"]')
       await expect(rows).toHaveCount(1)
     })
@@ -167,10 +167,10 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await app.pageSongManagement().primaryAction().click()
+      await app.songManagementPage().primaryAction().click()
       await page.waitForLoadState('networkidle')
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       const firstRow = songMgmt.locator('[data-testid^="row-"]').first()
       const testId = await firstRow.getAttribute('data-testid') ?? ''
       const newSongId = parseInt(testId.replace('row-', ''), 10)
@@ -189,7 +189,7 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       await songMgmt.action('delete-song-1').click()
 
       await expect(songMgmt.row(1)).not.toBeVisible()
@@ -202,9 +202,9 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await app.pageSongManagement().action('delete-song-1').click()
+      await app.songManagementPage().action('delete-song-1').click()
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       const rows = songMgmt.locator('[data-testid^="row-"]')
       await expect(rows).toHaveCount(0)
     })
@@ -217,7 +217,7 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       await expect(songMgmt.action('remove-pdf-1')).toBeVisible()
       await songMgmt.action('remove-pdf-1').click()
 
@@ -231,7 +231,7 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      const input = app.pageSongManagement().bySongUploadInput(1)
+      const input = app.songManagementPage().bySongUploadInput(1)
       const type = await input.getAttribute('type')
       const accept = await input.getAttribute('accept')
 
@@ -245,7 +245,7 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      const songMgmt = app.pageSongManagement()
+      const songMgmt = app.songManagementPage()
       await songMgmt.bySongUploadInput(1).setInputFiles(pdfPath)
 
       await expect(songMgmt.action('view-song-1')).toBeVisible()
@@ -258,10 +258,10 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await app.pageSongManagement().action('view-song-1').click()
+      await app.songManagementPage().action('view-song-1').click()
       await page.waitForLoadState('networkidle')
 
-      await expect(page.locator('.pdf-reader-empty, [data-testid="page-song-view"]')).toBeVisible()
+      await expect(app.songViewPage()).toBeVisible()
     })
   })
 })

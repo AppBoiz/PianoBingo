@@ -9,7 +9,7 @@ interface GameHeaderProps {
   onEndGame: () => void
 }
 
-export default function GameHeader({
+export default function GamePageHeader({
   songIndex,
   songTitle,
   onNextSong,
