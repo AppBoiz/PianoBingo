@@ -254,4 +254,5 @@ If you want to deploy under a subpath, treat that as a deliberate deployment pro
 ## Related Documentation
 
 - Root project overview: [../README.md](../README.md)
+- E2E testing and locator guide: [E2E_TESTING.md](E2E_TESTING.md)
 - Agent-oriented implementation context: [agent/CODING_AGENT_CONTEXT.md](agent/CODING_AGENT_CONTEXT.md)

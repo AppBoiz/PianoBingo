@@ -170,6 +170,7 @@ Then publish the contents of `dist/` to your static host.
 ## Documentation
 
 - Detailed project guide: [docs/README.md](docs/README.md)
+- E2E testing and locator guide: [docs/E2E_TESTING.md](docs/E2E_TESTING.md)
 - Coding-agent project context: [docs/agent/CODING_AGENT_CONTEXT.md](docs/agent/CODING_AGENT_CONTEXT.md)
 
 ## Useful Commands
