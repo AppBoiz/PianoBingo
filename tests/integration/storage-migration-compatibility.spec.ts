@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test'
-import { pianoBingoLocator, pianoExpect } from '../support/locators'
+import { test } from '@playwright/test'
+import { expect, pianoBingoLocator } from '../support/locators'
 
 test.describe('Storage compatibility and migration', () => {
   test.beforeEach(async ({ page }) => {
@@ -445,7 +445,7 @@ test.describe('version increments on every edit', () => {
 
     // Navigate to pack management and confirm the pack loaded.
     await spaNavigate(page, '/pack-management')
-    await pianoExpect(app.pagePackManagement()).toBeVisible()
+    await expect(app.pagePackManagement()).toBeVisible()
     await expect(app.pagePackManagement().nameInput(1).locate()).toHaveValue('Original Pack')
 
     // Rename — this calls renamePack → savePack which does version + 1.
@@ -475,7 +475,7 @@ test.describe('version increments on every edit', () => {
 
     // Navigate to song management and confirm the song loaded.
     await spaNavigate(page, '/song-management')
-    await pianoExpect(app.pageSongManagement()).toBeVisible()
+    await expect(app.pageSongManagement()).toBeVisible()
     await expect(app.pageSongManagement().nameInput(1).locate()).toHaveValue('Original Song')
 
     // Rename — this calls renameSong → saveSong which does version + 1.

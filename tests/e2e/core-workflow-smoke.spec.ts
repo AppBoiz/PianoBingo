@@ -55,9 +55,10 @@ test.describe('Core Workflow Smoke Tests', () => {
       await page.goto('/')
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pageWelcome().action('new-game')).toBeVisible()
-      await expect(app.pageWelcome().action('manage-songs')).toBeVisible()
-      await expect(app.pageWelcome().action('manage-playlists')).toBeVisible()
+      const welcome = app.pageWelcome()
+      await expect(welcome.action('new-game')).toBeVisible()
+      await expect(welcome.action('manage-songs')).toBeVisible()
+      await expect(welcome.action('manage-playlists')).toBeVisible()
     })
 
     test('New Game navigates to Pack Select with multiple packs', async ({ page }) => {
@@ -66,8 +67,9 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
-      await expect(app.pagePackSelect().packRadioInputs().second()).toBeVisible()
+      const packSelect = app.pagePackSelect()
+      await expect(packSelect.packRadioInputs().first()).toBeVisible()
+      await expect(packSelect.packRadioInputs().second()).toBeVisible()
     })
   })
 
@@ -83,31 +85,34 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
 
-      await app.pagePackSelect().packRadioInputs().first().click()
-      await app.pagePackSelect().startGameButton().click()
+      const packSelect = app.pagePackSelect()
+      await packSelect.packRadioInputs().first().click()
+      await packSelect.startGameButton().click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pageGame().nextSong()).toBeVisible()
-      await expect(app.pageGame().navTitle()).not.toBeEmpty()
-      const firstTitle = await app.pageGame().navTitle().textContent()
+      const game = app.pageGame()
+      await expect(game.nextSong()).toBeVisible()
+      await expect(game.navTitle()).not.toBeEmpty()
+      const firstTitle = await game.navTitle().textContent()
       expect(firstTitle).toBeTruthy()
 
-      await app.pageGame().nextSong().click()
+      await game.nextSong().click()
       await page.waitForLoadState('networkidle')
-      await expect(app.pageGame().navTitle()).not.toBeEmpty()
-      const secondTitle = await app.pageGame().navTitle().textContent()
+      await expect(game.navTitle()).not.toBeEmpty()
+      const secondTitle = await game.navTitle().textContent()
       expect(secondTitle).toBeTruthy()
 
-      await app.pageGame().menuToggle().click()
-      await expect(app.pageGame().menu()).toBeVisible()
+      await game.menuToggle().click()
+      await expect(game.menu()).toBeVisible()
 
-      await app.pageGame().menuItem('game-history').click()
+      await game.menuItem('game-history').click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pageGameHistory().header()).toBeVisible()
-      await expect(app.pageGameHistory().boxes()).toHaveCount(PACK_SIZE)
+      const gameHistory = app.pageGameHistory()
+      await expect(gameHistory.header()).toBeVisible()
+      await expect(gameHistory.boxes()).toHaveCount(PACK_SIZE)
 
-      const highlighted = await app.pageGameHistory().highlightedBoxes().count()
+      const highlighted = await gameHistory.highlightedBoxes().count()
       expect(highlighted).toBeGreaterThanOrEqual(2)
     })
 
@@ -116,54 +121,59 @@ test.describe('Core Workflow Smoke Tests', () => {
       await page.goto('/')
       await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await app.pagePackSelect().packRadioInputs().first().click()
-      await app.pagePackSelect().startGameButton().click()
+      const packSelect = app.pagePackSelect()
+      await packSelect.packRadioInputs().first().click()
+      await packSelect.startGameButton().click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pageGame().header()).toBeVisible()
-      await expect(app.pageGame().navTitle()).not.toBeEmpty()
-      const firstTitle = await app.pageGame().navTitle().textContent()
+      const game = app.pageGame()
+      await expect(game.header()).toBeVisible()
+      await expect(game.navTitle()).not.toBeEmpty()
+      const firstTitle = await game.navTitle().textContent()
 
-      await app.pageGame().nextSong().click()
+      await game.nextSong().click()
       // Poll until the nav title settles on a different song.
       // Using toPass (not not.toHaveText) avoids a TOCTOU race where the element
       // briefly disappears during a React re-render, causing not.toHaveText to pass
       // prematurely before the new text has been rendered.
       let secondTitle: string | null = null
       await expect(async () => {
-        secondTitle = await app.pageGame().navTitle().textContent()
+        secondTitle = await game.navTitle().textContent()
         expect(secondTitle).not.toBeNull()
         expect(secondTitle).not.toEqual(firstTitle)
       }).toPass({ timeout: 10000 })
 
-      await app.pageGame().menuToggle().click()
-      await app.pageGame().menuItem('prev-song').click()
+      await game.menuToggle().click()
+      await game.menuItem('prev-song').click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pageGame().header()).toBeVisible()
+      await expect(game.header()).toBeVisible()
     })
 
     test('end game returns to welcome page with reset state', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
-      await app.pageWelcome().action('new-game').click()
+      const packSelect = app.pagePackSelect()
+      const welcome = app.pageWelcome()
+      const game = app.pageGame()
+      await welcome.action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await app.pagePackSelect().packRadioInputs().first().click()
-      await app.pagePackSelect().startGameButton().click()
-      await page.waitForLoadState('networkidle')
-
-      await app.pageGame().nextSong().click()
-      await page.waitForLoadState('networkidle')
-
-      await app.pageGame().menuToggle().click()
-      await app.pageGame().menuItem('end-game').click()
+      await packSelect.packRadioInputs().first().click()
+      await packSelect.startGameButton().click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pageWelcome().action('new-game')).toBeVisible()
-
-      await app.pageWelcome().action('new-game').click()
+      await game.nextSong().click()
       await page.waitForLoadState('networkidle')
-      await expect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
+
+      await game.menuToggle().click()
+      await game.menuItem('end-game').click()
+      await page.waitForLoadState('networkidle')
+
+      await expect(welcome.action('new-game')).toBeVisible()
+
+      await welcome.action('new-game').click()
+      await page.waitForLoadState('networkidle')
+      await expect(packSelect.packRadioInputs().first()).toBeVisible()
     })
   })
 
@@ -178,8 +188,9 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pageWelcome().action('manage-songs').click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pageSongManagement().list()).toBeVisible()
-      await expect(app.pageSongManagement().row(1)).toBeVisible()
+      const songMgmt = app.pageSongManagement()
+      await expect(songMgmt.list()).toBeVisible()
+      await expect(songMgmt.row(1)).toBeVisible()
     })
 
     test('click song to preview', async ({ page }) => {
@@ -191,8 +202,9 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pageSongManagement().action('view-song-1').click()
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pageSongView()).toBeVisible()
-      await expect(app.pageSongView().backButton()).toBeVisible()
+      const songView = app.pageSongView()
+      await expect(songView).toBeVisible()
+      await expect(songView.backButton()).toBeVisible()
     })
   })
 
@@ -227,14 +239,16 @@ test.describe('Core Workflow Smoke Tests', () => {
       await page.goto('/')
       await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await app.pagePackSelect().packRadioInputs().first().click()
-      await app.pagePackSelect().startGameButton().click()
+      const packSelect = app.pagePackSelect()
+      await packSelect.packRadioInputs().first().click()
+      await packSelect.startGameButton().click()
       await page.waitForLoadState('networkidle')
 
-      const titleBefore = await app.pageGame().navTitle().textContent()
-      await app.pageGame().nextSong().click()
+      const game = app.pageGame()
+      const titleBefore = await game.navTitle().textContent()
+      await game.nextSong().click()
       await page.waitForLoadState('networkidle')
-      const titleAfter = await app.pageGame().navTitle().textContent()
+      const titleAfter = await game.navTitle().textContent()
       expect(titleAfter || titleBefore).toBeTruthy()
 
       const stateBeforeReload = await page.evaluate(() => {
@@ -258,23 +272,26 @@ test.describe('Core Workflow Smoke Tests', () => {
     test('pack selection persists across navigation', async ({ page }) => {
       const app = pianoBingoLocator(page)
       await page.goto('/')
-      await app.pageWelcome().action('new-game').click()
+      const packSelect = app.pagePackSelect()
+      const welcome = app.pageWelcome()
+      const game = app.pageGame()
+      await welcome.action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await app.pagePackSelect().packRadioInputs().first().click()
-      await app.pagePackSelect().startGameButton().click()
+      await packSelect.packRadioInputs().first().click()
+      await packSelect.startGameButton().click()
       await page.waitForLoadState('networkidle')
 
-      await app.pageGame().menuToggle().click()
-      await app.pageGame().menuItem('end-game').click()
+      await game.menuToggle().click()
+      await game.menuItem('end-game').click()
       await page.waitForLoadState('networkidle')
-      await app.pageWelcome().action('manage-songs').click()
+      await welcome.action('manage-songs').click()
       await page.waitForLoadState('networkidle')
       await app.pageSongManagement().backButton().click()
       await page.waitForLoadState('networkidle')
 
-      await app.pageWelcome().action('new-game').click()
+      await welcome.action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await expect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
+      await expect(packSelect.packRadioInputs().first()).toBeVisible()
     })
   })
 })

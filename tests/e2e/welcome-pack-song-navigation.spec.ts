@@ -61,9 +61,10 @@ test.describe('Welcome Page', () => {
     await clearAndSeedPacks(page)
     const app = pianoBingoLocator(page)
 
-    await expect(app.pageWelcome().action('new-game')).toBeVisible()
-    await expect(app.pageWelcome().action('manage-songs')).toBeVisible()
-    await expect(app.pageWelcome().action('manage-playlists')).toBeVisible()
+      const welcome = app.pageWelcome()
+      await expect(welcome.action('new-game')).toBeVisible()
+      await expect(welcome.action('manage-songs')).toBeVisible()
+      await expect(welcome.action('manage-playlists')).toBeVisible()
   })
 
   test('"New Game" navigates to pack select', async ({ page }) => {
@@ -111,10 +112,11 @@ test.describe('Pack Select Page', () => {
     await goToPackSelect(page, [{ packId: 1, packName: 'Pack A' }])
     const app = pianoBingoLocator(page)
 
-    await expect(app.pagePackSelect()).toBeVisible()
-    await expect(app.pagePackSelect().header()).toBeVisible()
-    await expect(app.pagePackSelect().startGameButton()).toBeVisible()
-    await expect(app.pagePackSelect().list()).toBeVisible()
+      const packSelect = app.pagePackSelect()
+      await expect(packSelect).toBeVisible()
+      await expect(packSelect.header()).toBeVisible()
+      await expect(packSelect.startGameButton()).toBeVisible()
+      await expect(packSelect.list()).toBeVisible()
   })
 
   test('auto-selects first pack when only one pack exists', async ({ page }) => {
@@ -132,8 +134,9 @@ test.describe('Pack Select Page', () => {
     ])
     const app = pianoBingoLocator(page)
 
-    await expect(app.pagePackSelect().option(1)).toBeChecked()
-    await expect(app.pagePackSelect().option(2)).not.toBeChecked()
+      const packSelect = app.pagePackSelect()
+      await expect(packSelect.option(1)).toBeChecked()
+      await expect(packSelect.option(2)).not.toBeChecked()
   })
 
   test('renders one radio option per pack with correct labels', async ({ page }) => {
@@ -155,10 +158,11 @@ test.describe('Pack Select Page', () => {
     ])
     const app = pianoBingoLocator(page)
 
-    await app.pagePackSelect().option(2).click()
+      const packSelect = app.pagePackSelect()
+      await packSelect.option(2).click()
 
-    await expect(app.pagePackSelect().option(2)).toBeChecked()
-    await expect(app.pagePackSelect().option(1)).not.toBeChecked()
+      await expect(packSelect.option(2)).toBeChecked()
+      await expect(packSelect.option(1)).not.toBeChecked()
   })
 
   test('back button navigates back to welcome page', async ({ page }) => {
@@ -191,8 +195,9 @@ test.describe('Song View Page', () => {
     })
     await page.waitForLoadState('networkidle')
 
-    await expect(page.locator('.pdf-reader-empty')).toBeVisible()
-    await expect(page.locator('.pdf-reader-empty')).toContainText('No song selected')
+    const emptyState = page.locator('.pdf-reader-empty')
+    await expect(emptyState).toBeVisible()
+    await expect(emptyState).toContainText('No song selected')
   })
 
   test('back button on song view navigates to song management', async ({ page }) => {

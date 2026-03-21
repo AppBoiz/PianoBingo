@@ -51,26 +51,29 @@ test.describe('Game History Page', () => {
 
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    await app.pagePackSelect().packRadioInputs().first().click()
-    await app.pagePackSelect().startGameButton().click()
+    const packSelect = app.pagePackSelect()
+    await packSelect.packRadioInputs().first().click()
+    await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    await expect(app.pageGame().nextSong()).toBeVisible()
+    const game = app.pageGame()
+    await expect(game.nextSong()).toBeVisible()
 
-    await app.pageGame().menuToggle().click()
-    await app.pageGame().menuItem('game-history').click()
+    await game.menuToggle().click()
+    await game.menuItem('game-history').click()
     await page.waitForLoadState('networkidle')
 
-    await expect(app.pageGameHistory().header()).toBeVisible()
+    const gameHistory = app.pageGameHistory()
+    await expect(gameHistory.header()).toBeVisible()
 
-    const boxes = app.pageGameHistory().boxes()
+    const boxes = gameHistory.boxes()
     await expect(boxes).toHaveCount(PACK_SIZE)
 
-    const highlightedCount = await app.pageGameHistory().highlightedBoxes().count()
+    const highlightedCount = await gameHistory.highlightedBoxes().count()
     expect(highlightedCount).toBeGreaterThan(0)
 
-    await expect(app.pageGameHistory().box(1)).toHaveText('1')
-    await expect(app.pageGameHistory().box(PACK_SIZE)).toHaveText(String(PACK_SIZE))
+    await expect(gameHistory.box(1)).toHaveText('1')
+    await expect(gameHistory.box(PACK_SIZE)).toHaveText(String(PACK_SIZE))
   })
 
   test('shows empty state message when no active game', async ({ page }) => {
@@ -93,20 +96,23 @@ test.describe('Game History Page', () => {
 
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    await app.pagePackSelect().packRadioInputs().first().click()
-    await app.pagePackSelect().startGameButton().click()
+    const packSelect = app.pagePackSelect()
+    await packSelect.packRadioInputs().first().click()
+    await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    await expect(app.pageGame().nextSong()).toBeVisible()
+    const game = app.pageGame()
+    await expect(game.nextSong()).toBeVisible()
 
-    await app.pageGame().menuToggle().click()
-    await app.pageGame().menuItem('game-history').click()
+    await game.menuToggle().click()
+    await game.menuItem('game-history').click()
     await page.waitForLoadState('networkidle')
-    await expect(app.pageGameHistory().header()).toBeVisible()
+    const gameHistory = app.pageGameHistory()
+    await expect(gameHistory.header()).toBeVisible()
 
-    await app.pageGameHistory().backButton().click()
+    await gameHistory.backButton().click()
     await page.waitForLoadState('networkidle')
 
-    await expect(app.pageGame().nextSong()).toBeVisible()
+    await expect(game.nextSong()).toBeVisible()
   })
 })

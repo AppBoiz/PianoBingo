@@ -54,9 +54,10 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      await expect(app.pagePackManagement()).toBeVisible()
-      await expect(app.pagePackManagement().header()).toBeVisible()
-      await expect(app.pagePackManagement().list()).toBeVisible()
+      const packMgmt = app.pagePackManagement()
+      await expect(packMgmt).toBeVisible()
+      await expect(packMgmt.header()).toBeVisible()
+      await expect(packMgmt.list()).toBeVisible()
     })
 
     test('back button navigates to welcome page', async ({ page }) => {
@@ -83,13 +84,14 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      await expect(app.pagePackManagement().row(1)).toBeVisible()
-      await expect(app.pagePackManagement().row(2)).toBeVisible()
-      await expect(app.pagePackManagement().row(3)).toBeVisible()
+      const packMgmt = app.pagePackManagement()
+      await expect(packMgmt.row(1)).toBeVisible()
+      await expect(packMgmt.row(2)).toBeVisible()
+      await expect(packMgmt.row(3)).toBeVisible()
 
-      await expect(app.pagePackManagement().nameInput(1)).toHaveValue('Alpha Pack')
-      await expect(app.pagePackManagement().nameInput(2)).toHaveValue('Beta Pack')
-      await expect(app.pagePackManagement().nameInput(3)).toHaveValue('Gamma Pack')
+      await expect(packMgmt.nameInput(1)).toHaveValue('Alpha Pack')
+      await expect(packMgmt.nameInput(2)).toHaveValue('Beta Pack')
+      await expect(packMgmt.nameInput(3)).toHaveValue('Gamma Pack')
     })
 
     test('empty list when no packs exist', async ({ page }) => {
@@ -111,15 +113,16 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
+      const packMgmt = app.pagePackManagement()
       await expect(
-        app.pagePackManagement().locator('[data-testid^="row-"]')
+        packMgmt.locator('[data-testid^="row-"]')
       ).toHaveCount(1)
 
-      await app.pagePackManagement().action('create-pack').click()
+      await packMgmt.action('create-pack').click()
       await page.waitForLoadState('networkidle')
 
       await expect(
-        app.pagePackManagement().locator('[data-testid^="row-"]')
+        packMgmt.locator('[data-testid^="row-"]')
       ).toHaveCount(2)
     })
   })
@@ -131,13 +134,15 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      await expect(app.pagePackManagement().nameInput(1)).toHaveValue('Original Name')
+      const packMgmt = app.pagePackManagement()
+      const nameInput = packMgmt.nameInput(1)
+      await expect(nameInput).toHaveValue('Original Name')
 
-      await app.pagePackManagement().nameInput(1).fill('New Pack Name')
-      await app.pagePackManagement().nameInput(1).press('Tab')
+      await nameInput.fill('New Pack Name')
+      await nameInput.press('Tab')
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pagePackManagement().nameInput(1)).toHaveValue('New Pack Name')
+      await expect(nameInput).toHaveValue('New Pack Name')
     })
   })
 
@@ -151,17 +156,18 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
+      const packMgmt = app.pagePackManagement()
       await expect(
-        app.pagePackManagement().locator('[data-testid^="row-"]')
+        packMgmt.locator('[data-testid^="row-"]')
       ).toHaveCount(2)
 
-      await app.pagePackManagement().action('delete-pack-1').click()
+      await packMgmt.action('delete-pack-1').click()
       await page.waitForLoadState('networkidle')
 
       await expect(
-        app.pagePackManagement().locator('[data-testid^="row-"]')
+        packMgmt.locator('[data-testid^="row-"]')
       ).toHaveCount(1)
-      await expect(app.pagePackManagement().row(2)).toBeVisible()
+      await expect(packMgmt.row(2)).toBeVisible()
     })
 
     test('deleting the last pack leaves an empty list', async ({ page }) => {
@@ -170,11 +176,12 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      await app.pagePackManagement().action('delete-pack-1').click()
+      const packMgmt = app.pagePackManagement()
+      await packMgmt.action('delete-pack-1').click()
       await page.waitForLoadState('networkidle')
 
       await expect(
-        app.pagePackManagement().locator('[data-testid^="row-"]')
+        packMgmt.locator('[data-testid^="row-"]')
       ).toHaveCount(0)
     })
   })
@@ -203,11 +210,12 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      await app.pagePackManagement().action('create-pack').click()
+      const packMgmt = app.pagePackManagement()
+      await packMgmt.action('create-pack').click()
       await page.waitForLoadState('networkidle')
 
       await expect(
-        app.pagePackManagement().locator('[data-testid^="row-"]')
+        packMgmt.locator('[data-testid^="row-"]')
       ).toHaveCount(3)
 
       // Find the newly created pack id (not 1 or 2)
@@ -227,14 +235,14 @@ test.describe('Pack Management Page', () => {
         })
       })
 
-      await app.pagePackManagement().action(`delete-pack-${newPackId}`).click()
+      await packMgmt.action(`delete-pack-${newPackId}`).click()
       await page.waitForLoadState('networkidle')
 
       await expect(
-        app.pagePackManagement().locator('[data-testid^="row-"]')
+        packMgmt.locator('[data-testid^="row-"]')
       ).toHaveCount(2)
-      await expect(app.pagePackManagement().row(1)).toBeVisible()
-      await expect(app.pagePackManagement().row(2)).toBeVisible()
+      await expect(packMgmt.row(1)).toBeVisible()
+      await expect(packMgmt.row(2)).toBeVisible()
     })
   })
 })

@@ -69,8 +69,9 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await expect(app.pageSongManagement().header()).toBeVisible()
-      await expect(app.pageSongManagement().header()).toContainText('Manage Songs')
+      const songMgmt = app.pageSongManagement()
+      await expect(songMgmt.header()).toBeVisible()
+      await expect(songMgmt.header()).toContainText('Manage Songs')
     })
 
     test('shows "New Song" button in footer', async ({ page }) => {
@@ -79,8 +80,9 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await expect(app.pageSongManagement().primaryAction()).toBeVisible()
-      await expect(app.pageSongManagement().primaryAction()).toContainText('New Song')
+      const songMgmt = app.pageSongManagement()
+      await expect(songMgmt.primaryAction()).toBeVisible()
+      await expect(songMgmt.primaryAction()).toContainText('New Song')
     })
 
     test('back button navigates back to welcome page', async ({ page }) => {
@@ -115,8 +117,9 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await expect(app.pageSongManagement().row(1)).toBeVisible()
-      await expect(app.pageSongManagement().row(2)).toBeVisible()
+      const songMgmt = app.pageSongManagement()
+      await expect(songMgmt.row(1)).toBeVisible()
+      await expect(songMgmt.row(2)).toBeVisible()
     })
 
     test('song with PDF shows view and remove-pdf buttons', async ({ page }) => {
@@ -125,8 +128,9 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await expect(app.pageSongManagement().action('view-song-1')).toBeVisible()
-      await expect(app.pageSongManagement().action('remove-pdf-1')).toBeVisible()
+      const songMgmt = app.pageSongManagement()
+      await expect(songMgmt.action('view-song-1')).toBeVisible()
+      await expect(songMgmt.action('remove-pdf-1')).toBeVisible()
     })
 
     test('song without PDF shows upload input instead of view/remove buttons', async ({ page }) => {
@@ -135,9 +139,10 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await expect(app.pageSongManagement().bySongUploadInput(1)).toBeAttached()
-      await expect(app.pageSongManagement().action('view-song-1')).not.toBeVisible()
-      await expect(app.pageSongManagement().action('remove-pdf-1')).not.toBeVisible()
+      const songMgmt = app.pageSongManagement()
+      await expect(songMgmt.bySongUploadInput(1)).toBeAttached()
+      await expect(songMgmt.action('view-song-1')).not.toBeVisible()
+      await expect(songMgmt.action('remove-pdf-1')).not.toBeVisible()
     })
   })
 
@@ -151,7 +156,8 @@ test.describe('Song Management Page', () => {
       await app.pageSongManagement().primaryAction().click()
       await page.waitForLoadState('networkidle')
 
-      const rows = app.pageSongManagement().locator('[data-testid^="row-"]')
+      const songMgmt = app.pageSongManagement()
+      const rows = songMgmt.locator('[data-testid^="row-"]')
       await expect(rows).toHaveCount(1)
     })
 
@@ -164,11 +170,12 @@ test.describe('Song Management Page', () => {
       await app.pageSongManagement().primaryAction().click()
       await page.waitForLoadState('networkidle')
 
-      const firstRow = app.pageSongManagement().locator('[data-testid^="row-"]').first()
+      const songMgmt = app.pageSongManagement()
+      const firstRow = songMgmt.locator('[data-testid^="row-"]').first()
       const testId = await firstRow.getAttribute('data-testid') ?? ''
       const newSongId = parseInt(testId.replace('row-', ''), 10)
 
-      await expect(app.pageSongManagement().bySongUploadInput(newSongId)).toBeAttached()
+      await expect(songMgmt.bySongUploadInput(newSongId)).toBeAttached()
     })
   })
 
@@ -182,10 +189,11 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await app.pageSongManagement().action('delete-song-1').click()
+      const songMgmt = app.pageSongManagement()
+      await songMgmt.action('delete-song-1').click()
 
-      await expect(app.pageSongManagement().row(1)).not.toBeVisible()
-      await expect(app.pageSongManagement().row(2)).toBeVisible()
+      await expect(songMgmt.row(1)).not.toBeVisible()
+      await expect(songMgmt.row(2)).toBeVisible()
     })
 
     test('deleting last song leaves empty list', async ({ page }) => {
@@ -196,7 +204,8 @@ test.describe('Song Management Page', () => {
 
       await app.pageSongManagement().action('delete-song-1').click()
 
-      const rows = app.pageSongManagement().locator('[data-testid^="row-"]')
+      const songMgmt = app.pageSongManagement()
+      const rows = songMgmt.locator('[data-testid^="row-"]')
       await expect(rows).toHaveCount(0)
     })
   })
@@ -208,11 +217,12 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await expect(app.pageSongManagement().action('remove-pdf-1')).toBeVisible()
-      await app.pageSongManagement().action('remove-pdf-1').click()
+      const songMgmt = app.pageSongManagement()
+      await expect(songMgmt.action('remove-pdf-1')).toBeVisible()
+      await songMgmt.action('remove-pdf-1').click()
 
-      await expect(app.pageSongManagement().bySongUploadInput(1)).toBeAttached()
-      await expect(app.pageSongManagement().action('view-song-1')).not.toBeVisible()
+      await expect(songMgmt.bySongUploadInput(1)).toBeAttached()
+      await expect(songMgmt.action('view-song-1')).not.toBeVisible()
     })
 
     test('upload PDF input accepts pdf files', async ({ page }) => {
@@ -235,10 +245,11 @@ test.describe('Song Management Page', () => {
 
       await navigateToSongManagement(page)
 
-      await app.pageSongManagement().bySongUploadInput(1).setInputFiles(pdfPath)
+      const songMgmt = app.pageSongManagement()
+      await songMgmt.bySongUploadInput(1).setInputFiles(pdfPath)
 
-      await expect(app.pageSongManagement().action('view-song-1')).toBeVisible()
-      await expect(app.pageSongManagement().action('remove-pdf-1')).toBeVisible()
+      await expect(songMgmt.action('view-song-1')).toBeVisible()
+      await expect(songMgmt.action('remove-pdf-1')).toBeVisible()
     })
 
     test('view-song button navigates to song view page', async ({ page }) => {

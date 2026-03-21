@@ -120,9 +120,10 @@ test.describe('Direct navigation without game state', () => {
     })
     await page.waitForLoadState('networkidle')
 
-    await expect(app.pageGameHistory().header()).toBeVisible()
-    await expect(app.pageGameHistory().emptyState()).toBeVisible()
-    await expect(app.pageGameHistory().boxes()).toHaveCount(0)
+    const gameHistory = app.pageGameHistory()
+    await expect(gameHistory.header()).toBeVisible()
+    await expect(gameHistory.emptyState()).toBeVisible()
+    await expect(gameHistory.boxes()).toHaveCount(0)
   })
 
   test('/pack-edit with invalid packId renders gracefully', async ({ page }) => {
@@ -158,20 +159,22 @@ test.describe('Pack exhaustion', () => {
     page.on('pageerror', (err) => errors.push(err.message))
 
     await app.pageWelcome().action('new-game').click()
-    await app.pagePackSelect().packRadioInputs().first().click()
+    const packSelect = app.pagePackSelect()
+    await packSelect.packRadioInputs().first().click()
     await page.waitForLoadState('networkidle')
-    await app.pagePackSelect().startGameButton().click()
+    await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    await expect(app.pageGame().nextSong()).toBeVisible()
-    await expect(app.pageGame().header().getByText('Solo Song')).toBeVisible()
+    const game = app.pageGame()
+    await expect(game.nextSong()).toBeVisible()
+    await expect(game.header().getByText('Solo Song')).toBeVisible()
 
     // Attempt to advance — pack is now exhausted, generateSong() returns null
-    await app.pageGame().nextSong().click()
+    await game.nextSong().click()
     await page.waitForLoadState('networkidle')
 
     expect(errors).toHaveLength(0)
-    await expect(app.pageGame().header()).toBeVisible()
+    await expect(game.header()).toBeVisible()
   })
 })
 
@@ -193,15 +196,17 @@ test.describe('Hamburger menu behaviour', () => {
 
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    await app.pagePackSelect().packRadioInputs().first().click()
-    await app.pagePackSelect().startGameButton().click()
+    const packSelect = app.pagePackSelect()
+    await packSelect.packRadioInputs().first().click()
+    await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
-    await expect(app.pageGame().nextSong()).toBeVisible()
+    const game = app.pageGame()
+    await expect(game.nextSong()).toBeVisible()
 
     // First cycle: open menu, click "Next Song"
-    await app.pageGame().menuToggle().click()
-    await expect(app.pageGame().menu()).toBeVisible()
-    await app.pageGame().menuItem('next-song').click()
+    await game.menuToggle().click()
+    await expect(game.menu()).toBeVisible()
+    await game.menuItem('next-song').click()
     await page.waitForLoadState('networkidle')
     let isChecked = await page.evaluate(() => {
       const toggle = document.getElementById('menu-toggle') as HTMLInputElement | null
@@ -210,9 +215,9 @@ test.describe('Hamburger menu behaviour', () => {
     expect(isChecked).toBe(false)
 
     // Second cycle: open menu again, click "Prev Song" — must also close
-    await app.pageGame().menuToggle().click()
-    await expect(app.pageGame().menu()).toBeVisible()
-    await app.pageGame().menuItem('prev-song').click()
+    await game.menuToggle().click()
+    await expect(game.menu()).toBeVisible()
+    await game.menuItem('prev-song').click()
     await page.waitForLoadState('networkidle')
     isChecked = await page.evaluate(() => {
       const toggle = document.getElementById('menu-toggle') as HTMLInputElement | null
@@ -238,10 +243,12 @@ test.describe('Data deletion during active game', () => {
 
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    await app.pagePackSelect().packRadioInputs().first().click()
-    await app.pagePackSelect().startGameButton().click()
+    const packSelect = app.pagePackSelect()
+    await packSelect.packRadioInputs().first().click()
+    await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
-    await expect(app.pageGame().nextSong()).toBeVisible()
+    const game = app.pageGame()
+    await expect(game.nextSong()).toBeVisible()
 
     // Delete song 1 directly from IndexedDB (simulates user deleting from song management)
     await page.evaluate(async () => {
@@ -267,7 +274,7 @@ test.describe('Data deletion during active game', () => {
     await page.waitForLoadState('networkidle')
 
     expect(errors).toHaveLength(0)
-    await expect(app.pageGame().header()).toBeVisible()
+    await expect(game.header()).toBeVisible()
   })
 
   test('deleting the active pack then returning to game does not crash', async ({ page }) => {
@@ -280,10 +287,12 @@ test.describe('Data deletion during active game', () => {
 
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    await app.pagePackSelect().packRadioInputs().first().click()
-    await app.pagePackSelect().startGameButton().click()
+    const packSelect = app.pagePackSelect()
+    await packSelect.packRadioInputs().first().click()
+    await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
-    await expect(app.pageGame().nextSong()).toBeVisible()
+    const game = app.pageGame()
+    await expect(game.nextSong()).toBeVisible()
 
     // Delete pack 1 directly from IndexedDB
     await page.evaluate(async () => {
@@ -301,10 +310,10 @@ test.describe('Data deletion during active game', () => {
     })
 
     // Attempt to advance song — generateSong() can now not find the pack
-    await app.pageGame().nextSong().click()
+    await game.nextSong().click()
     await page.waitForLoadState('networkidle')
 
     expect(errors).toHaveLength(0)
-    await expect(app.pageGame().header()).toBeVisible()
+    await expect(game.header()).toBeVisible()
   })
 })

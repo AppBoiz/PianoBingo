@@ -63,10 +63,11 @@ test.describe('Pack Edit Page', () => {
 
       await navigateToPackEdit(page)
 
-      await expect(app.pagePackEdit()).toBeVisible()
-      await expect(app.pagePackEdit().header()).toBeVisible()
-      await expect(app.pagePackEdit().list()).toBeVisible()
-      await expect(app.pagePackEdit().primaryAction()).toBeVisible()
+      const packEdit = app.pagePackEdit()
+      await expect(packEdit).toBeVisible()
+      await expect(packEdit.header()).toBeVisible()
+      await expect(packEdit.list()).toBeVisible()
+      await expect(packEdit.primaryAction()).toBeVisible()
     })
 
     test('back button navigates back to pack management', async ({ page }) => {
@@ -102,11 +103,12 @@ test.describe('Pack Edit Page', () => {
 
       await navigateToPackEdit(page)
 
+      const packEdit = app.pagePackEdit()
       // Song 1 is in pack — should NOT have 'unchecked' class
-      await expect(app.pagePackEdit().row(1)).not.toHaveClass(/unchecked/)
+      await expect(packEdit.row(1)).not.toHaveClass(/unchecked/)
       // Songs 2 and 3 are not in pack — should have 'unchecked' class
-      await expect(app.pagePackEdit().row(2)).toHaveClass(/unchecked/)
-      await expect(app.pagePackEdit().row(3)).toHaveClass(/unchecked/)
+      await expect(packEdit.row(2)).toHaveClass(/unchecked/)
+      await expect(packEdit.row(3)).toHaveClass(/unchecked/)
     })
 
     test('song in pack shows its position number in the handle', async ({ page }) => {
@@ -125,9 +127,10 @@ test.describe('Pack Edit Page', () => {
 
       await navigateToPackEdit(page)
 
-      await expect(app.pagePackEdit().row(1).getByTestId('name')).toContainText('Song One')
-      await expect(app.pagePackEdit().row(2).getByTestId('name')).toContainText('Song Two')
-      await expect(app.pagePackEdit().row(3).getByTestId('name')).toContainText('Song Three')
+      const packEdit = app.pagePackEdit()
+      await expect(packEdit.row(1).getByTestId('name')).toContainText('Song One')
+      await expect(packEdit.row(2).getByTestId('name')).toContainText('Song Two')
+      await expect(packEdit.row(3).getByTestId('name')).toContainText('Song Three')
     })
   })
 
@@ -138,9 +141,10 @@ test.describe('Pack Edit Page', () => {
 
       await navigateToPackEdit(page)
 
-      await expect(app.pagePackEdit().row(2)).toHaveClass(/unchecked/)
-      await app.pagePackEdit().row(2).click()
-      await expect(app.pagePackEdit().row(2)).not.toHaveClass(/unchecked/)
+      const packEdit = app.pagePackEdit()
+      await expect(packEdit.row(2)).toHaveClass(/unchecked/)
+      await packEdit.row(2).click()
+      await expect(packEdit.row(2)).not.toHaveClass(/unchecked/)
 
       await expect(page.locator('#song-counter')).toContainText('2/75')
     })
@@ -151,9 +155,10 @@ test.describe('Pack Edit Page', () => {
 
       await navigateToPackEdit(page)
 
-      await expect(app.pagePackEdit().row(1)).not.toHaveClass(/unchecked/)
-      await app.pagePackEdit().row(1).click()
-      await expect(app.pagePackEdit().row(1)).toHaveClass(/unchecked/)
+      const packEdit = app.pagePackEdit()
+      await expect(packEdit.row(1)).not.toHaveClass(/unchecked/)
+      await packEdit.row(1).click()
+      await expect(packEdit.row(1)).toHaveClass(/unchecked/)
 
       await expect(page.locator('#song-counter')).toContainText('0/75')
     })
@@ -167,13 +172,14 @@ test.describe('Pack Edit Page', () => {
       await expect(counter).toContainText('1/75')
 
       const app = pianoBingoLocator(page)
-      await app.pagePackEdit().row(2).click()
+      const packEdit = app.pagePackEdit()
+      await packEdit.row(2).click()
       await expect(counter).toContainText('2/75')
 
-      await app.pagePackEdit().row(3).click()
+      await packEdit.row(3).click()
       await expect(counter).toContainText('3/75')
 
-      await app.pagePackEdit().row(1).click()
+      await packEdit.row(1).click()
       await expect(counter).toContainText('2/75')
     })
 
@@ -183,10 +189,11 @@ test.describe('Pack Edit Page', () => {
 
       await navigateToPackEdit(page)
 
-      const checkbox2 = app.pagePackEdit().row(2).getByTestId('checkbox')
+      const packEdit = app.pagePackEdit()
+      const checkbox2 = packEdit.row(2).getByTestId('checkbox')
       await checkbox2.click()
 
-      await expect(app.pagePackEdit().row(2)).not.toHaveClass(/unchecked/)
+      await expect(packEdit.row(2)).not.toHaveClass(/unchecked/)
       await expect(page.locator('#song-counter')).toContainText('2/75')
     })
   })
@@ -198,8 +205,9 @@ test.describe('Pack Edit Page', () => {
 
       await navigateToPackEdit(page)
 
-      await expect(app.pagePackEdit().primaryAction()).toBeDisabled()
-      await expect(app.pagePackEdit().primaryAction()).toContainText('Ok')
+      const packEdit = app.pagePackEdit()
+      await expect(packEdit.primaryAction()).toBeDisabled()
+      await expect(packEdit.primaryAction()).toContainText('Ok')
     })
   })
 })

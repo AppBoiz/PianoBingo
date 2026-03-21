@@ -44,9 +44,10 @@ test.describe('Mobile viewport flows', () => {
     const app = pianoBingoLocator(page)
     await page.goto('/')
 
-    await expect(app.pageWelcome().action('new-game')).toBeVisible()
-    await expect(app.pageWelcome().action('manage-songs')).toBeVisible()
-    await expect(app.pageWelcome().action('manage-playlists')).toBeVisible()
+    const welcome = app.pageWelcome()
+    await expect(welcome.action('new-game')).toBeVisible()
+    await expect(welcome.action('manage-songs')).toBeVisible()
+    await expect(welcome.action('manage-playlists')).toBeVisible()
   })
 
   test('pack select renders and starts game', async ({ page }) => {
@@ -56,10 +57,11 @@ test.describe('Mobile viewport flows', () => {
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
 
-    await expect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
-    await expect(app.pagePackSelect().startGameButton()).toBeVisible()
+    const packSelect = app.pagePackSelect()
+    await expect(packSelect.packRadioInputs().first()).toBeVisible()
+    await expect(packSelect.startGameButton()).toBeVisible()
 
-    await app.pagePackSelect().startGameButton().click()
+    await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
 
     await expect(app.pageGame().nextSong()).toBeVisible()
@@ -71,16 +73,18 @@ test.describe('Mobile viewport flows', () => {
     await seedPackAndSong(page)
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    await expect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
-    await app.pagePackSelect().startGameButton().click()
+    const packSelect = app.pagePackSelect()
+    await expect(packSelect.packRadioInputs().first()).toBeVisible()
+    await packSelect.startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    await expect(app.pageGame().navTitle()).toBeVisible()
+    const game = app.pageGame()
+    await expect(game.navTitle()).toBeVisible()
 
-    await app.pageGame().menuToggle().click()
-    await expect(app.pageGame().menu()).toBeVisible()
-    await expect(app.pageGame().menuItem('next-song')).toBeVisible()
-    await expect(app.pageGame().menuItem('game-history')).toBeVisible()
+    await game.menuToggle().click()
+    await expect(game.menu()).toBeVisible()
+    await expect(game.menuItem('next-song')).toBeVisible()
+    await expect(game.menuItem('game-history')).toBeVisible()
   })
 
   test('song management list renders on mobile', async ({ page }) => {
@@ -90,7 +94,8 @@ test.describe('Mobile viewport flows', () => {
     await app.pageWelcome().action('manage-songs').click()
     await page.waitForLoadState('networkidle')
 
-    await expect(app.pageSongManagement().header()).toBeVisible()
-    await expect(app.pageSongManagement().list()).toBeVisible()
+    const songMgmt = app.pageSongManagement()
+    await expect(songMgmt.header()).toBeVisible()
+    await expect(songMgmt.list()).toBeVisible()
   })
 })

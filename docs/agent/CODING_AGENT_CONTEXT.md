@@ -450,6 +450,51 @@ New npm scripts:
 - [ ] **Further Tailwind consolidation**: Migrate remaining per-page CSS to Tailwind utilities (current per-page CSS working well, low priority)
 
 
+### E2E test locator system refactor (2026-03-22) ✅
+
+**Custom `expect` wrapper and `.locate()`-free test style**
+
+All E2E tests now use a project-level `expect` wrapper exported from `tests/support/locators/`. The wrapper automatically unwraps `LocatorBuilder` instances before delegating to Playwright's native `expect`, so no test ever needs to call `.locate()` manually.
+
+**Import rule for every E2E test file:**
+```ts
+import { test }                        from '@playwright/test'  // expect NOT imported here
+import { expect, pianoBingoLocator }   from '../support/locators'
+```
+Never import `expect` from `@playwright/test` in an E2E test. The locators export is the single source.
+
+**How the wrapper works (`tests/support/locators/LocatorBuilder.ts`):**
+```ts
+import { expect as pwExpect, type Locator } from '@playwright/test'
+
+function _expectLocator(l: Locator) { return pwExpect(l) }
+type LocatorAssertions = ReturnType<typeof _expectLocator>
+type ExpectFn = ((value: LocatorBuilder) => LocatorAssertions) & typeof pwExpect
+
+export const expect = ((value: unknown) => {
+  if (value instanceof LocatorBuilder) return pwExpect(value.locate())
+  return pwExpect(value as never)
+}) as unknown as ExpectFn
+```
+`LocatorAssertions` is not a named export from `@playwright/test` — derive it via `ReturnType<typeof _expectLocator>`. Use `as unknown as ExpectFn` to satisfy TypeScript.
+
+**No `.locate()` in tests — ever.** If a `LocatorBuilder` method is missing, add it to `LocatorBuilder` rather than escaping to raw Playwright. Currently delegated: `click`, `fill`, `press`, `count`, `textContent`, `getByTestId`, `getByText`, `getByRole`, `locator`, `nth`, `filter`, `first`, `getAttribute`, `setInputFiles`.
+
+**`const` extraction rule:** If a locator accessor (e.g. `app.pagePackEdit()`) is called more than once inside a single test, extract it to a named `const` before first use:
+```ts
+const packEdit = app.pagePackEdit()
+// then use packEdit.* throughout the test
+```
+
+**Support file locations:**
+- `tests/support/locators/LocatorBuilder.ts` — base class + `expect` export
+- `tests/support/locators/HtmlLocatorBuilder.ts` — HTML-specific locator helpers
+- `tests/support/locators/PianoBingoLocatorBuilder.ts` — all page-specific accessors
+- `tests/support/locators/index.ts` — public re-exports for tests
+
+**Test run status after refactor:** 76/76 E2E tests passing.
+
+
 ## 13) Confirmed project decisions
 
 1. **Legacy files**: Kept only until migration complete, then removed.
