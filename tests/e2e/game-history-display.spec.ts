@@ -1,8 +1,8 @@
-import { test, expect } from '@playwright/test'
+import { test } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
 import { PACK_SIZE } from '../../src/shared/constants/game'
-import { pianoBingoLocator, pianoExpect } from '../support/locators'
+import { expect, pianoBingoLocator } from '../support/locators'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -55,22 +55,22 @@ test.describe('Game History Page', () => {
     await app.pagePackSelect().startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageGame().nextSong()).toBeVisible()
+    await expect(app.pageGame().nextSong()).toBeVisible()
 
     await app.pageGame().menuToggle().click()
     await app.pageGame().menuItem('game-history').click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageGameHistory().header()).toBeVisible()
+    await expect(app.pageGameHistory().header()).toBeVisible()
 
     const boxes = app.pageGameHistory().boxes()
-    await pianoExpect(boxes).toHaveCount(PACK_SIZE)
+    await expect(boxes).toHaveCount(PACK_SIZE)
 
     const highlightedCount = await app.pageGameHistory().highlightedBoxes().count()
     expect(highlightedCount).toBeGreaterThan(0)
 
-    await pianoExpect(app.pageGameHistory().box(1)).toHaveText('1')
-    await pianoExpect(app.pageGameHistory().box(PACK_SIZE)).toHaveText(String(PACK_SIZE))
+    await expect(app.pageGameHistory().box(1)).toHaveText('1')
+    await expect(app.pageGameHistory().box(PACK_SIZE)).toHaveText(String(PACK_SIZE))
   })
 
   test('shows empty state message when no active game', async ({ page }) => {
@@ -84,7 +84,7 @@ test.describe('Game History Page', () => {
     })
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageGameHistory().emptyState()).toBeVisible()
+    await expect(app.pageGameHistory().emptyState()).toBeVisible()
   })
 
   test('back button returns to game page', async ({ page }) => {
@@ -97,16 +97,16 @@ test.describe('Game History Page', () => {
     await app.pagePackSelect().startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageGame().nextSong()).toBeVisible()
+    await expect(app.pageGame().nextSong()).toBeVisible()
 
     await app.pageGame().menuToggle().click()
     await app.pageGame().menuItem('game-history').click()
     await page.waitForLoadState('networkidle')
-    await pianoExpect(app.pageGameHistory().header()).toBeVisible()
+    await expect(app.pageGameHistory().header()).toBeVisible()
 
     await app.pageGameHistory().backButton().click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageGame().nextSong()).toBeVisible()
+    await expect(app.pageGame().nextSong()).toBeVisible()
   })
 })

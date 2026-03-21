@@ -1,4 +1,4 @@
-import { expect, type Locator } from '@playwright/test'
+import { expect as pwExpect, type Locator } from '@playwright/test'
 
 export class LocatorBuilder {
   protected readonly current: Locator
@@ -56,15 +56,32 @@ export class LocatorBuilder {
     return this.current.textContent(options)
   }
 
+  first(): LocatorBuilder {
+    return new LocatorBuilder(this.current.first())
+  }
+
+  getAttribute(name: string, options?: Parameters<Locator['getAttribute']>[1]): Promise<string | null> {
+    return this.current.getAttribute(name, options)
+  }
+
+  setInputFiles(files: Parameters<Locator['setInputFiles']>[0], options?: Parameters<Locator['setInputFiles']>[1]): Promise<void> {
+    return this.current.setInputFiles(files, options)
+  }
+
   async as<T>(fn: (scoped: this) => Promise<T> | T): Promise<T> {
     return fn(this)
   }
 }
 
-export function pianoExpect(value: unknown) {
-  if (value instanceof LocatorBuilder) {
-    return expect(value.locate())
-  }
+// Derive the return type that pwExpect produces when given a Locator (i.e. LocatorAssertions)
+function _expectLocator(l: Locator) { return pwExpect(l) }
+type LocatorAssertions = ReturnType<typeof _expectLocator>
 
-  return expect(value as never)
-}
+type ExpectFn = ((value: LocatorBuilder) => LocatorAssertions) & typeof pwExpect
+
+export const expect = ((value: unknown) => {
+  if (value instanceof LocatorBuilder) {
+    return pwExpect(value.locate())
+  }
+  return pwExpect(value as never)
+}) as unknown as ExpectFn

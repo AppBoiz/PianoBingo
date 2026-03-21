@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test'
-import { pianoBingoLocator, pianoExpect } from '../support/locators'
+import { test } from '@playwright/test'
+import { expect, pianoBingoLocator } from '../support/locators'
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -54,16 +54,16 @@ test.describe('Welcome Page', () => {
 
     await expect(page.locator('#logo')).toBeVisible()
     const app = pianoBingoLocator(page)
-    await pianoExpect(app.pageWelcome()).toBeVisible()
+    await expect(app.pageWelcome()).toBeVisible()
   })
 
   test('shows all action buttons', async ({ page }) => {
     await clearAndSeedPacks(page)
     const app = pianoBingoLocator(page)
 
-    await pianoExpect(app.pageWelcome().action('new-game')).toBeVisible()
-    await pianoExpect(app.pageWelcome().action('manage-songs')).toBeVisible()
-    await pianoExpect(app.pageWelcome().action('manage-playlists')).toBeVisible()
+    await expect(app.pageWelcome().action('new-game')).toBeVisible()
+    await expect(app.pageWelcome().action('manage-songs')).toBeVisible()
+    await expect(app.pageWelcome().action('manage-playlists')).toBeVisible()
   })
 
   test('"New Game" navigates to pack select', async ({ page }) => {
@@ -73,7 +73,7 @@ test.describe('Welcome Page', () => {
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pagePackSelect()).toBeVisible()
+    await expect(app.pagePackSelect()).toBeVisible()
   })
 
   test('"Manage Songs" navigates to song management', async ({ page }) => {
@@ -83,7 +83,7 @@ test.describe('Welcome Page', () => {
     await app.pageWelcome().action('manage-songs').click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageSongManagement()).toBeVisible()
+    await expect(app.pageSongManagement()).toBeVisible()
   })
 
   test('"Manage Playlists" navigates to pack management', async ({ page }) => {
@@ -93,7 +93,7 @@ test.describe('Welcome Page', () => {
     await app.pageWelcome().action('manage-playlists').click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pagePackManagement()).toBeVisible()
+    await expect(app.pagePackManagement()).toBeVisible()
   })
 })
 
@@ -111,17 +111,17 @@ test.describe('Pack Select Page', () => {
     await goToPackSelect(page, [{ packId: 1, packName: 'Pack A' }])
     const app = pianoBingoLocator(page)
 
-    await pianoExpect(app.pagePackSelect()).toBeVisible()
-    await pianoExpect(app.pagePackSelect().header()).toBeVisible()
-    await pianoExpect(app.pagePackSelect().startGameButton()).toBeVisible()
-    await pianoExpect(app.pagePackSelect().list()).toBeVisible()
+    await expect(app.pagePackSelect()).toBeVisible()
+    await expect(app.pagePackSelect().header()).toBeVisible()
+    await expect(app.pagePackSelect().startGameButton()).toBeVisible()
+    await expect(app.pagePackSelect().list()).toBeVisible()
   })
 
   test('auto-selects first pack when only one pack exists', async ({ page }) => {
     await goToPackSelect(page, [{ packId: 1, packName: 'Pack A' }])
     const app = pianoBingoLocator(page)
 
-    const firstOption = app.pagePackSelect().option(1).locate()
+    const firstOption = app.pagePackSelect().option(1)
     await expect(firstOption).toBeChecked()
   })
 
@@ -132,8 +132,8 @@ test.describe('Pack Select Page', () => {
     ])
     const app = pianoBingoLocator(page)
 
-    await expect(app.pagePackSelect().option(1).locate()).toBeChecked()
-    await expect(app.pagePackSelect().option(2).locate()).not.toBeChecked()
+    await expect(app.pagePackSelect().option(1)).toBeChecked()
+    await expect(app.pagePackSelect().option(2)).not.toBeChecked()
   })
 
   test('renders one radio option per pack with correct labels', async ({ page }) => {
@@ -143,7 +143,7 @@ test.describe('Pack Select Page', () => {
     ])
     const app = pianoBingoLocator(page)
 
-    await expect(app.pagePackSelect().packRadioInputs().locate()).toHaveCount(2)
+    await expect(app.pagePackSelect().packRadioInputs()).toHaveCount(2)
     await expect(page.getByText('My Cool Pack')).toBeVisible()
     await expect(page.getByText('Another Pack')).toBeVisible()
   })
@@ -155,10 +155,10 @@ test.describe('Pack Select Page', () => {
     ])
     const app = pianoBingoLocator(page)
 
-    await app.pagePackSelect().option(2).locate().click()
+    await app.pagePackSelect().option(2).click()
 
-    await expect(app.pagePackSelect().option(2).locate()).toBeChecked()
-    await expect(app.pagePackSelect().option(1).locate()).not.toBeChecked()
+    await expect(app.pagePackSelect().option(2)).toBeChecked()
+    await expect(app.pagePackSelect().option(1)).not.toBeChecked()
   })
 
   test('back button navigates back to welcome page', async ({ page }) => {
@@ -168,14 +168,14 @@ test.describe('Pack Select Page', () => {
     await app.pagePackSelect().backButton().click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageWelcome()).toBeVisible()
+    await expect(app.pageWelcome()).toBeVisible()
   })
 
   test('shows no radio options when no packs exist', async ({ page }) => {
     await goToPackSelect(page, [])
     const app = pianoBingoLocator(page)
 
-    await expect(app.pagePackSelect().packRadioInputs().locate()).toHaveCount(0)
+    await expect(app.pagePackSelect().packRadioInputs()).toHaveCount(0)
   })
 })
 
@@ -232,7 +232,7 @@ test.describe('Song View Page', () => {
     await app.pageSongView().backButton().click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageSongManagement()).toBeVisible()
+    await expect(app.pageSongManagement()).toBeVisible()
   })
 
   test('song view page shows song title in header', async ({ page }) => {
@@ -269,6 +269,6 @@ test.describe('Song View Page', () => {
     await app.pageSongManagement().action('view-song-1').click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageSongView()).toBeVisible()
+    await expect(app.pageSongView()).toBeVisible()
   })
 })

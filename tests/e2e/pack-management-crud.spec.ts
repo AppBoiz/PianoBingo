@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test'
-import { pianoBingoLocator, pianoExpect } from '../support/locators'
+import { test } from '@playwright/test'
+import { expect, pianoBingoLocator } from '../support/locators'
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -54,9 +54,9 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      await pianoExpect(app.pagePackManagement()).toBeVisible()
-      await pianoExpect(app.pagePackManagement().header()).toBeVisible()
-      await pianoExpect(app.pagePackManagement().list()).toBeVisible()
+      await expect(app.pagePackManagement()).toBeVisible()
+      await expect(app.pagePackManagement().header()).toBeVisible()
+      await expect(app.pagePackManagement().list()).toBeVisible()
     })
 
     test('back button navigates to welcome page', async ({ page }) => {
@@ -68,7 +68,7 @@ test.describe('Pack Management Page', () => {
       await app.pagePackManagement().backButton().click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pageWelcome()).toBeVisible()
+      await expect(app.pageWelcome()).toBeVisible()
     })
   })
 
@@ -83,13 +83,13 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      await pianoExpect(app.pagePackManagement().row(1)).toBeVisible()
-      await pianoExpect(app.pagePackManagement().row(2)).toBeVisible()
-      await pianoExpect(app.pagePackManagement().row(3)).toBeVisible()
+      await expect(app.pagePackManagement().row(1)).toBeVisible()
+      await expect(app.pagePackManagement().row(2)).toBeVisible()
+      await expect(app.pagePackManagement().row(3)).toBeVisible()
 
-      await expect(app.pagePackManagement().nameInput(1).locate()).toHaveValue('Alpha Pack')
-      await expect(app.pagePackManagement().nameInput(2).locate()).toHaveValue('Beta Pack')
-      await expect(app.pagePackManagement().nameInput(3).locate()).toHaveValue('Gamma Pack')
+      await expect(app.pagePackManagement().nameInput(1)).toHaveValue('Alpha Pack')
+      await expect(app.pagePackManagement().nameInput(2)).toHaveValue('Beta Pack')
+      await expect(app.pagePackManagement().nameInput(3)).toHaveValue('Gamma Pack')
     })
 
     test('empty list when no packs exist', async ({ page }) => {
@@ -99,7 +99,7 @@ test.describe('Pack Management Page', () => {
       await navigateToPackManagement(page)
 
       await expect(
-        app.pagePackManagement().locate().locator('[data-testid^="row-"]')
+        app.pagePackManagement().locator('[data-testid^="row-"]')
       ).toHaveCount(0)
     })
   })
@@ -112,14 +112,14 @@ test.describe('Pack Management Page', () => {
       await navigateToPackManagement(page)
 
       await expect(
-        app.pagePackManagement().locate().locator('[data-testid^="row-"]')
+        app.pagePackManagement().locator('[data-testid^="row-"]')
       ).toHaveCount(1)
 
       await app.pagePackManagement().action('create-pack').click()
       await page.waitForLoadState('networkidle')
 
       await expect(
-        app.pagePackManagement().locate().locator('[data-testid^="row-"]')
+        app.pagePackManagement().locator('[data-testid^="row-"]')
       ).toHaveCount(2)
     })
   })
@@ -131,13 +131,13 @@ test.describe('Pack Management Page', () => {
 
       await navigateToPackManagement(page)
 
-      await expect(app.pagePackManagement().nameInput(1).locate()).toHaveValue('Original Name')
+      await expect(app.pagePackManagement().nameInput(1)).toHaveValue('Original Name')
 
       await app.pagePackManagement().nameInput(1).fill('New Pack Name')
       await app.pagePackManagement().nameInput(1).press('Tab')
       await page.waitForLoadState('networkidle')
 
-      await expect(app.pagePackManagement().nameInput(1).locate()).toHaveValue('New Pack Name')
+      await expect(app.pagePackManagement().nameInput(1)).toHaveValue('New Pack Name')
     })
   })
 
@@ -152,16 +152,16 @@ test.describe('Pack Management Page', () => {
       await navigateToPackManagement(page)
 
       await expect(
-        app.pagePackManagement().locate().locator('[data-testid^="row-"]')
+        app.pagePackManagement().locator('[data-testid^="row-"]')
       ).toHaveCount(2)
 
       await app.pagePackManagement().action('delete-pack-1').click()
       await page.waitForLoadState('networkidle')
 
       await expect(
-        app.pagePackManagement().locate().locator('[data-testid^="row-"]')
+        app.pagePackManagement().locator('[data-testid^="row-"]')
       ).toHaveCount(1)
-      await pianoExpect(app.pagePackManagement().row(2)).toBeVisible()
+      await expect(app.pagePackManagement().row(2)).toBeVisible()
     })
 
     test('deleting the last pack leaves an empty list', async ({ page }) => {
@@ -174,7 +174,7 @@ test.describe('Pack Management Page', () => {
       await page.waitForLoadState('networkidle')
 
       await expect(
-        app.pagePackManagement().locate().locator('[data-testid^="row-"]')
+        app.pagePackManagement().locator('[data-testid^="row-"]')
       ).toHaveCount(0)
     })
   })
@@ -189,7 +189,7 @@ test.describe('Pack Management Page', () => {
       await app.pagePackManagement().action('edit-pack-1').click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pagePackEdit()).toBeVisible()
+      await expect(app.pagePackEdit()).toBeVisible()
     })
   })
 
@@ -207,7 +207,7 @@ test.describe('Pack Management Page', () => {
       await page.waitForLoadState('networkidle')
 
       await expect(
-        app.pagePackManagement().locate().locator('[data-testid^="row-"]')
+        app.pagePackManagement().locator('[data-testid^="row-"]')
       ).toHaveCount(3)
 
       // Find the newly created pack id (not 1 or 2)
@@ -231,10 +231,10 @@ test.describe('Pack Management Page', () => {
       await page.waitForLoadState('networkidle')
 
       await expect(
-        app.pagePackManagement().locate().locator('[data-testid^="row-"]')
+        app.pagePackManagement().locator('[data-testid^="row-"]')
       ).toHaveCount(2)
-      await pianoExpect(app.pagePackManagement().row(1)).toBeVisible()
-      await pianoExpect(app.pagePackManagement().row(2)).toBeVisible()
+      await expect(app.pagePackManagement().row(1)).toBeVisible()
+      await expect(app.pagePackManagement().row(2)).toBeVisible()
     })
   })
 })

@@ -1,8 +1,8 @@
-import { test, expect } from '@playwright/test'
+import { test } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
 import { PACK_SIZE } from '../../src/shared/constants/game'
-import { pianoBingoLocator, pianoExpect } from '../support/locators'
+import { expect, pianoBingoLocator } from '../support/locators'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -55,9 +55,9 @@ test.describe('Core Workflow Smoke Tests', () => {
       await page.goto('/')
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pageWelcome().action('new-game')).toBeVisible()
-      await pianoExpect(app.pageWelcome().action('manage-songs')).toBeVisible()
-      await pianoExpect(app.pageWelcome().action('manage-playlists')).toBeVisible()
+      await expect(app.pageWelcome().action('new-game')).toBeVisible()
+      await expect(app.pageWelcome().action('manage-songs')).toBeVisible()
+      await expect(app.pageWelcome().action('manage-playlists')).toBeVisible()
     })
 
     test('New Game navigates to Pack Select with multiple packs', async ({ page }) => {
@@ -66,8 +66,8 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
-      await pianoExpect(app.pagePackSelect().packRadioInputs().second()).toBeVisible()
+      await expect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
+      await expect(app.pagePackSelect().packRadioInputs().second()).toBeVisible()
     })
   })
 
@@ -87,25 +87,25 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pagePackSelect().startGameButton().click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pageGame().nextSong()).toBeVisible()
-      await pianoExpect(app.pageGame().navTitle()).not.toBeEmpty()
+      await expect(app.pageGame().nextSong()).toBeVisible()
+      await expect(app.pageGame().navTitle()).not.toBeEmpty()
       const firstTitle = await app.pageGame().navTitle().textContent()
       expect(firstTitle).toBeTruthy()
 
       await app.pageGame().nextSong().click()
       await page.waitForLoadState('networkidle')
-      await pianoExpect(app.pageGame().navTitle()).not.toBeEmpty()
+      await expect(app.pageGame().navTitle()).not.toBeEmpty()
       const secondTitle = await app.pageGame().navTitle().textContent()
       expect(secondTitle).toBeTruthy()
 
       await app.pageGame().menuToggle().click()
-      await pianoExpect(app.pageGame().menu()).toBeVisible()
+      await expect(app.pageGame().menu()).toBeVisible()
 
       await app.pageGame().menuItem('game-history').click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pageGameHistory().header()).toBeVisible()
-      await pianoExpect(app.pageGameHistory().boxes()).toHaveCount(PACK_SIZE)
+      await expect(app.pageGameHistory().header()).toBeVisible()
+      await expect(app.pageGameHistory().boxes()).toHaveCount(PACK_SIZE)
 
       const highlighted = await app.pageGameHistory().highlightedBoxes().count()
       expect(highlighted).toBeGreaterThanOrEqual(2)
@@ -120,8 +120,8 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pagePackSelect().startGameButton().click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pageGame().header()).toBeVisible()
-      await pianoExpect(app.pageGame().navTitle()).not.toBeEmpty()
+      await expect(app.pageGame().header()).toBeVisible()
+      await expect(app.pageGame().navTitle()).not.toBeEmpty()
       const firstTitle = await app.pageGame().navTitle().textContent()
 
       await app.pageGame().nextSong().click()
@@ -140,7 +140,7 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pageGame().menuItem('prev-song').click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pageGame().header()).toBeVisible()
+      await expect(app.pageGame().header()).toBeVisible()
     })
 
     test('end game returns to welcome page with reset state', async ({ page }) => {
@@ -159,11 +159,11 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pageGame().menuItem('end-game').click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pageWelcome().action('new-game')).toBeVisible()
+      await expect(app.pageWelcome().action('new-game')).toBeVisible()
 
       await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await pianoExpect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
+      await expect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
     })
   })
 
@@ -178,8 +178,8 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pageWelcome().action('manage-songs').click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pageSongManagement().list()).toBeVisible()
-      await pianoExpect(app.pageSongManagement().row(1)).toBeVisible()
+      await expect(app.pageSongManagement().list()).toBeVisible()
+      await expect(app.pageSongManagement().row(1)).toBeVisible()
     })
 
     test('click song to preview', async ({ page }) => {
@@ -191,8 +191,8 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pageSongManagement().action('view-song-1').click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pageSongView()).toBeVisible()
-      await pianoExpect(app.pageSongView().backButton()).toBeVisible()
+      await expect(app.pageSongView()).toBeVisible()
+      await expect(app.pageSongView().backButton()).toBeVisible()
     })
   })
 
@@ -213,7 +213,7 @@ test.describe('Core Workflow Smoke Tests', () => {
       await app.pageSongView().backButton().click()
       await page.waitForLoadState('networkidle')
 
-      await pianoExpect(app.pageSongManagement().row(1)).toBeVisible()
+      await expect(app.pageSongManagement().row(1)).toBeVisible()
     })
   })
 
@@ -274,7 +274,7 @@ test.describe('Core Workflow Smoke Tests', () => {
 
       await app.pageWelcome().action('new-game').click()
       await page.waitForLoadState('networkidle')
-      await pianoExpect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
+      await expect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
     })
   })
 })

@@ -1,7 +1,7 @@
 import { test } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { pianoBingoLocator, pianoExpect } from '../support/locators'
+import { expect, pianoBingoLocator } from '../support/locators'
 
 const pdfBase64 = fs.readFileSync(
   path.join(process.cwd(), 'resources', 'pdf', 'introdutione-seconda.pdf')
@@ -44,9 +44,9 @@ test.describe('Mobile viewport flows', () => {
     const app = pianoBingoLocator(page)
     await page.goto('/')
 
-    await pianoExpect(app.pageWelcome().action('new-game')).toBeVisible()
-    await pianoExpect(app.pageWelcome().action('manage-songs')).toBeVisible()
-    await pianoExpect(app.pageWelcome().action('manage-playlists')).toBeVisible()
+    await expect(app.pageWelcome().action('new-game')).toBeVisible()
+    await expect(app.pageWelcome().action('manage-songs')).toBeVisible()
+    await expect(app.pageWelcome().action('manage-playlists')).toBeVisible()
   })
 
   test('pack select renders and starts game', async ({ page }) => {
@@ -56,13 +56,13 @@ test.describe('Mobile viewport flows', () => {
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
-    await pianoExpect(app.pagePackSelect().startGameButton()).toBeVisible()
+    await expect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
+    await expect(app.pagePackSelect().startGameButton()).toBeVisible()
 
     await app.pagePackSelect().startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageGame().nextSong()).toBeVisible()
+    await expect(app.pageGame().nextSong()).toBeVisible()
   })
 
   test('hamburger menu opens on mobile game screen', async ({ page }) => {
@@ -71,16 +71,16 @@ test.describe('Mobile viewport flows', () => {
     await seedPackAndSong(page)
     await app.pageWelcome().action('new-game').click()
     await page.waitForLoadState('networkidle')
-    await pianoExpect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
+    await expect(app.pagePackSelect().packRadioInputs().first()).toBeVisible()
     await app.pagePackSelect().startGameButton().click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageGame().navTitle()).toBeVisible()
+    await expect(app.pageGame().navTitle()).toBeVisible()
 
     await app.pageGame().menuToggle().click()
-    await pianoExpect(app.pageGame().menu()).toBeVisible()
-    await pianoExpect(app.pageGame().menuItem('next-song')).toBeVisible()
-    await pianoExpect(app.pageGame().menuItem('game-history')).toBeVisible()
+    await expect(app.pageGame().menu()).toBeVisible()
+    await expect(app.pageGame().menuItem('next-song')).toBeVisible()
+    await expect(app.pageGame().menuItem('game-history')).toBeVisible()
   })
 
   test('song management list renders on mobile', async ({ page }) => {
@@ -90,7 +90,7 @@ test.describe('Mobile viewport flows', () => {
     await app.pageWelcome().action('manage-songs').click()
     await page.waitForLoadState('networkidle')
 
-    await pianoExpect(app.pageSongManagement().header()).toBeVisible()
-    await pianoExpect(app.pageSongManagement().list()).toBeVisible()
+    await expect(app.pageSongManagement().header()).toBeVisible()
+    await expect(app.pageSongManagement().list()).toBeVisible()
   })
 })
