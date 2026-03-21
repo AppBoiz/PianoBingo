@@ -2,8 +2,9 @@
   height: 100%;
   margin: 0;
   padding: 0;
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
 }
 
 .pack-management-page-root .main-content {
@@ -53,11 +54,13 @@
 }
 
   .pack-management-page-root .nav-bar{
-    width:100%; 
-    display: flex; 
-    flex-direction: row; 
-    justify-content: center; 
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
     align-items: center;
+    position: relative;
+    box-sizing: border-box;
 }
 
   .pack-management-page-root .nav-bar-left {
@@ -66,10 +69,11 @@
 }
 
   .pack-management-page-root .back-container{
-    width: 100%;
+    width: auto;
     padding: 30px 40px;
     display: flex;
     align-items: center;
+    box-sizing: border-box;
 }
 
   .pack-management-page-root .back-container button{
