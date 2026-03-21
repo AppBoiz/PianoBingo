@@ -28,9 +28,14 @@ export async function renderPdfPageIntoContainer(
   page: PDFPageProxy,
   scaleMode: 'fit-width' | 'fit-contain' = 'fit-width',
 ): Promise<void> {
+  const styles = window.getComputedStyle(container)
+  const insetX = Number.parseFloat(styles.getPropertyValue('--pdf-render-inset-x')) || 0
+  const insetY = Number.parseFloat(styles.getPropertyValue('--pdf-render-inset-y')) || 0
+  const availableWidth = Math.max(container.clientWidth - insetX * 2, 1)
+  const availableHeight = Math.max(container.clientHeight - insetY * 2, 1)
   const unscaledViewport = page.getViewport({ scale: 1 })
-  const widthScale = container.clientWidth / unscaledViewport.width
-  const heightScale = container.clientHeight / unscaledViewport.height
+  const widthScale = availableWidth / unscaledViewport.width
+  const heightScale = availableHeight / unscaledViewport.height
   const scale = scaleMode === 'fit-contain'
     ? Math.min(widthScale, heightScale)
     : widthScale

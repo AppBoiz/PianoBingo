@@ -44,6 +44,8 @@
 }
 
   .song-view-page-root #pdf-viewer {
+    --pdf-render-inset-x: 16px;
+    --pdf-render-inset-y: 16px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
