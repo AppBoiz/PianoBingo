@@ -3,8 +3,8 @@
   "short_name": "PianoBingo",
   "description": "App to automate generation of piano bingo pdf sheetmusic",
 
-  "start_url": "/PianoBingo/",
-  "scope": "/PianoBingo/",
+  "start_url": "/",
+  "scope": "/",
 
   "display": "standalone",
   "background_color": "#ffffff",
