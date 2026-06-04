@@ -1,0 +1,61 @@
+import { createNewPack, deletePack, renamePack } from '../../../shared/storage/indexedDb'
+import { useNavigation } from '../../../shared/context/NavigationContext'
+import { usePacks } from '../hooks/usePacks'
+import Header from '../../../shared/components/organisms/Header'
+import IconButton from '../../../shared/components/atoms/IconButton'
+import PlaylistRow from './molecules/PlaylistRow'
+import PageLayout from '../../../shared/components/organisms/PageLayout'
+import PlaylistContainer from '../../../shared/components/organisms/PlaylistContainer'
+import PackManagementPageFooter from './organisms/PackManagementPageFooter'
+import { PAGE, PAGE_NAME } from '../../../shared/constants/navigation'
+
+export default function PackManagementPage(){
+  const { packs, refresh: refreshPacks } = usePacks()
+  const { loadPage } = useNavigation()
+
+  async function handleCreateNewPack(){
+    await createNewPack()
+    await refreshPacks()
+  }
+
+  async function handleDeletePack(packId: number){
+    await deletePack(packId)
+    await refreshPacks()
+  }
+
+  function handleEditPack(packId: number){
+    loadPage(`${PAGE.PACK_EDIT}/${packId}`)
+  }
+
+  async function handleRenamePack(packId: number, newName: string){
+    await renamePack(packId, newName)
+    await refreshPacks()
+  }
+
+  return (
+    <PageLayout
+      rootClassName="pack-management-page-root"
+      rootTestId="pack-management-page"
+      header={<Header title="Manage Playlists" backAction={() => loadPage(PAGE_NAME.WELCOME)} />}
+    >
+      <PlaylistContainer containerId="playlist-container" className="my-4 w-full px-4 pb-4 md:px-6">
+        {packs.map(pack => (
+          <PlaylistRow
+            key={pack.packId}
+            value={pack.packName || ''}
+            rowTestId={`row-${pack.packId}`}
+            rowClassName="w-full max-w-[500px] self-center"
+            onRename={(newName) => handleRenamePack(pack.packId, newName)}
+            actions={(
+              <>
+                <IconButton className="edit-btn rounded-md bg-amber-400 px-2.5 py-1.5 text-base text-white shadow-sm transition hover:bg-amber-500" actionId={`edit-pack-${pack.packId}`} onClick={() => handleEditPack(pack.packId)} icon="✏️" />
+                <IconButton className="delete-btn rounded-md bg-rose-500 px-2.5 py-1.5 text-base text-white shadow-sm transition hover:bg-rose-600" actionId={`delete-pack-${pack.packId}`} onClick={() => handleDeletePack(pack.packId)} icon="🗑️" />
+              </>
+            )}
+          />
+        ))}
+      </PlaylistContainer>
+      <PackManagementPageFooter onCreateNewPack={handleCreateNewPack} />
+    </PageLayout>
+  )
+}

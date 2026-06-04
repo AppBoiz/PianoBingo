@@ -1,0 +1,186 @@
+import React, { useEffect, useRef, useState } from 'react'
+import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
+import {
+  loadFallbackPdfBase64,
+  resolvePdfBase64,
+} from '../../services/pdf/pdfSourceService'
+import {
+  loadPdfDocumentFromBase64,
+  renderPdfPageIntoContainer,
+} from '../../services/pdf/pdfDocumentService'
+import {
+  markPdfError,
+  markPdfLoaded,
+  markPdfRendered,
+  resetPdfDiagnostics,
+} from '../../services/runtime/windowGlobals'
+
+// Keep the PDF runtime out of the main bundle until a document is actually opened.
+
+type PdfDocument = PDFDocumentProxy
+
+type PdfPage = PDFPageProxy
+
+type Props = {
+  base64: string | null | undefined
+  scaleMode?: 'fit-width' | 'fit-contain'
+}
+
+function useResolvedPdfBase64(base64: string | null | undefined) {
+  const [pdfBase64, setPdfBase64] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const resolvePdfSource = async () => {
+      if (base64) {
+        setPdfBase64(resolvePdfBase64(base64))
+        return
+      }
+
+      try {
+        const fallbackBase64 = await loadFallbackPdfBase64()
+        if (!cancelled) {
+          setPdfBase64(fallbackBase64)
+        }
+      } catch (error) {
+        console.error('failed loading fallback pdf', error)
+      }
+    }
+
+    setPdfBase64(null)
+    resolvePdfSource()
+
+    return () => {
+      cancelled = true
+    }
+  }, [base64])
+
+  return pdfBase64
+}
+
+function useLoadedPdfDocument(pdfBase64: string | null) {
+  const [pdfDocument, setPdfDocument] = useState<PdfDocument | null>(null)
+  const [totalPages, setTotalPages] = useState<number>(0)
+  const [currentPage, setCurrentPage] = useState<number>(1)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadPdfDocument = async () => {
+      if (!pdfBase64 || !pdfBase64.startsWith('JVBERi0')) {
+        setPdfDocument(null)
+        setTotalPages(0)
+        setCurrentPage(1)
+        resetPdfDiagnostics()
+        return
+      }
+
+      const loadedPdfDocument = await loadPdfDocumentFromBase64(pdfBase64)
+
+      if (cancelled) {
+        return
+      }
+
+      setPdfDocument(loadedPdfDocument)
+      setTotalPages(loadedPdfDocument.numPages)
+      setCurrentPage(1)
+      markPdfLoaded()
+    }
+
+    setPdfDocument(null)
+    setTotalPages(0)
+
+    loadPdfDocument().catch(error => {
+      if (!cancelled) {
+        markPdfError(error)
+        console.error('Failed to load PDF document:', error)
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [pdfBase64])
+
+  return {
+    currentPage,
+    pdfDocument,
+    setCurrentPage,
+    totalPages,
+  }
+}
+
+function useRenderedPdfPage(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  pdfDocument: PdfDocument | null,
+  currentPage: number,
+  scaleMode: 'fit-width' | 'fit-contain',
+) {
+  useEffect(() => {
+    if (!pdfDocument) {
+      return
+    }
+
+    let cancelled = false
+
+    const renderPageIntoContainer = async () => {
+      const page = await pdfDocument.getPage(currentPage)
+      const container = containerRef.current
+
+      if (!container || cancelled) {
+        return
+      }
+
+      // Match the legacy viewer's width-first behavior so sizing stays visually consistent.
+      await renderPdfPageIntoContainer(container, page, scaleMode)
+
+      if (!cancelled) {
+        markPdfRendered()
+      }
+    }
+
+    renderPageIntoContainer().catch(error => {
+      if (!cancelled) {
+        markPdfError(error)
+        console.error(error)
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [containerRef, currentPage, pdfDocument, scaleMode])
+}
+
+export default function PDFViewer({ base64, scaleMode = 'fit-width' }: Props){
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const pdfBase64 = useResolvedPdfBase64(base64)
+  const { pdfDocument, totalPages, currentPage, setCurrentPage } = useLoadedPdfDocument(pdfBase64)
+
+  useRenderedPdfPage(containerRef, pdfDocument, currentPage, scaleMode)
+
+  if (!pdfBase64) {
+    return <div className="flex min-h-0 flex-1 items-center justify-center px-6 text-center text-xl text-zinc-600">Loading PDF...</div>
+  }
+
+  return (
+    <div
+      id="pdf-viewer"
+      data-testid="pdf-viewer"
+      ref={containerRef}
+      className="relative flex min-h-0 flex-1 flex-wrap items-center justify-center overflow-hidden [--pdf-render-inset-x:16px] [--pdf-render-inset-y:16px] [&_canvas]:max-h-full [&_canvas]:max-w-full [&_canvas]:rounded-xl [&_canvas]:shadow-pdf"
+    >
+      <span
+        data-testid="pdf-prev-page-zone"
+        className="left absolute left-0 top-0 h-full w-1/2 cursor-pointer"
+        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+      />
+      <span
+        data-testid="pdf-next-page-zone"
+        className="right absolute left-1/2 top-0 h-full w-1/2 cursor-pointer"
+        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+      />
+    </div>
+  )
+}
