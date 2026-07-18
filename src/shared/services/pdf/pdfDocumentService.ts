@@ -1,13 +1,23 @@
-import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
+import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist'
+import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.js?url'
 import { decodePdfBase64ToBytes } from './pdfSourceService'
 
-type PdfJsModule = typeof import('pdfjs-dist/legacy/build/pdf.mjs')
+type PdfJsModule = typeof import('pdfjs-dist/legacy/build/pdf.js')
 
 let pdfJsModulePromise: Promise<PdfJsModule> | null = null
 
 async function getPdfJsModule(): Promise<PdfJsModule> {
   if (!pdfJsModulePromise) {
-    pdfJsModulePromise = import('pdfjs-dist/legacy/build/pdf.mjs')
+    pdfJsModulePromise = import('pdfjs-dist/legacy/build/pdf.js')
+      .then(pdfjs => {
+        pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl
+        return pdfjs
+      })
+      .catch(error => {
+        // Allow the error screen's retry action to recover from a transient chunk failure.
+        pdfJsModulePromise = null
+        throw error
+      })
   }
 
   return pdfJsModulePromise
@@ -17,15 +27,15 @@ export async function loadPdfDocumentFromBase64(pdfBase64: string): Promise<PDFD
   const pdfjs = await getPdfJsModule()
   const data = decodePdfBase64ToBytes(pdfBase64)
 
-  const loadingTask = pdfjs.getDocument({ data, disableWorker: true })
+  const loadingTask = pdfjs.getDocument({ data })
   return await loadingTask.promise
 }
 
-export async function renderPdfPageIntoContainer(
+export function renderPdfPageIntoContainer(
   container: HTMLDivElement,
   page: PDFPageProxy,
   scaleMode: 'fit-width' | 'fit-contain' = 'fit-width',
-): Promise<void> {
+): RenderTask {
   const styles = window.getComputedStyle(container)
   const insetX = Number.parseFloat(styles.getPropertyValue('--pdf-render-inset-x')) || 0
   const insetY = Number.parseFloat(styles.getPropertyValue('--pdf-render-inset-y')) || 0
@@ -51,5 +61,5 @@ export async function renderPdfPageIntoContainer(
   container.querySelectorAll('canvas').forEach(existingCanvas => existingCanvas.remove())
   container.appendChild(canvas)
 
-  await page.render({ canvas, canvasContext: context, viewport }).promise
+  return page.render({ canvasContext: context, viewport })
 }

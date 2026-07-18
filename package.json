@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp -r resources dist/resources && node scripts/generate-sw-manifest.js && node scripts/generate-workbox-sw.js",
+    "build": "vite build && node scripts/copy-resources.js && node scripts/generate-sw-manifest.js && node scripts/generate-workbox-sw.js",
     "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:arch": "jest --config jest.config.cjs tests/unit/architecture",
@@ -14,7 +15,7 @@
     "test:all": "jest --config jest.config.cjs && playwright test"
   },
   "dependencies": {
-    "pdfjs-dist": "latest",
+    "pdfjs-dist": "3.11.174",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "latest",

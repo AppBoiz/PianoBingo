@@ -8,5 +8,8 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.jest.json' }],
   },
+  moduleNameMapper: {
+    '^.+\\?url$': '<rootDir>/tests/unit/services/urlAssetMock.ts',
+  },
   clearMocks: true,
 }

@@ -6,10 +6,10 @@ export default defineConfig({
   timeout: 60000,
   expect: { timeout: 5000 },
   webServer: {
-    command: 'npm run build && npx serve dist -p 3000',
+    command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 3000',
     url: 'http://localhost:3000',
     timeout: 120000,
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
   },
   use: {
     baseURL: 'http://localhost:3000',

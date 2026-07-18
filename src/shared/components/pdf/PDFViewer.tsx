@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
+import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist'
 import {
   loadFallbackPdfBase64,
   resolvePdfBase64,
@@ -93,6 +93,7 @@ function useLoadedPdfDocument(pdfBase64: string | null, retryToken: number) {
 
   useEffect(() => {
     let cancelled = false
+    let loadedPdfDocument: PdfDocument | null = null
 
     const loadPdfDocument = async () => {
       if (!pdfBase64 || !pdfBase64.startsWith('JVBERi0')) {
@@ -104,9 +105,10 @@ function useLoadedPdfDocument(pdfBase64: string | null, retryToken: number) {
         return
       }
 
-      const loadedPdfDocument = await loadPdfDocumentFromBase64(pdfBase64)
+      loadedPdfDocument = await loadPdfDocumentFromBase64(pdfBase64)
 
       if (cancelled) {
+        await loadedPdfDocument.destroy()
         return
       }
 
@@ -131,6 +133,9 @@ function useLoadedPdfDocument(pdfBase64: string | null, retryToken: number) {
 
     return () => {
       cancelled = true
+      if (loadedPdfDocument) {
+        void loadedPdfDocument.destroy()
+      }
     }
   }, [pdfBase64, retryToken])
 
@@ -143,12 +148,47 @@ function useLoadedPdfDocument(pdfBase64: string | null, retryToken: number) {
   }
 }
 
+function useContainerResizeRevision(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  active: boolean,
+) {
+  const [resizeRevision, setResizeRevision] = useState(0)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!active || !container || typeof ResizeObserver === 'undefined') {
+      return
+    }
+
+    let width = Math.round(container.clientWidth)
+    let height = Math.round(container.clientHeight)
+    const observer = new ResizeObserver(entries => {
+      const nextWidth = Math.round(entries[0]?.contentRect.width ?? container.clientWidth)
+      const nextHeight = Math.round(entries[0]?.contentRect.height ?? container.clientHeight)
+
+      if (nextWidth === width && nextHeight === height) {
+        return
+      }
+
+      width = nextWidth
+      height = nextHeight
+      setResizeRevision(revision => revision + 1)
+    })
+
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [active, containerRef])
+
+  return resizeRevision
+}
+
 function useRenderedPdfPage(
   containerRef: React.RefObject<HTMLDivElement | null>,
   pdfDocument: PdfDocument | null,
   currentPage: number,
   scaleMode: 'fit-width' | 'fit-contain',
   retryToken: number,
+  resizeRevision: number,
 ) {
   const [renderError, setRenderError] = useState<string | null>(null)
 
@@ -159,6 +199,7 @@ function useRenderedPdfPage(
     }
 
     let cancelled = false
+    let renderTask: RenderTask | null = null
 
     const renderPageIntoContainer = async () => {
       const page = await pdfDocument.getPage(currentPage)
@@ -169,7 +210,8 @@ function useRenderedPdfPage(
       }
 
       // Match the legacy viewer's width-first behavior so sizing stays visually consistent.
-      await renderPdfPageIntoContainer(container, page, scaleMode)
+      renderTask = renderPdfPageIntoContainer(container, page, scaleMode)
+      await renderTask.promise
 
       if (!cancelled) {
         setRenderError(null)
@@ -187,8 +229,9 @@ function useRenderedPdfPage(
 
     return () => {
       cancelled = true
+      renderTask?.cancel()
     }
-  }, [containerRef, currentPage, pdfDocument, scaleMode, retryToken])
+  }, [containerRef, currentPage, pdfDocument, resizeRevision, scaleMode, retryToken])
 
   return renderError
 }
@@ -198,7 +241,8 @@ export default function PDFViewer({ base64, scaleMode = 'fit-width' }: Props){
   const [retryToken, setRetryToken] = useState(0)
   const { pdfBase64, resolveError } = useResolvedPdfBase64(base64, retryToken)
   const { pdfDocument, totalPages, currentPage, setCurrentPage, loadError } = useLoadedPdfDocument(pdfBase64, retryToken)
-  const renderError = useRenderedPdfPage(containerRef, pdfDocument, currentPage, scaleMode, retryToken)
+  const resizeRevision = useContainerResizeRevision(containerRef, Boolean(pdfDocument))
+  const renderError = useRenderedPdfPage(containerRef, pdfDocument, currentPage, scaleMode, retryToken, resizeRevision)
 
   const failureError = resolveError || loadError || renderError
   const failureStage: PdfFailureStage = resolveError ? 'resolve' : loadError ? 'load' : 'render'

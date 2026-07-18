@@ -35,6 +35,18 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test:unit -- --runInBand
+
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      - name: PDF browser tests
+        run: npm run test:e2e -- tests/integration/offline-pdf-caching.spec.ts
+
       - name: Build
         run: npm run build
 
