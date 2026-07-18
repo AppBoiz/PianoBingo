@@ -7,6 +7,7 @@ export const PAGE = {
   PACK_EDIT: '/pack-edit',
   SONG_MANAGEMENT: '/song-management',
   SONG_VIEW: '/song-view',
+  DATA_BACKUP: '/data-backup',
 } as const
 
 export const PAGE_NAME = {
@@ -18,6 +19,7 @@ export const PAGE_NAME = {
   PACK_EDIT: 'PACK_EDIT',
   SONG_MANAGEMENT: 'SONG_MANAGEMENT',
   SONG_VIEW: 'SONG_VIEW',
+  DATA_BACKUP: 'DATA_BACKUP',
 } as const
 
 export type PageKey = keyof typeof PAGE

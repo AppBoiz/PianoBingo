@@ -191,7 +191,7 @@ export async function createNewSong(): Promise<Song> {
   const songs = await loadAllSongs()
   const maxSongId = songs.length ? Math.max(...songs.map(s => s.songId)) : 0
   const newSong: Song = {
-    songId: maxSongId + 1,
+    songId: Math.max(maxSongId + 1, INDEXED_BD_CONFIG.PARTITION_SIZE),
     title: 'New Song',
     pdfUrl: null,
   }

@@ -104,5 +104,8 @@ describe('architecture rules', () => {
     expect(navigationText).toMatch(/GAME:\s*'\/game'/)
     expect(appText).toContain("import GamePage from './pages/game/GamePage/GamePage'")
     expect(appText).toMatch(/Route\s+path=\{PAGE\.GAME\}\s+element=\{<GamePage\/>\}/)
+    expect(navigationText).toMatch(/DATA_BACKUP:\s*'\/data-backup'/)
+    expect(appText).toContain("import DataBackupPage from './pages/welcome/DataBackupPage'")
+    expect(appText).toMatch(/Route\s+path=\{PAGE\.DATA_BACKUP\}\s+element=\{<DataBackupPage\/>\}/)
   })
 })

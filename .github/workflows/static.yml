@@ -44,8 +44,8 @@ jobs:
       - name: Install browser
         run: npx playwright install --with-deps chromium
 
-      - name: PDF browser tests
-        run: npm run test:e2e -- tests/integration/offline-pdf-caching.spec.ts
+      - name: Critical browser tests
+        run: npm run test:e2e -- tests/integration/offline-pdf-caching.spec.ts tests/e2e/data-backup-restore.spec.ts
 
       - name: Build
         run: npm run build

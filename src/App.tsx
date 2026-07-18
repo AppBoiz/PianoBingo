@@ -10,6 +10,7 @@ import { NavigationProvider } from './shared/context/NavigationContext'
 import SongViewPage from './pages/songs/SongViewPage/SongViewPage'
 import GameHistoryPage from './pages/game/GameHistoryPage/GameHistoryPage'
 import { PAGE } from './shared/constants/navigation'
+import DataBackupPage from './pages/welcome/DataBackupPage'
 
 export default function App(){
   return (
@@ -23,6 +24,7 @@ export default function App(){
         <Route path={PAGE.SONG_MANAGEMENT} element={<SongManagementPage/>} />
         <Route path={`${PAGE.SONG_VIEW}/:songId`} element={<SongViewPage/>} />
         <Route path={PAGE.GAME_HISTORY} element={<GameHistoryPage/>} />
+        <Route path={PAGE.DATA_BACKUP} element={<DataBackupPage/>} />
       </Routes>
     </NavigationProvider>
   )

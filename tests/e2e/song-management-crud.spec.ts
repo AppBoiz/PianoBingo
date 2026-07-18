@@ -159,6 +159,7 @@ test.describe('Song Management Page', () => {
       const songMgmt = app.songManagementPage()
       const rows = songMgmt.locator('[data-testid^="row-"]')
       await expect(rows).toHaveCount(1)
+      await expect(songMgmt.locator('[data-testid="row-1000000"]')).toBeVisible()
     })
 
     test('newly created song has no PDF — shows upload input', async ({ page }) => {

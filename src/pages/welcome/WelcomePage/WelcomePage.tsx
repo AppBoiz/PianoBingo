@@ -25,6 +25,7 @@ export default function WelcomePage(){
           { id: 'new-game', label: 'New Game', onClick: newGameButtonHandler },
           { id: 'manage-songs', label: 'Manage Songs', onClick: () => loadPage(PAGE_NAME.SONG_MANAGEMENT) },
           { id: 'manage-playlists', label: 'Manage Playlists', onClick: () => loadPage(PAGE_NAME.PACK_MANAGEMENT) },
+          { id: 'backup-restore', label: 'Backup & Restore', onClick: () => loadPage(PAGE_NAME.DATA_BACKUP) },
         ]}
         banner={<img className="pointer-events-none fixed -bottom-24 -right-[31rem] hidden -rotate-45 lg:block" src="/resources/images/piano.png" alt="" aria-hidden="true" />}
       />
