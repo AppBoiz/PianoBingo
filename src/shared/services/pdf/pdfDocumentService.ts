@@ -1,14 +1,14 @@
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
 import { decodePdfBase64ToBytes } from './pdfSourceService'
 
-type PdfJsModule = typeof import('pdfjs-dist')
+type PdfJsModule = typeof import('pdfjs-dist/legacy/build/pdf.mjs')
 
 let pdfJsModulePromise: Promise<PdfJsModule> | null = null
 
 async function getPdfJsModule(): Promise<PdfJsModule> {
   if (!pdfJsModulePromise) {
-    pdfJsModulePromise = import('pdfjs-dist').then(pdfjs => {
-      const workerUrl = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url)
+    pdfJsModulePromise = import('pdfjs-dist/legacy/build/pdf.mjs').then(pdfjs => {
+      const workerUrl = new URL('pdfjs-dist/legacy/build/pdf.worker.min.mjs', import.meta.url)
       pdfjs.GlobalWorkerOptions.workerSrc = workerUrl.toString()
       return pdfjs
     })
@@ -19,8 +19,17 @@ async function getPdfJsModule(): Promise<PdfJsModule> {
 
 export async function loadPdfDocumentFromBase64(pdfBase64: string): Promise<PDFDocumentProxy> {
   const pdfjs = await getPdfJsModule()
-  const loadingTask = pdfjs.getDocument({ data: decodePdfBase64ToBytes(pdfBase64) })
-  return loadingTask.promise
+  const data = decodePdfBase64ToBytes(pdfBase64)
+
+  try {
+    const loadingTask = pdfjs.getDocument({ data })
+    return await loadingTask.promise
+  } catch (error) {
+    // Safari 15 can still fail to spin up the worker in some environments.
+    // Fall back to the in-thread path so the viewer remains functional instead of blank.
+    const loadingTask = pdfjs.getDocument({ data, disableWorker: true })
+    return await loadingTask.promise
+  }
 }
 
 export async function renderPdfPageIntoContainer(
