@@ -14,7 +14,7 @@ export default function PackSlots({
   onSlotClear,
 }: PackSlotsProps) {
   return (
-    <div className="pack-slots flex flex-col w-full gap-3 items-center">
+    <div className="pack-slots flex flex-col w-full gap-3 items-center max-h-[calc(100vh-280px)] overflow-y-auto pr-2">
       {displaySlots.map((song, index) => (
         <SlotCard
           key={index}
