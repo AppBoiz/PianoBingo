@@ -7,9 +7,10 @@ import { useLoadedSong } from '../hooks/usePdfSong'
 import { getCurrentSong, getSelectedSongPackId, getShownSongIds, loadPack, nextSong as loadNextSongFromStorage, prevSong as loadPrevSongFromStorage } from '../../../shared/storage/indexedDb'
 import { useNavigation } from '../../../shared/context/NavigationContext'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
+import { Modal } from '../../../shared/components/organisms/Modal'
 
 function useCurrentSongPositionInSelectedPack(song: { songId: number; pdfUrl: string | null } | null | undefined) {
-  const [songIndex, setSongIndex] = useState<number>(0)
+  const [songIndex, setSongIndex] = useState<number>(0);
 
   useEffect(() => {
     const loadSongIndex = async () => {
@@ -94,29 +95,53 @@ export default function GamePage(){
   })
   const songIndex = useCurrentSongPositionInSelectedPack(song)
   const { canGoPrevious, canGoNext } = useGameNavigationAvailability(song)
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   return (
-    <PageLayout
-      rootClassName="game-page-root pdf-page overflow-hidden"
-      rootTestId="game-page"
-      header={(
-        <GamePageHeader
-          songIndex={songIndex}
-          songTitle={songTitle}
-          onNextSong={nextSong}
-          onPreviousSong={prevSong}
-          canGoPrevious={canGoPrevious}
-          canGoNext={canGoNext}
-          onOpenGameHistory={() => loadPage(PAGE_NAME.GAME_HISTORY)}
-          onEndGame={() => loadPage(PAGE_NAME.WELCOME)}
-        />
-      )}
-      footer={(
-        <GamePageFooter onNextSong={nextSong} disabled={!canGoNext} />
-      )}
-      skipMainWrapper
-    >
-      <PDFViewer base64={base64} scaleMode="fit-contain" />
-    </PageLayout>
+    <>
+      <Modal open={isModalOpen} onOpenChange={setIsModalOpen} title="Are you sure you want to end the game?">
+        <div className="flex justify-center gap-4">
+          <button
+            type="button"
+            className="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-100"
+            onClick={() => setIsModalOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="rounded-lg bg-brand-pink px-4 py-2 font-medium text-white transition hover:bg-brand-pinkDark"
+            onClick={() => {
+              setIsModalOpen(false)
+              loadPage(PAGE_NAME.WELCOME)
+            }}
+          >
+            End game
+          </button>
+        </div>
+      </Modal>
+      <PageLayout
+        rootClassName="game-page-root pdf-page overflow-hidden"
+        rootTestId="game-page"
+        header={(
+          <GamePageHeader
+            songIndex={songIndex}
+            songTitle={songTitle}
+            onNextSong={nextSong}
+            onPreviousSong={prevSong}
+            canGoPrevious={canGoPrevious}
+            canGoNext={canGoNext}
+            onOpenGameHistory={() => loadPage(PAGE_NAME.GAME_HISTORY)}
+            onEndGame={() => setIsModalOpen(true)}
+            />
+          )}
+          footer={(
+            <GamePageFooter onNextSong={nextSong} disabled={!canGoNext} />
+          )}
+          skipMainWrapper
+          >
+        <PDFViewer base64={base64} scaleMode="fit-contain" />
+      </PageLayout>
+    </>
   )
 }

@@ -167,6 +167,15 @@ test.describe('Core Workflow Smoke Tests', () => {
 
       await game.menuToggle().click()
       await game.menuItem('end-game').click()
+      await expect(app.dialog()).toBeVisible()
+
+      await app.dialogButton('Cancel').click()
+      await expect(app.dialog()).not.toBeVisible()
+      await expect(game.header()).toBeVisible()
+
+      await game.menuToggle().click()
+      await game.menuItem('end-game').click()
+      await app.dialogButton('End game').click()
       await page.waitForLoadState('networkidle')
 
       await expect(welcome.action('new-game')).toBeVisible()

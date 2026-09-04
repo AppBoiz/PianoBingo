@@ -98,6 +98,14 @@ export class PianoBingoLocatorBuilder extends HtmlLocatorBuilder {
     return new PianoBingoLocatorBuilder(this.menu().locate().locator(`[data-action="${actionId}"]`))
   }
 
+  dialog(): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByRole('dialog'))
+  }
+
+  dialogButton(name: string): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.dialog().locate().getByRole('button', { name }))
+  }
+
   nextSong(): PianoBingoLocatorBuilder {
     return new PianoBingoLocatorBuilder(this.footer().locate().locator('[data-action="next-song"]'))
   }

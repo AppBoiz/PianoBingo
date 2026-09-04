@@ -15,6 +15,7 @@
     "test:all": "jest --config jest.config.cjs && playwright test"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.23",
     "pdfjs-dist": "3.11.174",
     "react": "latest",
     "react-dom": "latest",
