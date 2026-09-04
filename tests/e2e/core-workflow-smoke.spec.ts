@@ -129,6 +129,7 @@ test.describe('Core Workflow Smoke Tests', () => {
       const game = app.gamePage()
       await expect(game.header()).toBeVisible()
       await expect(game.navTitle()).not.toBeEmpty()
+      await expect(game.playedSongsCounter()).toHaveText('Played: 1')
       const firstTitle = await game.navTitle().textContent()
 
       await game.nextSong().click()
@@ -142,6 +143,7 @@ test.describe('Core Workflow Smoke Tests', () => {
         expect(secondTitle).not.toBeNull()
         expect(secondTitle).not.toEqual(firstTitle)
       }).toPass({ timeout: 10000 })
+      await expect(game.playedSongsCounter()).toHaveText('Played: 2')
 
       await game.menuToggle().click()
       await game.menuItem('prev-song').click()
@@ -292,6 +294,7 @@ test.describe('Core Workflow Smoke Tests', () => {
 
       await game.menuToggle().click()
       await game.menuItem('end-game').click()
+      await app.dialogButton('End game').click()
       await page.waitForLoadState('networkidle')
       await welcome.action('manage-songs').click()
       await page.waitForLoadState('networkidle')

@@ -189,13 +189,10 @@ test.describe('Song View Page', () => {
   test('shows "No song selected" when navigating to a non-existent song id', async ({ page }) => {
     await clearAndSeedPacks(page)
 
-    await page.evaluate(() => {
-      window.history.pushState({}, '', '/song-view/9999')
-      window.dispatchEvent(new PopStateEvent('popstate'))
-    })
+    await page.goto('/song-view/9999')
     await page.waitForLoadState('networkidle')
 
-    const emptyState = page.locator('.pdf-reader-empty')
+    const emptyState = page.getByText('No song selected')
     await expect(emptyState).toBeVisible()
     await expect(emptyState).toContainText('No song selected')
   })

@@ -74,6 +74,10 @@ export class PianoBingoLocatorBuilder extends HtmlLocatorBuilder {
     return new PianoBingoLocatorBuilder(this.locate().getByTestId('header'))
   }
 
+  playedSongsCounter(): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.header().locate().getByTestId('played-songs'))
+  }
+
   footer(): PianoBingoLocatorBuilder {
     return new PianoBingoLocatorBuilder(this.locate().getByTestId('footer'))
   }
