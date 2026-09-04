@@ -19,8 +19,7 @@
     "pdfjs-dist": "3.11.174",
     "react": "latest",
     "react-dom": "latest",
-    "react-router-dom": "latest",
-    "sortablejs": "latest"
+    "react-router-dom": "latest"
   },
   "devDependencies": {
     "@playwright/test": "latest",
@@ -28,7 +27,6 @@
     "@types/jest": "^30.0.0",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@types/sortablejs": "^1.15.9",
     "@vitejs/plugin-react": "latest",
     "autoprefixer": "^10.4.27",
     "jest": "^30.3.0",

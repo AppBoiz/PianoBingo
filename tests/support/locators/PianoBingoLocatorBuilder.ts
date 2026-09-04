@@ -169,6 +169,28 @@ export class PianoBingoLocatorBuilder extends HtmlLocatorBuilder {
   backButton(): PianoBingoLocatorBuilder {
     return new PianoBingoLocatorBuilder(this.locate().locator('[data-action="back"]'))
   }
+
+  // Pack Edit Page — slot-based selection
+  slotCard(index: number): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId(`slot-${index}`))
+  }
+
+  slotName(index: number): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId(`slot-name-${index}`))
+  }
+
+  slotClearButton(index: number): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId(`slot-clear-${index}`))
+  }
+
+  // Song Selection Modal
+  songSearchInput(): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId('song-search-input'))
+  }
+
+  songListItem(songId: number): PianoBingoLocatorBuilder {
+    return new PianoBingoLocatorBuilder(this.locate().getByTestId(`song-item-${songId}`))
+  }
 }
 
 export function pianoBingoLocator(page: Page): PianoBingoLocatorBuilder {
