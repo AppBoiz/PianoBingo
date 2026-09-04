@@ -94,6 +94,7 @@ export default function GamePage(){
     loadPrevSong: loadPrevSongFromStorage,
   })
   const songIndex = useCurrentSongPositionInSelectedPack(song)
+  const playedSongs = getShownSongIds().length
   const { canGoPrevious, canGoNext } = useGameNavigationAvailability(song)
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
 
@@ -110,6 +111,7 @@ export default function GamePage(){
         header={(
           <GamePageHeader
             songIndex={songIndex}
+            playedSongs={playedSongs}
             songTitle={songTitle}
             onNextSong={nextSong}
             onPreviousSong={prevSong}
