@@ -26,6 +26,8 @@ export function Modal({
             -translate-x-1/2 -translate-y-1/2
             rounded-lg bg-white p-6 shadow-xl flex flex-col
           "
+          onPointerDownOutside={(event) => event.preventDefault()}
+          onEscapeKeyDown={(event) => event.preventDefault()}
         >
           <Dialog.Title className="text-lg font-semibold">
             {title}
@@ -34,10 +36,6 @@ export function Modal({
           <div className="mt-4 flex flex-1 items-center justify-center">
             {children}
           </div>
-
-          <Dialog.Close className="absolute right-4 top-4">
-            ×
-          </Dialog.Close>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
