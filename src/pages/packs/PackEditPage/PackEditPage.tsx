@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { loadPack, savePack } from '../../../shared/storage/indexedDb'
 import { useNavigation } from '../../../shared/context/NavigationContext'
 import { useSongs } from '../../songs/hooks/useSongs'
-import { useSortable } from '../hooks/useSortable'
 import Header from '../../../shared/components/organisms/Header'
-import SelectableSongRow from './molecules/SelectableSongRow'
 import PageLayout from '../../../shared/components/organisms/PageLayout'
-import PlaylistContainer from '../../../shared/components/organisms/PlaylistContainer'
 import PrimaryActionFooter from '../../../shared/components/organisms/PrimaryActionFooter'
-import type { Pack } from '../../../shared/types/models'
-import { compareSongsByPackMembershipThenPackOrder } from '../../../shared/utils/sort'
+import PackSlots from './organisms/PackSlots'
+import SongSelectionModal from './organisms/SongSelectionModal'
+import type { Pack, Song } from '../../../shared/types/models'
 import { PACK_SIZE } from '../../../shared/constants/game'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
+import { displaySlotsFromPackSongs, packSongsFromDisplaySlots } from './utils/slotDataTransforms'
 import { useParams } from 'react-router-dom'
 
 function useLoadPackFromPathParam(packIdParam: string | undefined) {
@@ -53,37 +52,58 @@ export default function PackEditPage() {
   const { songs } = useSongs()
   const { loadPage } = useNavigation()
 
-  const containerRef = useSortable(
-    orderedIds => {
-      setPack(prev => prev ? { ...prev, songs: orderedIds.filter(id => prev.songs.includes(id)) } : prev)
-    },
-    { rowSelector: '.playlist-row', idAttribute: 'data-song-id' }
-  )
+  const [displaySlots, setDisplaySlots] = useState<(Song | null)[]>([])
+  const [modalOpen, setModalOpen] = useState(false)
+  const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null)
+
+  // Initialize displaySlots from pack.songs when pack loads
+  useEffect(() => {
+    if (pack && songs.length > 0) {
+      const slots = displaySlotsFromPackSongs(pack.songs, songs, PACK_SIZE)
+      setDisplaySlots(slots)
+    }
+  }, [pack, songs])
 
   if (isLoading) return <div className="flex min-h-screen items-center justify-center px-6 text-xl text-zinc-600">Loading...</div>
   if (!pack) return <div className="flex min-h-screen items-center justify-center px-6 text-xl text-zinc-600">Pack not found</div>
 
-  const songsSortedByPackOrder = songs.sort(compareSongsByPackMembershipThenPackOrder(pack.songs))
+  function handleSlotSelect(slotIndex: number) {
+    setSelectedSlotIndex(slotIndex)
+    setModalOpen(true)
+  }
 
-  function toggleSong(songId: number) {
-    setPack(prev => {
-      if (!prev) return prev
-      const isInPack = prev.songs.includes(songId)
-      const updatedSongs = isInPack
-        ? prev.songs.filter(id => id !== songId)
-        : [...prev.songs, songId]
-      return { ...prev, songs: updatedSongs }
+  function handleSlotClear(slotIndex: number) {
+    setDisplaySlots(prev => {
+      const updated = [...prev]
+      updated[slotIndex] = null
+      return updated
     })
+  }
+
+  function handleSongSelect(songId: number, slotIndex: number) {
+    const song = songs.find(s => s.songId === songId)
+    if (song) {
+      setDisplaySlots(prev => {
+        const updated = [...prev]
+        updated[slotIndex] = song
+        return updated
+      })
+    }
   }
 
   async function handleSave() {
     if (!pack) return
-    await savePack(pack)
+    const updatedSongs = packSongsFromDisplaySlots(displaySlots)
+    const updatedPack = { ...pack, songs: updatedSongs }
+    await savePack(updatedPack)
     loadPage(PAGE_NAME.PACK_MANAGEMENT)
   }
 
-  const selectedCount = pack.songs.length
+  const selectedCount = displaySlots.filter(s => s !== null).length
   const isPackComplete = selectedCount === PACK_SIZE
+  const alreadySelectedSongIds = displaySlots
+    .filter((song): song is Song => song !== null)
+    .map(song => song.songId)
 
   return (
     <PageLayout
@@ -93,27 +113,27 @@ export default function PackEditPage() {
         <Header
           title="Edit Pack"
           backAction={() => loadPage(PAGE_NAME.PACK_MANAGEMENT)}
-          rightContent={<div id="song-counter">{selectedCount}/{PACK_SIZE}</div>}
+          rightContent={<div data-testid="song-counter">{selectedCount}/{PACK_SIZE}</div>}
         />
       )}
       footer={<PrimaryActionFooter label="Ok" actionId="save-pack" disabled={!isPackComplete} onClick={handleSave} />}
     >
-      <PlaylistContainer containerRef={containerRef} className="my-4 w-full px-4 pb-6 md:px-6">
-        {songsSortedByPackOrder.map(song => {
-          const packPosition = pack.songs.indexOf(song.songId) + 1
-          const isInPack = packPosition !== 0
-          return (
-            <SelectableSongRow
-              key={song.songId}
-              songId={song.songId}
-              title={song.title}
-              position={isInPack ? packPosition : null}
-              isSelected={isInPack}
-              onToggle={() => toggleSong(song.songId)}
-            />
-          )
-        })}
-      </PlaylistContainer>
+      <div className="my-4 w-full px-4 pb-6 md:px-6">
+        <PackSlots
+          displaySlots={displaySlots}
+          onSlotSelect={handleSlotSelect}
+          onSlotClear={handleSlotClear}
+        />
+      </div>
+
+      <SongSelectionModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        allSongs={songs}
+        alreadySelectedSongIds={alreadySelectedSongIds}
+        onSongSelect={handleSongSelect}
+        currentSlotIndex={selectedSlotIndex}
+      />
     </PageLayout>
   )
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PDFViewer from '../../../shared/components/pdf/PDFViewer'
 import PageLayout from '../../../shared/components/organisms/PageLayout'
+import { ConfirmationModal } from '../../../shared/components/organisms/ConfirmationModal'
 import GamePageHeader from './organisms/GamePageHeader'
 import GamePageFooter from './organisms/GamePageFooter'
 import { useLoadedSong } from '../hooks/usePdfSong'
@@ -9,7 +10,7 @@ import { useNavigation } from '../../../shared/context/NavigationContext'
 import { PAGE_NAME } from '../../../shared/constants/navigation'
 
 function useCurrentSongPositionInSelectedPack(song: { songId: number; pdfUrl: string | null } | null | undefined) {
-  const [songIndex, setSongIndex] = useState<number>(0)
+  const [songIndex, setSongIndex] = useState<number>(0);
 
   useEffect(() => {
     const loadSongIndex = async () => {
@@ -93,30 +94,40 @@ export default function GamePage(){
     loadPrevSong: loadPrevSongFromStorage,
   })
   const songIndex = useCurrentSongPositionInSelectedPack(song)
+  const playedSongs = getShownSongIds().length
   const { canGoPrevious, canGoNext } = useGameNavigationAvailability(song)
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
 
   return (
-    <PageLayout
-      rootClassName="game-page-root pdf-page overflow-hidden"
-      rootTestId="game-page"
-      header={(
-        <GamePageHeader
-          songIndex={songIndex}
-          songTitle={songTitle}
-          onNextSong={nextSong}
-          onPreviousSong={prevSong}
-          canGoPrevious={canGoPrevious}
-          canGoNext={canGoNext}
-          onOpenGameHistory={() => loadPage(PAGE_NAME.GAME_HISTORY)}
-          onEndGame={() => loadPage(PAGE_NAME.WELCOME)}
-        />
-      )}
-      footer={(
-        <GamePageFooter onNextSong={nextSong} disabled={!canGoNext} />
-      )}
-      skipMainWrapper
-    >
-      <PDFViewer base64={base64} scaleMode="fit-contain" />
-    </PageLayout>
+    <>
+      <ConfirmationModal
+        open={isConfirmationModalOpen}
+        onOpenChange={setIsConfirmationModalOpen}
+        title="Are you sure you want to end the game?"
+      />
+      <PageLayout
+        rootClassName="game-page-root pdf-page overflow-hidden"
+        rootTestId="game-page"
+        header={(
+          <GamePageHeader
+            songIndex={songIndex}
+            playedSongs={playedSongs}
+            songTitle={songTitle}
+            onNextSong={nextSong}
+            onPreviousSong={prevSong}
+            canGoPrevious={canGoPrevious}
+            canGoNext={canGoNext}
+            onOpenGameHistory={() => loadPage(PAGE_NAME.GAME_HISTORY)}
+            onEndGame={() => setIsConfirmationModalOpen(true)}
+            />
+          )}
+          footer={(
+            <GamePageFooter onNextSong={nextSong} disabled={!canGoNext} />
+          )}
+          skipMainWrapper
+          >
+        <PDFViewer base64={base64} scaleMode="fit-contain" />
+      </PageLayout>
+    </>
   )
 }
